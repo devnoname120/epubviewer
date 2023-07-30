@@ -14,7 +14,7 @@
   $annotations = $_['annotations'];
   $title = htmlentities(basename($downloadLink));
   $revision = '0048';
-  $version = \OC::$server->getAppManager()->getAppVersion('epubreader') . '.' . $revision;
+  $version = \OC::$server->getAppManager()->getAppVersion('epubviewer') . '.' . $revision;
 
   /* Mobile safari, the new IE6 */
   $idevice = (strstr($_SERVER['HTTP_USER_AGENT'],'iPhone')
@@ -28,28 +28,28 @@
 ?>
 
 <html dir="ltr">
-<head class="session" data-nonce='<?php p($nonce);?>' data-downloadlink='<?php print_unescaped($downloadLink);?>' data-fileid='<?php print_unescaped($fileId);?>' data-filetype='<?php print_unescaped($fileType);?>' data-filename='<?php print_unescaped($fileName);?>' data-version='<?php print_unescaped($version);?>' data-basepath='<?php p($urlGenerator->linkToRoute('epubreader.page.showReader'));?>' data-staticpath='<?php p($urlGenerator->linkTo('epubreader', ''));?>' data-scope='<?php print_unescaped($scope);?>' data-cursor='<?php print_unescaped($cursor);?>' data-defaults='<?php print_unescaped($defaults);?>' data-preferences='<?php print_unescaped($preferences);?>' data-metadata='<?php print_unescaped($metadata);?>' data-annotations='<?php print_unescaped($annotations);?>'>
+<head class="session" data-nonce='<?php p($nonce);?>' data-downloadlink='<?php print_unescaped($downloadLink);?>' data-fileid='<?php print_unescaped($fileId);?>' data-filetype='<?php print_unescaped($fileType);?>' data-filename='<?php print_unescaped($fileName);?>' data-version='<?php print_unescaped($version);?>' data-basepath='<?php p($urlGenerator->linkToRoute('epubviewer.page.showReader'));?>' data-staticpath='<?php p($urlGenerator->linkTo('epubviewer', ''));?>' data-scope='<?php print_unescaped($scope);?>' data-cursor='<?php print_unescaped($cursor);?>' data-defaults='<?php print_unescaped($defaults);?>' data-preferences='<?php print_unescaped($preferences);?>' data-metadata='<?php print_unescaped($metadata);?>' data-annotations='<?php print_unescaped($annotations);?>'>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <!-- <base href="<?php p($urlGenerator->linkTo('epubreader',''));?>"> -->
+        <!-- <base href="<?php p($urlGenerator->linkTo('epubviewer',''));?>"> -->
         <title>
             <?php p($title);?>
         </title>
-        <link rel="shortcut icon" href="<?php p($urlGenerator->linkTo('epubreader', 'img/book.png')) ?>">
-        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubreader', 'vendor/icomoon/style.css')) ?>?v=<?php p($version) ?>">
-        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubreader', 'vendor/cbrjs/css/cbr.css')) ?>?v=<?php p($version) ?>">
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/epubjs/libs/jquery.min.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/sindresorhus/screenfull.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/pixastic/pixastic_combined.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/bitjs/archive/archive.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/cbrjs/cbr.js')) ?>?v=<?php p($version) ?>"> </script>
+        <link rel="shortcut icon" href="<?php p($urlGenerator->linkTo('epubviewer', 'img/book.png')) ?>">
+        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/icomoon/style.css')) ?>?v=<?php p($version) ?>">
+        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/cbrjs/css/cbr.css')) ?>?v=<?php p($version) ?>">
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/epubjs/libs/jquery.min.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/sindresorhus/screenfull.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/pixastic/pixastic_combined.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/bitjs/archive/archive.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/cbrjs/cbr.js')) ?>?v=<?php p($version) ?>"> </script>
 
         <?php if ($idevice): ?>
-        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubreader', 'vendor/cbrjs/css/idevice.css')) ?>?v=<?php p($version) ?>">
+        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/cbrjs/css/idevice.css')) ?>?v=<?php p($version) ?>">
         <?php endif; ?>
 
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'js/ready.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'js/ready.js')) ?>?v=<?php p($version) ?>"> </script>
     </head>
 
     <body>
@@ -109,7 +109,7 @@
 
         <!-- loading overlay -->
         <div id="cbr-loading-overlay" class="cbr-control control overlay" name="loadingOverlay" style="display:none">
-            <img src="<?php p($urlGenerator->linkTo('epubreader', 'img/loading.gif')) ?>">
+            <img src="<?php p($urlGenerator->linkTo('epubviewer', 'img/loading.gif')) ?>">
         </div>
         <!-- /loading overlay -->
 

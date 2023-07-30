@@ -1,5 +1,5 @@
 OC.L10N.register(
-    "epubreader",
+    "epubviewer",
     {
     "Settings updated successfully." : "Innstillingene ble oppdatert.",
     "EPUB/CBZ/PDF ebook reader" : "EPUB/CBZ/PDF ebok-leser",

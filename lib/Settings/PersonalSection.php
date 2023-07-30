@@ -1,6 +1,6 @@
 <?php
 /**
- * ownCloud - Epubreader App
+ * ownCloud - Epubviewer App
  *
  * @author Frank de Lange
  * @copyright 2014,2018 Frank de Lange
@@ -9,7 +9,7 @@
  * later.
  */
 
-namespace OCA\Epubreader\Settings;
+namespace OCA\Epubviewer\Settings;
 
 use OCP\IL10N;
 use OCP\IURLGenerator;
@@ -35,7 +35,7 @@ class PersonalSection implements IIconSection
      */
     public function getIcon()
     {
-        return $this->urlGenerator->imagePath('epubreader', 'app.svg');
+        return $this->urlGenerator->imagePath('epubviewer', 'app.svg');
     }
 
     /**
@@ -45,7 +45,7 @@ class PersonalSection implements IIconSection
      */
     public function getID()
     {
-        return 'epubreader';
+        return 'epubviewer';
     }
 
     /**

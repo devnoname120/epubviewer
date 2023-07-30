@@ -8,7 +8,7 @@
  * See the COPYING-README file.
  */
 
-namespace OCA\Epubreader\Controller;
+namespace OCA\Epubviewer\Controller;
 
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -20,9 +20,9 @@ use OCP\Share\IManager;
 use OCP\Files\FileInfo;
 use OCP\Files\NotFoundException;
 
-use OCA\Epubreader\Service\BookmarkService;
-use OCA\Epubreader\Service\MetadataService;
-use OCA\Epubreader\Service\PreferenceService;
+use OCA\Epubviewer\Service\BookmarkService;
+use OCA\Epubviewer\Service\MetadataService;
+use OCA\Epubviewer\Service\PreferenceService;
 
 class PageController extends Controller {
 
@@ -75,7 +75,7 @@ class PageController extends Controller {
      */
     public function showReader() {
         $templates= [
-            'application/epub+zip' => 'epubreader',
+            'application/epub+zip' => 'epubviewer',
             'application/x-cbr' => 'cbreader',
             'application/pdf' => 'pdfreader'
         ];
@@ -133,7 +133,7 @@ class PageController extends Controller {
      * @param string $path path-fragment from url
      * @return array
      * @throws NotFoundException
-     */ 
+     */
     private function getFileInfo($path) {
         $count = 0;
         $shareToken = preg_replace("/(?:\/index\.php)?\/s\/([A-Za-z0-9]{15,32})\/download.*/", "$1", $path, 1,$count);
@@ -153,7 +153,7 @@ class PageController extends Controller {
                 } else {
                     throw new NotFoundException('Shared file path or name not set');
                 }
-            } 
+            }
             $filePath = $node->getPath();
             $fileId = $node->getId();
         } else {

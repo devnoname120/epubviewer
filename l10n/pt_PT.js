@@ -1,5 +1,5 @@
 OC.L10N.register(
-    "epubreader",
+    "epubviewer",
     {
     "disable extra-wide page turn areas" : "desativar areas de viragem de página extra-largas",
     "show page turn arrows" : "mostrar botões de virar a página",

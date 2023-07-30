@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\Epubreader\Migration;
+namespace OCA\Epubviewer\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;

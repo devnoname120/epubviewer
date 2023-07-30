@@ -8,7 +8,7 @@
  * See the COPYING-README file.
  */
 
-namespace OCA\Epubreader\Db;
+namespace OCA\Epubviewer\Db;
 
 use OCP\AppFramework\Db\Entity;
 

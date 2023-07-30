@@ -8,7 +8,7 @@
  * See the COPYING-README file.
  */
 
-namespace OCA\Epubreader\Service;
+namespace OCA\Epubviewer\Service;
 
 use OCP\App\IAppManager;
 
@@ -18,7 +18,7 @@ class MetadataService {
 
     /**
      * @param IAppManager $appManager
-     */ 
+     */
     public function __construct(IAppManager $appManager) {
         $this->appManager = $appManager;
     }
@@ -72,4 +72,4 @@ class MetadataService {
         return [];
     }
 }
- 
+

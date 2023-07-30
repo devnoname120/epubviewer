@@ -1,6 +1,6 @@
 <?php
 /**
- * ownCloud - Epubreader App
+ * ownCloud - Epubviewer App
  *
  * @author Frank de Lange
  * @copyright 2014,2018 Frank de Lange
@@ -9,7 +9,7 @@
  * later.
  */
 
-namespace OCA\Epubreader\Settings;
+namespace OCA\Epubviewer\Settings;
 
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Settings\ISettings;
@@ -38,11 +38,11 @@ class Personal implements ISettings
     {
 
         $parameters = [
-            'EpubEnable' => $this->configManager->getUserValue($this->userId, 'epubreader', 'epub_enable'),
-            'PdfEnable' => $this->configManager->getUserValue($this->userId, 'epubreader', 'pdf_enable'),
-			'CbxEnable' => $this->configManager->getUserValue($this->userId, 'epubreader', 'cbx_enable'),
+            'EpubEnable' => $this->configManager->getUserValue($this->userId, 'epubviewer', 'epub_enable'),
+            'PdfEnable' => $this->configManager->getUserValue($this->userId, 'epubviewer', 'pdf_enable'),
+			'CbxEnable' => $this->configManager->getUserValue($this->userId, 'epubviewer', 'cbx_enable'),
         ];
-        return new TemplateResponse('epubreader', 'settings-personal', $parameters, '');
+        return new TemplateResponse('epubviewer', 'settings-personal', $parameters, '');
     }
 
     /**
@@ -61,7 +61,7 @@ class Personal implements ISettings
      */
     public function getSection()
     {
-        return 'epubreader';
+        return 'epubviewer';
     }
 
     /**
@@ -71,7 +71,7 @@ class Personal implements ISettings
      */
     public function getSectionID()
     {
-        return 'epubreader';
+        return 'epubviewer';
     }
 
     /**

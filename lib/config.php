@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ownCloud - Epubreader App
+ * ownCloud - Epubviewer App
  *
  * @author Frank de Lange
  * @copyright 2014,2018 Frank de Lange
@@ -10,7 +10,7 @@
  * later.
  */
 
-namespace OCA\Epubreader;
+namespace OCA\Epubviewer;
 
 /**
  * Config class for Reader
@@ -25,7 +25,7 @@ class Config
 	 * @return string retrieved value or default
 	 */
 	public static function get($key, $default) {
-		return \OC::$server->getConfig()->getUserValue(\OC_User::getUser(), 'epubreader', $key, $default);
+		return \OC::$server->getConfig()->getUserValue(\OC_User::getUser(), 'epubviewer', $key, $default);
 	}
 
 	/**
@@ -36,7 +36,7 @@ class Config
 	 * @return bool success
 	 */
 	public static function set($key, $value) {
-		return \OC::$server->getConfig()->setUserValue(\OC_User::getUser(), 'epubreader', $key, $value);
+		return \OC::$server->getConfig()->setUserValue(\OC_User::getUser(), 'epubviewer', $key, $value);
 	}
 
 	/**
@@ -47,7 +47,7 @@ class Config
 	 * @return string retrieved value or default
 	 */
 	public static function getApp($key, $default) {
-		return \OC::$server->getConfig()->getAppValue('epubreader', $key, $default);
+		return \OC::$server->getConfig()->getAppValue('epubviewer', $key, $default);
 	}
 
 	/**
@@ -58,6 +58,6 @@ class Config
 	 * @return bool success
 	 */
 	public static function setApp($key, $value) {
-		return \OC::$server->getConfig()->setAppValue('epubreader', $key, $value);
+		return \OC::$server->getConfig()->setAppValue('epubviewer', $key, $value);
 	}
 }

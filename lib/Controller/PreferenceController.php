@@ -8,14 +8,14 @@
  * See the COPYING-README file.
  */
 
-namespace OCA\Epubreader\Controller;
+namespace OCA\Epubviewer\Controller;
 
 use OCP\IRequest;
 use OCP\IURLGenerator;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Controller;
 
-use OCA\Epubreader\Service\PreferenceService;
+use OCA\Epubviewer\Service\PreferenceService;
 
 class PreferenceController extends Controller {
 
@@ -46,7 +46,7 @@ class PreferenceController extends Controller {
      *
      * @param string $scope
      * @param int $fileId
-     * @param string $name if null, return all preferences for $scope + $fileId 
+     * @param string $name if null, return all preferences for $scope + $fileId
      *
 	 * @return array|\OCP\AppFramework\Http\JSONResponse
 	 */

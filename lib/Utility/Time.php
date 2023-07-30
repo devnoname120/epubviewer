@@ -8,7 +8,7 @@
  * See the COPYING-README file.
  */
 
-namespace OCA\Epubreader\Utility;
+namespace OCA\Epubviewer\Utility;
 
 class Time {
     public function getTime() {
@@ -24,4 +24,4 @@ class Time {
         return $secs . substr($millisecs, 2, 6);
     }
 
-} 
+}

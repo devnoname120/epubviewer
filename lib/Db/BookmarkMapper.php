@@ -8,12 +8,12 @@
  * See the COPYING-README file.
  */
 
-namespace OCA\Epubreader\Db;
+namespace OCA\Epubviewer\Db;
 
 
 use OCP\IDBConnection;
 
-use OCA\Epubreader\Utility\Time;
+use OCA\Epubviewer\Utility\Time;
 
 class BookmarkMapper extends ReaderMapper {
 

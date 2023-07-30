@@ -20,21 +20,21 @@ git push --tags
 # Wait a second for Github to ingest our data
 sleep 1
 cd /tmp
-rm -Rf epubreader-packaging && mkdir epubreader-packaging && cd epubreader-packaging
+rm -Rf epubviewer-packaging && mkdir epubviewer-packaging && cd epubviewer-packaging
 
 # Download the git file from github
-wget https://github.com/e-alfred/epubreader/archive/${RELEASE_VERSION}.tar.gz
+wget https://github.com/devnoname120/epubviewer/archive/${RELEASE_VERSION}.tar.gz
 tar xzf ${RELEASE_VERSION}.tar.gz
-mv epubreader-${RELEASE_VERSION} epubreader
+mv epubviewer-${RELEASE_VERSION} epubviewer
 
 # Drop unneeded files
 rm -Rf \
-	epubreader/js/devel \
-	epubreader/gulpfile.js \
-	epubreader/package.json \
-	epubreader/.ci \
-	epubreader/.tx \
-	epubreader/doc
+	epubviewer/js/devel \
+	epubviewer/gulpfile.js \
+	epubviewer/package.json \
+	epubviewer/.ci \
+	epubviewer/.tx \
+	epubviewer/doc
 
-tar cfz epubreader-${RELEASE_VERSION}.tar.gz epubreader
+tar cfz epubviewer-${RELEASE_VERSION}.tar.gz epubviewer
 echo "Release version "${RELEASE_VERSION}" is now ready."

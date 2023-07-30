@@ -1,5 +1,5 @@
 OC.L10N.register(
-    "epubreader",
+    "epubviewer",
     {
     "Settings updated successfully." : "Nustatymai sėkmingai atnaujinti.",
     "menu" : "meniu"

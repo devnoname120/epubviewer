@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ownCloud - Epubreader App
+ * ownCloud - Epubviewer App
  *
  * @author Frank de Lange
  * @copyright 2015 Frank de Lange
@@ -34,7 +34,7 @@ return ['routes' => [
     ['name' => 'preference#get', 'url' => '/preference/{fileId}/{scope}/{name}', 'verb' => 'GET', 'defaults' => ['name' => '']],
     ['name' => 'preference#set', 'url' => '/preference', 'verb' => 'POST'],
     ['name' => 'preference#delete', 'url' => '/preference/{fileId}/{scope}/{name}', 'verb' => 'DELETE'],
-	
+
 	// User Settings
 	['name' => 'settings#setPreference', 'url' => '/settings/set', 'verb' => 'POST'],
 ]];

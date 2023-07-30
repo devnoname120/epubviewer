@@ -8,9 +8,9 @@
  * See the COPYING-README file.
  */
 
-namespace OCA\Epubreader\Service;
+namespace OCA\Epubviewer\Service;
 
-use OCA\Epubreader\Db\ReaderMapper;
+use OCA\Epubviewer\Db\ReaderMapper;
 
 abstract class Service {
 

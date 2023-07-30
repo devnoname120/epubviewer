@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ownCloud - Epubreader App
+ * ownCloud - Epubviewer App
  *
  * @author Frank de Lange
  * @copyright 2014,2018 Frank de Lange
@@ -10,17 +10,17 @@
  * later.
  */
 
-namespace OCA\Epubreader\Controller;
+namespace OCA\Epubviewer\Controller;
 use OCP\IRequest;
 use OCP\IURLGenerator;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Controller;
-use OCA\Epubreader\Service\PreferenceService;
-use OCA\Epubreader\Config;
+use OCA\Epubviewer\Service\PreferenceService;
+use OCA\Epubviewer\Config;
 use OCP\AppFramework\Http\JSONResponse;
 
 class SettingsController extends Controller {
-	
+
 	private $urlGenerator;
     private $preferenceService;
 
@@ -39,7 +39,7 @@ class SettingsController extends Controller {
         $this->urlGenerator = $urlGenerator;
         $this->preferenceService = $preferenceService;
     }
-	
+
 	/**
      * @brief set preference for file type association
      *
@@ -53,7 +53,7 @@ class SettingsController extends Controller {
 	 */
     public function setPreference(string $EpubEnable, string $PdfEnable, string $CbxEnable) {
 
-		$l = \OC::$server->getL10N('epubreader');
+		$l = \OC::$server->getL10N('epubviewer');
 
 		Config::set('epub_enable', $EpubEnable);
 		Config::set('pdf_enable', $PdfEnable);

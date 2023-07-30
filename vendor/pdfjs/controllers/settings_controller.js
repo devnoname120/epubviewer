@@ -62,7 +62,7 @@ PDFJS.reader.SettingsController = function() {
         $close.show();
         $close.on("click", function () {
             reader.book.destroy();
-            parent.OCA.Epubreader.Plugin.hide();
+            parent.OCA.Epubviewer.Plugin.hide();
         });
     }
 

@@ -8,13 +8,13 @@
  * See the COPYING-README file.
  */
 
-namespace OCA\Epubreader\Db;
+namespace OCA\Epubviewer\Db;
 
 use OCP\IDBConnection;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\AppFramework\Db\Entity;
 
-use OCA\Epubreader\Utility\Time;
+use OCA\Epubviewer\Utility\Time;
 
 abstract class ReaderMapper extends QBMapper {
 
@@ -37,4 +37,4 @@ abstract class ReaderMapper extends QBMapper {
         $entity->setLastModified($this->time->getMicroTime());
         return parent::insert($entity);
     }
-} 
+}

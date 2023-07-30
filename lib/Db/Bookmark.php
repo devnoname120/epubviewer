@@ -8,7 +8,7 @@
  * See the COPYING-README file.
  */
 
-namespace OCA\Epubreader\Db;
+namespace OCA\Epubviewer\Db;
 
 use OCP\AppFramework\Db\Entity;
 
@@ -23,7 +23,7 @@ class Bookmark extends ReaderEntity implements \JsonSerializable {
     protected $lastModified;    // modification timestamp
 
     public function jsonSerialize() {
-        return [ 
+        return [
             'id' => $this->getId(),
             'userId' => $this->getUserId(),
             'fileId' => $this->getFileId(),

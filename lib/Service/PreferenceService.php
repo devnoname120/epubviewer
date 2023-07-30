@@ -8,9 +8,9 @@
  * See the COPYING-README file.
  */
 
-namespace OCA\Epubreader\Service;
+namespace OCA\Epubviewer\Service;
 
-use OCA\Epubreader\Db\PreferenceMapper;
+use OCA\Epubviewer\Db\PreferenceMapper;
 
 class PreferenceService extends Service {
 
@@ -30,7 +30,7 @@ class PreferenceService extends Service {
 
     /**
      * @brief get preference
-     * 
+     *
      * scope identifies preference source, i.e. which renderer the preference applies to
      * preference type is format-dependent, eg CFI for epub, page number for CBR/CBZ, etc
      *

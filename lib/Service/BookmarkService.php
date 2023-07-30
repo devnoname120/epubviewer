@@ -8,10 +8,10 @@
  * See the COPYING-README file.
  */
 
-namespace OCA\Epubreader\Service;
+namespace OCA\Epubviewer\Service;
 
 
-use OCA\Epubreader\Db\BookmarkMapper;
+use OCA\Epubviewer\Db\BookmarkMapper;
 
 class BookmarkService extends Service {
 
@@ -110,4 +110,4 @@ class BookmarkService extends Service {
         $this->delete($fileId, static::CURSOR, static::bookmark_type);
     }
 }
- 
+

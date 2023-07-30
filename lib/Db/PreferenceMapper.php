@@ -8,10 +8,10 @@
  * See the COPYING-README file.
  */
 
-namespace OCA\Epubreader\Db;
+namespace OCA\Epubviewer\Db;
 
 use OCP\DB\QueryBuilder\IQueryBuilder;
-use OCA\Epubreader\Utility\Time;
+use OCA\Epubviewer\Utility\Time;
 use OCP\IDBConnection;
 
 class PreferenceMapper extends ReaderMapper {
@@ -38,10 +38,10 @@ class PreferenceMapper extends ReaderMapper {
             ->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($this->userId)));
 
         if (!empty($name)) {
-            $query->andWhere($query->expr()->eq('name', $query->createNamedParameter($name)));						   
+            $query->andWhere($query->expr()->eq('name', $query->createNamedParameter($name)));
         }
 
-        return $this->findEntities($query); 
+        return $this->findEntities($query);
     }
 
     /**

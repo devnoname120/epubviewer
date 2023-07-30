@@ -14,7 +14,7 @@
   $annotations = $_['annotations'];
   $title = htmlentities(basename($downloadLink));
   $revision = '0072';
-  $version = \OC::$server->getAppManager()->getAppVersion('epubreader') . '.' . $revision;
+  $version = \OC::$server->getAppManager()->getAppVersion('epubviewer') . '.' . $revision;
 
   /* Mobile safari, the new IE6 */
   $idevice = (strstr($_SERVER['HTTP_USER_AGENT'],'iPhone')
@@ -28,38 +28,38 @@
 ?>
 
 <html dir="ltr">
-<head class="session" data-nonce='<?php p($nonce);?>' data-downloadlink='<?php print_unescaped($downloadLink);?>' data-fileid='<?php print_unescaped($fileId);?>' data-filetype='<?php print_unescaped($fileType);?>' data-filename='<?php print_unescaped($fileName);?>' data-version='<?php print_unescaped($version);?>' data-basepath='<?php p($urlGenerator->linkToRoute('epubreader.page.showReader'));?>' data-staticpath='<?php p($urlGenerator->linkTo('epubreader', ''));?>' data-scope='<?php print_unescaped($scope);?>' data-cursor='<?php print_unescaped($cursor);?>' data-defaults='<?php print_unescaped($defaults);?>' data-preferences='<?php print_unescaped($preferences);?>' data-metadata='<?php print_unescaped($metadata);?>' data-annotations='<?php print_unescaped($annotations);?>'>
+<head class="session" data-nonce='<?php p($nonce);?>' data-downloadlink='<?php print_unescaped($downloadLink);?>' data-fileid='<?php print_unescaped($fileId);?>' data-filetype='<?php print_unescaped($fileType);?>' data-filename='<?php print_unescaped($fileName);?>' data-version='<?php print_unescaped($version);?>' data-basepath='<?php p($urlGenerator->linkToRoute('epubviewer.page.showReader'));?>' data-staticpath='<?php p($urlGenerator->linkTo('epubviewer', ''));?>' data-scope='<?php print_unescaped($scope);?>' data-cursor='<?php print_unescaped($cursor);?>' data-defaults='<?php print_unescaped($defaults);?>' data-preferences='<?php print_unescaped($preferences);?>' data-metadata='<?php print_unescaped($metadata);?>' data-annotations='<?php print_unescaped($annotations);?>'>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <!-- <base href="<?php p($urlGenerator->linkTo('epubreader',''));?>"> -->
+        <!-- <base href="<?php p($urlGenerator->linkTo('epubviewer',''));?>"> -->
         <title>
             <?php p($title);?>
         </title>
-        <link rel="shortcut icon" href="<?php p($urlGenerator->linkTo('epubreader', 'img/book.png')) ?>">
-        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubreader', 'vendor/icomoon/style.css')) ?>?v=<?php p($version) ?>">
-        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubreader', 'vendor/epubjs/css/main.css')) ?>?v=<?php p($version) ?>">
-        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubreader', 'vendor/epubjs/css/sidebar.css')) ?>?v=<?php p($version) ?>">
-        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubreader', 'vendor/epubjs/css/popup.css')) ?>?v=<?php p($version) ?>">
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'js/lib/typedarray.min.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'js/lib/wgxpath.install.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/epubjs/libs/jquery.min.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/bartaz/jquery.highlight.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/jquery/put-delete.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/sindresorhus/screenfull.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/epubjs/libs/zip.min.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/epubjs/epub.min.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/epubjs/hooks.min.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/epubjs/hooks/extensions/highlight.js')) ?>?v=<?php p($version) ?>"> </script>
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/epubjs/reader.min.js')) ?>?v=<?php p($version) ?>"> </script>
+        <link rel="shortcut icon" href="<?php p($urlGenerator->linkTo('epubviewer', 'img/book.png')) ?>">
+        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/icomoon/style.css')) ?>?v=<?php p($version) ?>">
+        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/epubjs/css/main.css')) ?>?v=<?php p($version) ?>">
+        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/epubjs/css/sidebar.css')) ?>?v=<?php p($version) ?>">
+        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/epubjs/css/popup.css')) ?>?v=<?php p($version) ?>">
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'js/lib/typedarray.min.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'js/lib/wgxpath.install.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/epubjs/libs/jquery.min.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/bartaz/jquery.highlight.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/jquery/put-delete.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/sindresorhus/screenfull.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/epubjs/libs/zip.min.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/epubjs/epub.min.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/epubjs/hooks.min.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/epubjs/hooks/extensions/highlight.js')) ?>?v=<?php p($version) ?>"> </script>
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/epubjs/reader.min.js')) ?>?v=<?php p($version) ?>"> </script>
 
         <?php if ($idevice): ?>
-        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubreader', 'vendor/epubjs/css/idevice.css')) ?>?v=<?php p($version) ?>">
-        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'vendor/bgrins/spectrum.js')) ?>?v=<?php p($version) ?>"> </script>
-        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubreader', 'vendor/bgrins/spectrum.css')) ?>?v=<?php p($version) ?>">
+        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/epubjs/css/idevice.css')) ?>?v=<?php p($version) ?>">
+        <script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/bgrins/spectrum.js')) ?>?v=<?php p($version) ?>"> </script>
+        <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubviewer', 'vendor/bgrins/spectrum.css')) ?>?v=<?php p($version) ?>">
         <?php endif; ?>
 
-		<script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubreader', 'js/ready.js')) ?>?v=<?php p($version) ?>"> </script>
+		<script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'js/ready.js')) ?>?v=<?php p($version) ?>"> </script>
     </head>
     <body>
         <div id="outerContainer">
@@ -241,7 +241,7 @@
                         <span id="book-title">
                         </span>
                         <span id="title-separator">
-                              –  
+                              –
                         </span>
                         <span id="chapter-title">
                         </span>
@@ -282,7 +282,7 @@
                     </div>
                 </div>
                 <div id="loader">
-                    <img src="<?php p($urlGenerator->linkTo('epubreader', 'img/loading.gif')) ?>">
+                    <img src="<?php p($urlGenerator->linkTo('epubviewer', 'img/loading.gif')) ?>">
                 </div>
 
                 <!-- /navigation + viewer -->

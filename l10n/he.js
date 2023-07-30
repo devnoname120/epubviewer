@@ -1,5 +1,5 @@
 OC.L10N.register(
-    "epubreader",
+    "epubviewer",
     {
     "Settings updated successfully." : "ההגדרות עודכנו בהצלחה",
     "EPUB/CBZ/PDF ebook reader" : "קורא ספרים אלקטרוניים מסוג EPUB/CBZ/PDF",

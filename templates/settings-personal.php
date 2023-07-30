@@ -8,8 +8,8 @@
  * See the COPYING-README file.
  */
 
-script('epubreader', 'settings');
-style('epubreader', 'settings');
+script('epubviewer', 'settings');
+style('epubviewer', 'settings');
 
 ?>
 

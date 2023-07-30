@@ -8,12 +8,12 @@
  * See the COPYING-README file.
  */
 
-namespace OCA\Epubreader\Controller;
+namespace OCA\Epubviewer\Controller;
 
 use OCP\IRequest;
 use OCP\AppFramework\Controller;
 
-use OCA\Epubreader\Service\MetadataService;
+use OCA\Epubviewer\Service\MetadataService;
 
 class MetadataController extends Controller {
 

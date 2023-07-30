@@ -1,4 +1,4 @@
-epubreader
+epubviewer
 ------------
 
 Reader is an ebook reader based on pure javascript renderers. It works for publications formatted according to the following standards:
@@ -110,25 +110,25 @@ The same Android device showing a zoomed-in part of a page|![The same Android de
    [balaclark]: https://github.com/balaclark/HTML5-Comic-Book-Reader
    [PDF]: https://en.wikipedia.org/wiki/Portable_Document_Format
    [pdf.js]: https://github.com/mozilla/pdf.js
-   [SS01]: https://github.com/e-alfred/epubreader/blob/master/screenshots/epubreader-1.png?raw=true "Reader showing day/nighyt mode"
-   [SS02]: https://github.com/e-alfred/epubreader/blob/master/screenshots/epubreader-3.png?raw=true "Single page full screen on a small-screen device"
-   [SS03]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_17-21-39.jpg "Day mode color selector"
-   [SS04]: https://github.com/e-alfred/epubreader/blob/master/screenshots/screenshots/photo_2017-03-15_17-21-41.jpg?raw=true "Longing For that olde-time terminal feeling..."
-   [SS05]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_17-21-53.jpg "Full-text search"
-   [SS06]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_18-28-46.jpg "Small screen device, __maximize text area__ enabled"
-   [SS07]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_18-28-49.jpg?raw=true "Search on small-screen device"
-   [SS08]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_17-21-52.jpg?raw=true "As close to full-screen as you can get on iOS"
-   [SS09]: https://github.com/e-alfred/epubreader/blob/master/screenshots/Screenshot_2014-09-29-20-21-50.png?raw=true "Android supports true fullscreen (as do most other systems)"
-   [SS10]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_17-21-59.jpg?raw=true "iOS approximation of full screen, CBR"
-   [SS11]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_17-22-00.jpg?raw=true "The same book, now in landscape mode, switch to 2-page spread is automatic"
-   [SS12]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_17-22-01.jpg?raw=true "Sidebar open, showing index, landscape mode"
-   [SS13]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_17-22-02.jpg?raw=true "Sidebar open, showing index, portrait mode"
-   [SS14]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_17-22-05.jpg?raw=true "Image enhancement filters, desaturate (grayscale) active"
-   [SS15]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_17-22-08.jpg?raw=true "full screen (apart from iOS restrictions), controls hidden"
-   [SS16]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_17-22-10.jpg?raw=true "Same page, zoomed in"
-   [SS17]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_18-28-54.jpg?raw=true "Small-screen, low memory (Android) device showing full-page book cover"
-   [SS18]: https://github.com/e-alfred/epubreader/blob/master/screenshots/photo_2017-03-15_18-28-56.jpg?raw=true "The same Android device showing a zoomed-in part of a page"
-   [SS19]: https://github.com/e-alfred/epubreader/blob/master/screenshots/epubreader_PDF_001.png?raw=true "Search through a document, showing all results in the sidebar"
-   [SS20]: https://github.com/e-alfred/epubreader/blob/master/screenshots/epubreader_PDF_002.png?raw=true "Reader showing PDF Reference document in spread mode (pages side by side)"
-   [SS21]: https://github.com/e-alfred/epubreader/blob/master/screenshots/epubreader_PDF_005.png?raw=true "Dropdown showing page format options - spread, single page, page width and zoom options"
-   [SS22]: https://github.com/e-alfred/epubreader/blob/master/screenshots/epubreader_PDF_006.png?raw=true "Reader showing PDF in spread mode, thumbnails in the sidebar"
+   [SS01]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer-1.png?raw=true "Reader showing day/nighyt mode"
+   [SS02]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer-3.png?raw=true "Single page full screen on a small-screen device"
+   [SS03]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-21-39.jpg "Day mode color selector"
+   [SS04]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/screenshots/photo_2017-03-15_17-21-41.jpg?raw=true "Longing For that olde-time terminal feeling..."
+   [SS05]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-21-53.jpg "Full-text search"
+   [SS06]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_18-28-46.jpg "Small screen device, __maximize text area__ enabled"
+   [SS07]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_18-28-49.jpg?raw=true "Search on small-screen device"
+   [SS08]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-21-52.jpg?raw=true "As close to full-screen as you can get on iOS"
+   [SS09]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/Screenshot_2014-09-29-20-21-50.png?raw=true "Android supports true fullscreen (as do most other systems)"
+   [SS10]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-21-59.jpg?raw=true "iOS approximation of full screen, CBR"
+   [SS11]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-22-00.jpg?raw=true "The same book, now in landscape mode, switch to 2-page spread is automatic"
+   [SS12]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-22-01.jpg?raw=true "Sidebar open, showing index, landscape mode"
+   [SS13]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-22-02.jpg?raw=true "Sidebar open, showing index, portrait mode"
+   [SS14]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-22-05.jpg?raw=true "Image enhancement filters, desaturate (grayscale) active"
+   [SS15]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-22-08.jpg?raw=true "full screen (apart from iOS restrictions), controls hidden"
+   [SS16]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-22-10.jpg?raw=true "Same page, zoomed in"
+   [SS17]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_18-28-54.jpg?raw=true "Small-screen, low memory (Android) device showing full-page book cover"
+   [SS18]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_18-28-56.jpg?raw=true "The same Android device showing a zoomed-in part of a page"
+   [SS19]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer_PDF_001.png?raw=true "Search through a document, showing all results in the sidebar"
+   [SS20]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer_PDF_002.png?raw=true "Reader showing PDF Reference document in spread mode (pages side by side)"
+   [SS21]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer_PDF_005.png?raw=true "Dropdown showing page format options - spread, single page, page width and zoom options"
+   [SS22]: https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer_PDF_006.png?raw=true "Reader showing PDF in spread mode, thumbnails in the sidebar"
