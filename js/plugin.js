@@ -144,15 +144,37 @@ OC.Plugins.register('OCA.Files.FileList', OCA.Epubreader.Plugin);
 
 // FIXME: Hack for single public file view since it is not attached to the fileslist
 window.addEventListener('DOMContentLoaded', function () {
-    if ($('#isPublic').val()
-        && ($('#mimetype').val() === 'application/epub+zip'
-            || $('#mimetype').val() === 'application/pdf'
-            || $('#mimetype').val() === 'application/x-cbr')
-    ) {
-		var sharingToken = $('#sharingToken').val();
-		var downloadUrl = OC.generateUrl('/s/{token}/download', {token: sharingToken});
-		var viewer = OCA.Epubreader.Plugin;
-		var mime = $('#mimetype').val();
-		viewer.show(downloadUrl, mime, false);
+	var supported_mimetypes = ['application/epub+zip', 'application/pdf', 'application/x-cbr'];
+	if (!$('#isPublic').val() || !supported_mimetypes.includes($('#mimetype').val())
+	) {
+		return;
 	}
+
+	var sharingToken = $('#sharingToken').val();
+	var downloadUrl = OC.generateUrl('/s/{token}/download', {token: sharingToken});
+
+	var content = $('#files-public-content');
+	var footerElmt = document.querySelector('body > footer') || document.querySelector('#app-content > footer')
+	var mainContent = document.querySelector('#content')
+
+	var mime = $('#mimetype').val();
+	var viewerUrl = OC.generateUrl('/apps/epubreader/?file={file}&type={type}', {file: downloadUrl, type: mime});
+
+	// Create viewer frame
+	const viewerNode = document.createElement('iframe')
+	viewerNode.style.height = '100%'
+	viewerNode.style.width = '100%'
+	viewerNode.style.position = 'absolute'
+
+	// Inject viewer
+	content.empty()
+	content.append(viewerNode)
+	viewerNode.src = viewerUrl
+	footerElmt.style.display = 'none'
+	mainContent.style.minHeight = 'calc(100% - var(--header-height))' // Make the viewer take the whole height as the footer is now hidden.
+	// overwrite style in order to fix the viewer on public pages
+	mainContent.style.marginLeft = '0'
+	mainContent.style.marginRight = '0'
+	mainContent.style.width = '100%'
+	mainContent.style.borderRadius = 'unset'
 });
