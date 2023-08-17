@@ -34,12 +34,11 @@ See [README] for more exhaustive information on features and potential misfeatur
     <author>Frank de Lange</author>
     <author>e-alfred</author>
     <author>devnoname120</author>
-    <documentation>https://github.com/devnoname120/epubviewer</documentation>
     <category>files</category>
     <category>multimedia</category>
     <category>office</category>
-    <bugs>https://github.com/devnoname120/epubviewer</bugs>
     <website>https://github.com/devnoname120/epubviewer</website>
+    <bugs>https://github.com/devnoname120/epubviewer</bugs>
     <screenshot>https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer-1.png?raw=true</screenshot>
     <screenshot>https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer-3.png?raw=true</screenshot>
     <screenshot>https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer_PDF_005.png?raw=true</screenshot>
