@@ -22,15 +22,15 @@ class BookmarkController extends Controller {
     private $bookmarkService;
 
 	/**
-	 * @param string $AppName
+	 * @param string $appName
 	 * @param IRequest $request
      * @param BookmarkService $bookmarkService
 	 */
-    public function __construct($AppName,
+    public function __construct($appName,
                                 IRequest $request,
                                 BookmarkService $bookmarkService ) {
 
-        parent::__construct($AppName, $request);
+        parent::__construct($appName, $request);
         $this->bookmarkService = $bookmarkService;
     }
 

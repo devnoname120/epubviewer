@@ -21,13 +21,13 @@ class BookmarkMapper extends ReaderMapper {
 
     /**
      * @param IDbConnection $db
-     * @param $UserId
+     * @param $userId
      * @param Time $time
      */
-    public function __construct(IDBConnection $db, $UserId, Time $time) {
+    public function __construct(IDBConnection $db, $userId, Time $time) {
         parent::__construct($db, 'reader_bookmarks', Bookmark::class, $time);
-        /** @var int $UserId */
-        $this->userId = $UserId;
+        /** @var int $userId */
+        $this->userId = $userId;
     }
 
     /**

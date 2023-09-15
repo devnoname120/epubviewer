@@ -16,9 +16,9 @@ use OCP\IDBConnection;
 
 class PreferenceMapper extends ReaderMapper {
 
-    public function __construct(IDBConnection $db, $UserId, Time $time) {
+    public function __construct(IDBConnection $db, $userId, Time $time) {
         parent::__construct($db, 'reader_prefs', Preference::class, $time);
-        $this->userId = $UserId;
+        $this->userId = $userId;
     }
 
     /**

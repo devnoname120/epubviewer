@@ -37,31 +37,31 @@ class PageController extends Controller {
     private $preferenceService;
 
     /**
-     * @param string $AppName
+     * @param string $appName
      * @param IRequest $request
      * @param IURLGenerator $urlGenerator
      * @param IRootFolder $rootFolder
      * @param IManager $shareManager
-     * @param string $UserId
+     * @param string $userId
      * @param BookmarkService $bookmarkService
      * @param PreferenceService $preferenceService
      * @param MetadataService $metadataService
      */
     public function __construct(
-            $AppName,
+            $appName,
             IRequest $request,
             IURLGenerator $urlGenerator,
             IRootFolder $rootFolder,
             IManager $shareManager,
-            $UserId,
+            $userId,
             BookmarkService $bookmarkService,
             PreferenceService $preferenceService,
             MetadataService $metadataService) {
-        parent::__construct($AppName, $request);
+        parent::__construct($appName, $request);
         $this->urlGenerator = $urlGenerator;
         $this->rootFolder = $rootFolder;
         $this->shareManager = $shareManager;
-        $this->userId = $UserId;
+        $this->userId = $userId;
         $this->bookmarkService = $bookmarkService;
         $this->metadataService = $metadataService;
         $this->preferenceService = $preferenceService;

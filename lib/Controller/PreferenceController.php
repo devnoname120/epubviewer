@@ -23,17 +23,17 @@ class PreferenceController extends Controller {
     private $preferenceService;
 
     /**
-     * @param string $AppName
+     * @param string $appName
      * @param IRequest $request
      * @param IURLGenerator $urlGenerator
      * @param PreferenceService $preferenceService
      */
-    public function __construct($AppName,
+    public function __construct($appName,
                                 IRequest $request,
                                 IURLGenerator $urlGenerator,
                                 PreferenceService $preferenceService ) {
 
-		parent::__construct($AppName, $request);
+		parent::__construct($appName, $request);
         $this->urlGenerator = $urlGenerator;
         $this->preferenceService = $preferenceService;
     }

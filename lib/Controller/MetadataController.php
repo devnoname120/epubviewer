@@ -20,15 +20,15 @@ class MetadataController extends Controller {
     private $metadataService;
 
 	/**
-	 * @param string $AppName
+	 * @param string $appName
 	 * @param IRequest $request
      * @param MetadataService $metadataService
 	 */
-    public function __construct($AppName,
+    public function __construct($appName,
                                 IRequest $request,
                                 MetadataService $metadataService ) {
 
-		parent::__construct($AppName, $request);
+		parent::__construct($appName, $request);
         $this->metadataService = $metadataService;
     }
 

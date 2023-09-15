@@ -22,10 +22,10 @@ class BookmarkService extends Service {
     private $bookmarkMapper;
     private $userId;
 
-    public function __construct(BookmarkMapper $bookmarkMapper, $UserId) {
+    public function __construct(BookmarkMapper $bookmarkMapper, $userId) {
         parent::__construct($bookmarkMapper);
         $this->bookmarkMapper = $bookmarkMapper;
-        $this->userId = $UserId;
+        $this->userId = $userId;
     }
 
     /**
