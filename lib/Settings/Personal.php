@@ -38,9 +38,9 @@ class Personal implements ISettings
     {
 
         $parameters = [
-            'EpubEnable' => $this->configManager->getUserValue($this->userId, 'epubviewer', 'epub_enable'),
-            'PdfEnable' => $this->configManager->getUserValue($this->userId, 'epubviewer', 'pdf_enable'),
-			'CbxEnable' => $this->configManager->getUserValue($this->userId, 'epubviewer', 'cbx_enable'),
+            'EpubEnable' => $this->configManager->getUserValue($this->userId, 'epubviewer', 'epub_enable', 'true'),
+            'PdfEnable' => $this->configManager->getUserValue($this->userId, 'epubviewer', 'pdf_enable', 'false'),
+			'CbxEnable' => $this->configManager->getUserValue($this->userId, 'epubviewer', 'cbx_enable', 'true'),
         ];
         return new TemplateResponse('epubviewer', 'settings-personal', $parameters, '');
     }
