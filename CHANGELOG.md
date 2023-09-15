@@ -1,3 +1,17 @@
+## 1.5.1 - 2023-09-15
+### Fixed
+- Settings: the default file association settings were not properly displayed, misleading the user into thinking that by default the app was not associated with any file type. The settings now display the correct defaults.
+
+## 1.5.0 - 2023-08-17
+### Added
+- EPUB/CBZ: viewer is now inlined when opening a shared EPUB. This matches the behavior of the official PDF viewer: https://github.com/nextcloud/files\_pdfviewer
+
+### Changed
+- PDF: disabled PDF file association by default in the app settings. Users are advised to use the official PDF viewer instead: https://github.com/nextcloud/files\_pdfviewer
+
+### Fixed
+ - various bugs that made it incompatible with NextCloud ≥ 22. It now works on NextCloud 26 and 27.
+
 ## 1.2.3 - 2018-02-24
 ### Fixed
  - (#76) typo plus some missing code kept Reader from being used to preview shared files
