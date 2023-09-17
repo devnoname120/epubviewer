@@ -15,6 +15,9 @@ namespace OCA\Epubviewer\AppInfo;
 use OCP\AppFramework\App;
 use OCP\Util;
 
+// Register the composer autoloader for packages shipped by this app, if applicable
+include_once __DIR__ . '/../vendor/autoload.php';
+
 $l = \OC::$server->getL10N('epubviewer');
 
 \OCA\Epubviewer\Hooks::register();

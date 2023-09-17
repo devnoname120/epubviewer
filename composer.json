@@ -1,0 +1,24 @@
+{
+    "name": "devnoname120/epubviewer",
+    "description": "EPUB/CBR/PDF reader app for Nextcloud",
+    "type": "project",
+    "license": "AGPL-3.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "OCA\\Epubviewer\\": "lib/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Paul",
+            "email": "devnoname120@gmail.com"
+        }
+    ],
+    "require": {},
+    "config": {
+      "autoloader-suffix": "Epubviewer",
+      "platform": {
+        "php": "7.4"
+      }
+    }
+}
