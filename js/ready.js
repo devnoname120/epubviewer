@@ -114,10 +114,13 @@ document.onreadystatechange = function () {
     function renderEpub(file, options) {
 
         // some parameters...
-        EPUBJS.filePath = "vendor/epubjs/";
-        EPUBJS.cssPath = "vendor/epubjs/css/";
-        EPUBJS.basePath = $('.session').data('basepath');
-		EPUBJS.staticPath = $('.session').data('staticpath');
+        EPUBJS.filePath = location.origin + $('.session').data('staticpath') + "vendor/epubjs/";
+        
+        // epub.js forcibly prepends EPUBJS.basePath to the cssPath.
+        // We use a relative link with .. to get rid of this incorrect path.
+        EPUBJS.cssPath = '../..' + $('.session').data('staticpath') + "vendor/epubjs/css/";
+        EPUBJS.basePath = location.origin + $('.session').data('basepath');
+		EPUBJS.staticPath = location.origin + $('.session').data('staticpath');
 
         /* device-specific boilerplate */
 
