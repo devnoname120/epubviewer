@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'devnoname120/epubviewer',
-        'pretty_version' => '1.5.2',
-        'version' => '1.5.2.0',
+        'pretty_version' => '1.5.3',
+        'version' => '1.5.3.0',
         'reference' => NULL,
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
@@ -11,8 +11,8 @@
     ),
     'versions' => array(
         'devnoname120/epubviewer' => array(
-            'pretty_version' => '1.5.2',
-            'version' => '1.5.2.0',
+            'pretty_version' => '1.5.3',
+            'version' => '1.5.3.0',
             'reference' => NULL,
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',

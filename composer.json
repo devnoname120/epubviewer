@@ -1,7 +1,7 @@
 {
     "name": "devnoname120/epubviewer",
     "description": "EPUB/CBR/PDF reader app for Nextcloud",
-    "version": "1.5.2",
+    "version": "1.5.3",
     "type": "project",
     "license": "AGPL-3.0-or-later",
     "autoload": {

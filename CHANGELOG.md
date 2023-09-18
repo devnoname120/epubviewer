@@ -1,3 +1,8 @@
+## 1.5.3 - 2023-09-18
+### Fixed
+- (#4) EPUB: fixed fullscreen mode. Nothing was happening when clicking on the fullscreen button within the viewer.
+- EPUB: fixed annotation tooltips not showing due to a bug in the library `epub.js`.
+
 ## 1.5.2 - 2023-09-18
 ### Fixed
 - (#3) NextCloud: a [cache bug in NextCloud's autoloader](https://github.com/nextcloud/server/issues/38797) broke the app on upgrade. We now use a custom Composer autoloader in order to work around this and future bugs that NextCloud will introduce in their autoloader.
