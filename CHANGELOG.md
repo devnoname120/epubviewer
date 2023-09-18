@@ -1,3 +1,7 @@
+## 1.5.2 - 2023-09-18
+### Fixed
+- (#3) NextCloud: a [cache bug in NextCloud's autoloader](https://github.com/nextcloud/server/issues/38797) broke the app on upgrade. We now use a custom Composer autoloader in order to work around this and future bugs that NextCloud will introduce in their autoloader.
+
 ## 1.5.1 - 2023-09-15
 ### Fixed
 - Settings: the default file association settings were not properly displayed, misleading the user into thinking that by default the app was not associated with any file type. The settings now display the correct defaults.
