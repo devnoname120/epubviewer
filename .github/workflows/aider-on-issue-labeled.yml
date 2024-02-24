@@ -5,14 +5,11 @@ on:
 
 jobs:
   generate:
-    uses: mirrajabi/aider-github-workflows/.github/workflows/aider-issue-to-pr.yml@main
+    uses: mirrajabi/aider-github-action/.github/workflows/aider-issue-to-pr.yml@main
+    # Check if the label is 'aider'
     if: github.event.label.name == 'aider'
     with:
       issue-number: ${{ github.event.issue.number }}
       base-branch: ${{ github.event.repository.default_branch }}
     secrets: 
       openai_api_key: ${{ secrets.OPENAI_API_KEY }}
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
