@@ -13,6 +13,44 @@ PDF is handled by Mozilla's [pdf.js] renderer in combination with a custom reade
 
 CBR and CBZ are supported using a custom renderer inspired by [balaclark]'s work. As with Epub, books can be navigated using the keyboard as well as mouse or touch navigation. Reader generates a visual index of all pages, show in the sidebar (thumbnail generation can be disabled for low-memory and/or -speed devices). As CBx files are often of varying quality, a set of image enhancement filters are provided.
 
+# Development
+
+## GitHub codespaces
+
+- Go to https://codespaces.new/nextcloud/server and use the default settings. It takes around 5 minutes to initialize. Then it starts automatically.
+- In the Codespace vscode interface, click on the burger menu on the upper left corner → `Terminal` → `Ne Terminal` and then run the following in the newly-open terminal:
+
+```shell
+cd /var/www/html/apps
+git clone https://github.com/devnoname120/epubviewer
+```
+
+- Click on the `PORTS` tab, then right-click on port 80 and then `Open in Browser`.
+- Log in (username: `admin`, password: `admin`).
+- Enable the `EPUB viewer` app from `Apps` → `Your Apps` → `EPUB Viewer`.
+
+
+## Local
+
+- Download and run Nextcloud:
+
+```shell
+git clone https://github.com/juliushaertl/nextcloud-docker-dev
+cd nextcloud-docker-dev
+./bootstrap.sh
+
+docker compose up -d nextcloud
+
+cd workspace/server/apps-extra
+git clone https://github.com/devnoname120/epubviewer
+cd epubviewer
+```
+
+- Open http://nextcloud.local and log in (username: `admin`, password: `admin`)
+
+- Enable the [`EPUB viewer`](http://nextcloud.local/index.php/settings/apps/installed/epubviewer) app from `Apps` → `Your Apps` → `EPUB Viewer`.
+
+
 # Features
 Reader remembers the last-visited page in a book and returns to that page when the book is re-opened. As all settings are stored on the server these features are device-independent, ie. you can start reading on a mobile device, continue on a PC to finish the book on a tablet.
 
