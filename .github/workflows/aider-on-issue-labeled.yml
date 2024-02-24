@@ -12,3 +12,7 @@ jobs:
       base-branch: ${{ github.event.repository.default_branch }}
     secrets: 
       openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
