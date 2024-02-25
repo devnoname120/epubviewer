@@ -15,34 +15,39 @@ use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
-class Application extends App implements IBootstrap {
-	public const APP_ID = 'epubviewer';
+class Application extends App implements IBootstrap
+{
+    public const APP_ID = 'epubviewer';
 
-	public function __construct() {
-		parent::__construct(self::APP_ID);
-	}
+    public function __construct()
+    {
+        parent::__construct(self::APP_ID);
+    }
 
 
-	public function register(IRegistrationContext $context): void {
-		/*
-		 * For further information about the app bootstrapping, please refer to our documentation:
-		 * https://docs.nextcloud.com/server/latest/developer_manual/app_development/bootstrap.html
-		 */
+    public function register(IRegistrationContext $context): void
+    {
+        /*
+         * For further information about the app bootstrapping, please refer to our documentation:
+         * https://docs.nextcloud.com/server/latest/developer_manual/app_development/bootstrap.html
+         */
 
-    // Register the composer autoloader for packages shipped by this app, if applicable
-    include_once __DIR__ . '/../../vendor/autoload.php';
+        // Register the composer autoloader for packages shipped by this app, if applicable
+        include_once __DIR__ . '/../../vendor/autoload.php';
 
         $context->registerEventListener(LoadAdditionalScriptsEvent::class, LoadAdditionalListener::class);
 
-    $l = \OC::$server->getL10N('epubviewer');
+        $l = \OC::$server->getL10N('epubviewer');
 //    Hooks::register();
-	}
+    }
 
-	public function boot(IBootContext $context): void {
-		/*
-		 * For further information about the app bootstrapping, please refer to our documentation:
-		 * https://docs.nextcloud.com/server/latest/developer_manual/app_development/bootstrap.html
-		 */
-    Util::addInitScript(Application::APP_ID, 'plugin');
-	}
+    public function boot(IBootContext $context): void
+    {
+        /*
+         * For further information about the app bootstrapping, please refer to our documentation:
+         * https://docs.nextcloud.com/server/latest/developer_manual/app_development/bootstrap.html
+         */
+
+        Util::addInitScript(Application::APP_ID, 'plugin');
+    }
 }

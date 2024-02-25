@@ -8,5 +8,6 @@ namespace OCA\Epubviewer\Controller;
 
 use Closure;
 
-trait Errors {
+trait Errors
+{
 }

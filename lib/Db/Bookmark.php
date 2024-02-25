@@ -12,7 +12,8 @@ namespace OCA\Epubviewer\Db;
 
 use OCP\AppFramework\Db\Entity;
 
-class Bookmark extends ReaderEntity implements \JsonSerializable {
+class Bookmark extends ReaderEntity implements \JsonSerializable
+{
 
     protected $userId;  // user
     protected $fileId;  // book (identified by fileId) for which this mark is valid
@@ -22,7 +23,8 @@ class Bookmark extends ReaderEntity implements \JsonSerializable {
     protected $content; // bookmark content (annotations, etc.), can be empty
     protected $lastModified;    // modification timestamp
 
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return [
             'id' => $this->getId(),
             'userId' => $this->getUserId(),
@@ -35,7 +37,8 @@ class Bookmark extends ReaderEntity implements \JsonSerializable {
         ];
     }
 
-    public function toService() {
+    public function toService()
+    {
         return [
             'name' => $this->getName(),
             'type' => $this->getType(),

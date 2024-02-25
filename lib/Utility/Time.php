@@ -10,8 +10,10 @@
 
 namespace OCA\Epubviewer\Utility;
 
-class Time {
-    public function getTime() {
+class Time
+{
+    public function getTime()
+    {
         return time();
     }
 
@@ -19,7 +21,8 @@ class Time {
      *
      * @return int the current unix time in milliseconds
      */
-    public function getMicroTime() {
+    public function getMicroTime()
+    {
         list($millisecs, $secs) = explode(" ", microtime());
         return $secs . substr($millisecs, 2, 6);
     }

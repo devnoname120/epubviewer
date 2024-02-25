@@ -12,7 +12,8 @@ namespace OCA\Epubviewer\Db;
 
 use OCP\AppFramework\Db\Entity;
 
-class Preference extends ReaderEntity implements \JsonSerializable {
+class Preference extends ReaderEntity implements \JsonSerializable
+{
 
     protected $userId;  // user for whom this preference is valid
     protected $scope;   // scope (default or specific renderer)
@@ -21,7 +22,8 @@ class Preference extends ReaderEntity implements \JsonSerializable {
     protected $value;   // preference value
     protected $lastModified;    // modification timestamp
 
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return [
             'id' => $this->getId(),
             'scope' => $this->getScope(),
@@ -32,7 +34,8 @@ class Preference extends ReaderEntity implements \JsonSerializable {
         ];
     }
 
-    public function toService() {
+    public function toService()
+    {
         return [
             'name' => $this->getName(),
             'value' => $this->conditional_json_decode($this->getValue()),

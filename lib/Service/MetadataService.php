@@ -12,14 +12,16 @@ namespace OCA\Epubviewer\Service;
 
 use OCP\App\IAppManager;
 
-class MetadataService {
+class MetadataService
+{
 
     private $appManager;
 
     /**
      * @param IAppManager $appManager
      */
-    public function __construct(IAppManager $appManager) {
+    public function __construct(IAppManager $appManager)
+    {
         $this->appManager = $appManager;
     }
 
@@ -31,7 +33,8 @@ class MetadataService {
      *
      * @return array
      */
-    public function get($fileId, $name=null) {
+    public function get($fileId, $name = null)
+    {
         if ($this->appManager->isInstalled('files_opds')) {
             if ($meta = \OCA\Files_Opds\Meta::get($fileId)) {
                 if (!empty($name) && array_key_exists($name, $meta)) {
@@ -53,7 +56,8 @@ class MetadataService {
      *
      * @return array
      */
-    public function setAll($fileId, $value) {
+    public function setAll($fileId, $value)
+    {
         // no-op for now
         return [];
     }
@@ -67,7 +71,8 @@ class MetadataService {
      *
      * @return array
      */
-    public function set($fileId, $name, $value) {
+    public function set($fileId, $name, $value)
+    {
         // no-op for now
         return [];
     }

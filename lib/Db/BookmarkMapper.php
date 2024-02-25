@@ -15,7 +15,8 @@ use OCP\IDBConnection;
 
 use OCA\Epubviewer\Utility\Time;
 
-class BookmarkMapper extends ReaderMapper {
+class BookmarkMapper extends ReaderMapper
+{
 
     private $userId;
 
@@ -24,7 +25,8 @@ class BookmarkMapper extends ReaderMapper {
      * @param $userId
      * @param Time $time
      */
-    public function __construct(IDBConnection $db, $userId, Time $time) {
+    public function __construct(IDBConnection $db, $userId, Time $time)
+    {
         parent::__construct($db, 'reader_bookmarks', Bookmark::class, $time);
         /** @var int $userId */
         $this->userId = $userId;
@@ -36,7 +38,8 @@ class BookmarkMapper extends ReaderMapper {
      * @param string $name
      * @return array
      */
-    public function get($fileId, $name, $type = null) {
+    public function get($fileId, $name, $type = null)
+    {
         $query = $this->db->getQueryBuilder();
         $query->select('*')
             ->from($this->getTableName())
@@ -63,11 +66,12 @@ class BookmarkMapper extends ReaderMapper {
      *
      * @return Bookmark the newly created or updated bookmark
      */
-    public function set($fileId, $name, $value, $type, $content=null) {
+    public function set($fileId, $name, $value, $type, $content = null)
+    {
 
         $result = $this->get($fileId, $name);
 
-        if(empty($result)) {
+        if (empty($result)) {
 
             // anonymous bookmarks are named after their contents
             if (null === $name) {
@@ -100,22 +104,24 @@ class BookmarkMapper extends ReaderMapper {
     }
 
     /* currently not used */
-    public function deleteForFileId($fileId) {
+    public function deleteForFileId($fileId)
+    {
         $sql = "SELECT * FROM `*PREFIX*reader_bookmarks` WHERE file_id=?";
-        $args = [ $fileId ];
+        $args = [$fileId];
         array_map(
-            function($entity) {
+            function ($entity) {
                 $this->delete($entity);
             }, $this->findEntities($sql, $args)
         );
     }
 
     /* currently not used */
-    public function deleteForUserId($userId) {
+    public function deleteForUserId($userId)
+    {
         $sql = "SELECT * FROM `*PREFIX*reader_bookmarks` WHERE user_id=?";
-        $args = [ $userId ];
+        $args = [$userId];
         array_map(
-            function($entity) {
+            function ($entity) {
                 $this->delete($entity);
             }, $this->findEntities($sql, $args)
         );

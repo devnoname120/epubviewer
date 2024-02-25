@@ -13,7 +13,8 @@ namespace OCA\Epubviewer\Service;
 
 use OCA\Epubviewer\Db\BookmarkMapper;
 
-class BookmarkService extends Service {
+class BookmarkService extends Service
+{
 
     // "bookmark" name to use for the cursor (current reading position)
     const CURSOR = '__CURSOR__';
@@ -22,7 +23,8 @@ class BookmarkService extends Service {
     private $bookmarkMapper;
     private $userId;
 
-    public function __construct(BookmarkMapper $bookmarkMapper, $userId) {
+    public function __construct(BookmarkMapper $bookmarkMapper, $userId)
+    {
         parent::__construct($bookmarkMapper);
         $this->bookmarkMapper = $bookmarkMapper;
         $this->userId = $userId;
@@ -38,10 +40,11 @@ class BookmarkService extends Service {
      *
      * @return array
      */
-    public function get($fileId, $name=null, $type=null) {
+    public function get($fileId, $name = null, $type = null)
+    {
         $result = $this->bookmarkMapper->get($fileId, $name, $type);
         return array_map(
-            function($entity) {
+            function ($entity) {
                 return $entity->toService();
             }, $result);
     }
@@ -57,7 +60,8 @@ class BookmarkService extends Service {
      *
      * @return array
      */
-    public function set($fileId, $name, $value, $type=null, $content=null) {
+    public function set($fileId, $name, $value, $type = null, $content = null)
+    {
         return $this->bookmarkMapper->set($fileId, $name, $value, $type, $content);
     }
 
@@ -68,7 +72,8 @@ class BookmarkService extends Service {
      *
      * @return array
      */
-    public function getCursor($fileId) {
+    public function getCursor($fileId)
+    {
         $result = $this->get($fileId, static::CURSOR);
         if (count($result) === 1) {
             return $result[0];
@@ -83,7 +88,8 @@ class BookmarkService extends Service {
      *
      * @return array
      */
-    public function setCursor($fileId, $value) {
+    public function setCursor($fileId, $value)
+    {
         return $this->bookmarkMapper->set($fileId, static::CURSOR, $value, static::bookmark_type);
     }
 
@@ -94,7 +100,8 @@ class BookmarkService extends Service {
      * @param string $name
      *
      */
-    public function delete($fileId, $name, $type=null) {
+    public function delete($fileId, $name, $type = null)
+    {
         foreach ($this->bookmarkMapper->get($fileId, $name, $type) as $bookmark) {
             $this->bookmarkMapper->delete($bookmark);
         }
@@ -106,7 +113,8 @@ class BookmarkService extends Service {
      * @param int $fileId
      *
      */
-    public function deleteCursor($fileId) {
+    public function deleteCursor($fileId)
+    {
         $this->delete($fileId, static::CURSOR, static::bookmark_type);
     }
 }
