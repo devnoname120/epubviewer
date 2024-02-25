@@ -1,67 +1,66 @@
-import {generateFilePath, generateUrl} from '@nextcloud/router'
-import {FileAction, registerFileAction, Permission, Node} from "@nextcloud/files";
+import { generateFilePath, generateUrl } from '@nextcloud/router';
+import { FileAction, registerFileAction, Permission, type Node } from '@nextcloud/files';
 
 // TODO: use i10n for strings:
 // import { translate as t, translatePlural as n } from '@nextcloud/l10n'
 
-
-function hideControls() {
-    $('#app-content #controls').hide();
-    // and, for NC12...
-    $('#app-navigation').css("display", "none");
+function hideControls () {
+  $('#app-content #controls').hide();
+  // and, for NC12...
+  $('#app-navigation').css('display', 'none');
 }
 
-function hide() {
-    if ($('#fileList').length) {
-        // FileList.setViewerMode(false);
-    }
-    $("#controls").show();
-    $('#app-content #controls').removeClass('hidden');
-    // NC12...
-    $('#app-navigation').css("display", "");
-    if ($('#isPublic').val()) {
-        $('#imgframe').show();
-        $('footer').show();
-        $('.directLink').show();
-        $('.directDownload').show();
-    }
-    $('iframe').remove();
-    $('body').off('focus.filesreader');
-    $(window).off('popstate.filesreader');
+function hide () {
+  if ($('#fileList').length) {
+    // FileList.setViewerMode(false);
+  }
+  $('#controls').show();
+  $('#app-content #controls').removeClass('hidden');
+  // NC12...
+  $('#app-navigation').css('display', '');
+  if ($('#isPublic').val()) {
+    $('#imgframe').show();
+    $('footer').show();
+    $('.directLink').show();
+    $('.directDownload').show();
+  }
+  $('iframe').remove();
+  $('body').off('focus.filesreader');
+  $(window).off('popstate.filesreader');
 }
 
-function show(downloadUrl: string, mimeType: string, isFileList: boolean) {
-    var viewer = generateUrl('/apps/epubviewer/?file={file}&type={type}', {file: downloadUrl, type: mimeType});
-    // launch in new window on all devices
-    window.open(viewer, downloadUrl);
+function show (downloadUrl: string, mimeType: string, isFileList: boolean) {
+  const viewer = generateUrl('/apps/epubviewer/?file={file}&type={type}', { file: downloadUrl, type: mimeType });
+  // launch in new window on all devices
+  window.open(viewer, downloadUrl);
 }
 
-function actionHandler(file: Node, mime: string, dir: string) {
-    var downloadUrl = '';
-    if ($('#isPublic').val()) {
-        var sharingToken = $('#sharingToken').val();
-        downloadUrl = generateUrl('/s/{token}/download?files={files}&path={path}', {
-            token: sharingToken,
-            files: file.basename,
-            path: dir
-        });
-    } else {
-        downloadUrl = file.source  // Files.getDownloadUrl(fileName, dir);
-    }
-    show(downloadUrl, mime, true);
+function actionHandler (file: Node, mime: string, dir: string) {
+  let downloadUrl = '';
+  if ($('#isPublic').val()) {
+    const sharingToken = $('#sharingToken').val();
+    downloadUrl = generateUrl('/s/{token}/download?files={files}&path={path}', {
+      token: sharingToken,
+      files: file.basename,
+      path: dir
+    });
+  } else {
+    downloadUrl = file.source; // Files.getDownloadUrl(fileName, dir);
+  }
+  show(downloadUrl, mime, true);
 }
 
 registerFileAction(new FileAction({
-    id: 'view-epub',
-    iconSvgInline: () => "<svg></svg>",
-    displayName: () => 'View',
-    enabled(nodes) {
-        return nodes.filter((node) => (node.permissions & Permission.READ) !== 0).length > 0
-    },
-    exec: async function (file, view, dir) {
-        actionHandler(file, 'application/epub+zip', dir);
-        return true;
-    }
+  id: 'view-epub',
+  iconSvgInline: () => '<svg></svg>',
+  displayName: () => 'View',
+  enabled (nodes) {
+    return nodes.filter((node) => (node.permissions & Permission.READ) !== 0).length > 0;
+  },
+  exec: async function (file, view, dir) {
+    actionHandler(file, 'application/epub+zip', dir);
+    return true;
+  }
 }));
 
 // // FIXME: Hack for single public file view since it is not attached to the fileslist
