@@ -45,9 +45,15 @@ function actionHandler (file: Node, mime: string, dir: string) {
       path: dir
     });
   } else {
-    downloadUrl = file.source; // Files.getDownloadUrl(fileName, dir);
+
+    downloadUrl = getAbsolutePath(file.source);
   }
   show(downloadUrl, mime, true);
+}
+
+function getAbsolutePath(url: string): string {
+  const urlObj = new URL(url);
+  return urlObj.pathname + urlObj.search + urlObj.hash;
 }
 
 registerFileAction(new FileAction({

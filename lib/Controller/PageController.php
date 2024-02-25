@@ -22,14 +22,14 @@ use OCP\Share\IManager;
 class PageController extends Controller {
 
   /** @var IURLGenerator */
-  private $urlGenerator;
+  private IURLGenerator $urlGenerator;
   /** @var IRootFolder */
-  private $rootFolder;
-  private $shareManager;
-  private $userId;
-  private $bookmarkService;
-  private $metadataService;
-  private $preferenceService;
+  private IRootFolder $rootFolder;
+  private IManager $shareManager;
+  private string $userId;
+  private BookmarkService $bookmarkService;
+  private MetadataService $metadataService;
+  private PreferenceService $preferenceService;
 
   /**
    * @param string $appName
@@ -68,7 +68,8 @@ class PageController extends Controller {
    *
    * @return TemplateResponse
    */
-  public function showReader() {
+  public function showReader(): TemplateResponse
+  {
     $templates= [
       'application/epub+zip' => 'epubviewer',
       'application/x-cbr' => 'cbreader',
@@ -83,6 +84,7 @@ class PageController extends Controller {
      *  ];
      */
     $fileInfo = $this->getFileInfo($this->request->get['file']);
+
     $fileId = $fileInfo['fileId'];
     $type = $this->request->get["type"];
     $scope = $template = $templates[$type];
@@ -97,7 +99,6 @@ class PageController extends Controller {
       'cursor' => $this->toJson($this->bookmarkService->getCursor($fileId)),
       'defaults' => $this->toJson($this->preferenceService->getDefault($scope)),
       'preferences' => $this->toJson($this->preferenceService->get($scope, $fileId)),
-      'defaults' => $this->toJson($this->preferenceService->getDefault($scope)),
       'metadata' => $this->toJson($this->metadataService->get($fileId)),
       'annotations' => $this->toJson($this->bookmarkService->get($fileId))
     ];
@@ -154,7 +155,7 @@ class PageController extends Controller {
     } else {
       $filePath = $path;
       $fileId = $this->rootFolder->getUserFolder($this->userId)
-        ->get(preg_replace("/.*\/remote.php\/webdav(.*)/", "$1", rawurldecode($this->request->get['file'])))
+        ->get(preg_replace("/.*\/remote.php\/dav\/files\/[^\/]*\/(.*)/", "$1", rawurldecode($this->request->get['file'])))
         ->getId();
     }
 
