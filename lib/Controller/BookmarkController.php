@@ -106,7 +106,7 @@ class BookmarkController extends Controller {
      *
      */
     public function delete($fileId, $name) {
-        return $this->bookmarkService->delete($fileId, $name);
+        $this->bookmarkService->delete($fileId, $name);
     }
 
     /**
@@ -119,6 +119,6 @@ class BookmarkController extends Controller {
      *
      */
     public function deleteCursor($fileId) {
-        return $this->bookmarkService->deleteCursor($fileId);
+        $this->bookmarkService->deleteCursor($fileId);
     }
 }

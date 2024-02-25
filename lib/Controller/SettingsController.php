@@ -20,8 +20,7 @@ use OCA\Epubviewer\Config;
 use OCP\AppFramework\Http\JSONResponse;
 
 class SettingsController extends Controller {
-
-	private $urlGenerator;
+    private $urlGenerator;
     private $preferenceService;
 
     /**

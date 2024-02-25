@@ -32,7 +32,7 @@ class PreferenceService extends Service {
      * @brief get preference
      *
      * scope identifies preference source, i.e. which renderer the preference applies to
-     * preference type is format-dependent, eg CFI for epub, page number for CBR/CBZ, etc
+     * preference type is format-dependent, e.g. CFI for epub, page number for CBR/CBZ, etc
      *
      * @param string $scope
      * @param int $fileId
@@ -52,7 +52,7 @@ class PreferenceService extends Service {
      * @brief write preference
      *
      * scope identifies preference source, i.e. which renderer the preference applies to
-     * position type is format-dependent, eg CFI for epub, page number for CBR/CBZ, etc
+     * position type is format-dependent, e.g. CFI for epub, page number for CBR/CBZ, etc
      *
      * @param string $scope
      * @param int $fileId

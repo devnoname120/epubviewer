@@ -1,0 +1,58 @@
+{
+  "name": "epubviewer",
+  "description": "EPUB/CBR/PDF reader app for Nextcloud",
+  "version": "1.5.3",
+  "author": "devnoname120 <devnoname120@gmail.com>",
+  "contributors": [
+    "devnoname120 <devnoname120@gmail.com>"
+  ],
+  "bugs": {
+    "url": "https://github.com/devnoname120/epubviewer/issues"
+  },
+  "repository": {
+    "url": "https://github.com/devnoname120/epubviewer.git",
+    "type": "git"
+  },
+  "homepage": "https://github.com/devnoname120/epubviewer",
+  "license": "agpl",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite --mode production build",
+    "dev": "vite --mode development build",
+    "watch": "vite --mode development build --watch",
+    "serve": "vite --mode development serve",
+    "lint": "eslint --ext .js,.vue,.ts src",
+    "lint:fix": "eslint --ext .js,.vue,.ts src --fix",
+    "stylelint": "stylelint css/*.css css/*.scss src/**/*.scss src/**/*.vue",
+    "stylelint:fix": "stylelint css/*.css css/*.scss src/**/*.scss src/**/*.vue --fix"
+  },
+  "dependencies": {
+    "@nextcloud/auth": "^2.2.1",
+    "@nextcloud/axios": "^2.4.0",
+    "@nextcloud/dialogs": "^4.2.2",
+    "@nextcloud/event-bus": "^3.1.0",
+    "@nextcloud/files": "^3.1.0",
+    "@nextcloud/initial-state": "^2.1.0",
+    "@nextcloud/l10n": "^2.2.0",
+    "@nextcloud/paths": "^2.1.0",
+    "@nextcloud/router": "^2.2.0",
+    "@nextcloud/sharing": "^0.1.0",
+    "@nextcloud/vue": "7.12.6",
+    "vue": "^2.7.0"
+  },
+  "browserslist": [
+    "extends @nextcloud/browserslist-config"
+  ],
+  "engines": {
+    "node": "^20.0.0",
+    "npm": "^9.0.0"
+  },
+  "devDependencies": {
+    "@nextcloud/browserslist-config": "^2.2.0",
+    "@nextcloud/eslint-config": "^8.3.0",
+    "@nextcloud/stylelint-config": "^2.1.2",
+    "@nextcloud/vite-config": "^1.1.0",
+    "@vue/tsconfig": "^0.4.0"
+  }
+}

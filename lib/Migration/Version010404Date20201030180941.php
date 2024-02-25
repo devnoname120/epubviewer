@@ -52,7 +52,7 @@ class Version010404Date20201030180941 extends SimpleMigrationStep {
 				'length' => 11,
 				'unsigned' => true,
 			]);
-			// type (bookmark, annotation, etc)
+			// type (bookmark, annotation, etc.)
 			$table->addColumn('type', 'string', [
 				'notnull' => true,
 				'length' => 32,

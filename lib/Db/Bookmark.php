@@ -19,7 +19,7 @@ class Bookmark extends ReaderEntity implements \JsonSerializable {
     protected $type;    // type, defaults to "bookmark"
     protected $name;    // name, defaults to $location
     protected $value;   // bookmark value (format-specific, eg. page number for PDF, CFI for epub, etc)
-    protected $content; // bookmark content (annotations etc), can be empty
+    protected $content; // bookmark content (annotations, etc.), can be empty
     protected $lastModified;    // modification timestamp
 
     public function jsonSerialize() {
