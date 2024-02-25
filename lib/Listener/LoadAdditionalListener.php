@@ -37,8 +37,13 @@ class LoadAdditionalListener implements IEventListener
         if (!($event instanceof LoadAdditionalScriptsEvent)) {
             return;
         }
+        // addInitScript was added in Nextcloud 28
+        if (method_exists(Util::class, 'addInitScript')) {
+            Util::addInitScript(Application::APP_ID, 'epubviewer-main');
+        } else {
+            Util::addScript(Application::APP_ID, 'epubviewer-main');
+        }
 
-        Util::addScript(Application::APP_ID, 'epubviewer-main');
         Util::addStyle(Application::APP_ID, 'epubviewer-main');
     }
 }

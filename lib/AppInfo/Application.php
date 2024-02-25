@@ -43,11 +43,5 @@ class Application extends App implements IBootstrap
 
     public function boot(IBootContext $context): void
     {
-        /*
-         * For further information about the app bootstrapping, please refer to our documentation:
-         * https://docs.nextcloud.com/server/latest/developer_manual/app_development/bootstrap.html
-         */
-
-        Util::addInitScript(Application::APP_ID, 'plugin');
     }
 }
