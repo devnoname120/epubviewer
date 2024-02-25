@@ -74,8 +74,15 @@ class PageController extends Controller
     {
         $templates = [
             'application/epub+zip' => 'epubviewer',
+            'application/pdf' => 'pdfreader',
+
             'application/x-cbr' => 'cbreader',
-            'application/pdf' => 'pdfreader'
+            'application/comicbook+7z' => 'cbreader',
+            'application/comicbook+ace' => 'cbreader',
+            'application/comicbook+rar' => 'cbreader',
+            'application/comicbook+tar' => 'cbreader',
+            'application/comicbook+truecrypt' => 'cbreader',
+            'application/comicbook+zip' => 'cbreader',
         ];
 
         /**

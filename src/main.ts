@@ -1,5 +1,5 @@
-import { generateFilePath, generateUrl } from '@nextcloud/router';
-import { FileAction, registerFileAction, Permission, type Node } from '@nextcloud/files';
+import {generateUrl} from '@nextcloud/router';
+import {DefaultType, FileAction, type Node, Permission, registerFileAction} from '@nextcloud/files';
 
 // TODO: use i10n for strings:
 // import { translate as t, translatePlural as n } from '@nextcloud/l10n'
@@ -35,7 +35,7 @@ function show (downloadUrl: string, mimeType: string, isFileList: boolean) {
   window.open(viewer, downloadUrl);
 }
 
-function actionHandler (file: Node, mime: string, dir: string) {
+function actionHandler (file: Node, dir: string) {
   let downloadUrl = '';
   if ($('#isPublic').val()) {
     const sharingToken = $('#sharingToken').val();
@@ -48,7 +48,7 @@ function actionHandler (file: Node, mime: string, dir: string) {
 
     downloadUrl = getAbsolutePath(file.source);
   }
-  show(downloadUrl, mime, true);
+  show(downloadUrl, file.mime || '', true);
 }
 
 function getAbsolutePath(url: string): string {
@@ -60,11 +60,59 @@ registerFileAction(new FileAction({
   id: 'view-epub',
   iconSvgInline: () => '<svg></svg>',
   displayName: () => 'View',
+  default: DefaultType.DEFAULT,
   enabled (nodes) {
-    return nodes.filter((node) => (node.permissions & Permission.READ) !== 0).length > 0;
+    const isEpub = nodes.some(node => node.mime === 'application/epub+zip')
+    const isReadable = nodes.some(node => node.permissions & Permission.READ);
+
+    return isEpub && isReadable;
   },
   exec: async function (file, view, dir) {
-    actionHandler(file, 'application/epub+zip', dir);
+    actionHandler(file, dir);
+    return true;
+  }
+}));
+
+registerFileAction(new FileAction({
+  id: 'view-cbr',
+  iconSvgInline: () => '<svg></svg>',
+  displayName: () => 'View',
+  default: DefaultType.DEFAULT,
+  enabled (nodes) {
+    const cbxMimes = [
+      'application/x-cbr',
+      'application/comicbook+7z',
+      'application/comicbook+ace',
+      'application/comicbook+rar',
+      'application/comicbook+tar',
+      'application/comicbook+truecrypt',
+      'application/comicbook+zip'
+    ];
+
+    const isCbr = nodes.some(node => cbxMimes.includes(node.mime || ''))
+    const isReadable = nodes.some(node => node.permissions & Permission.READ);
+
+    return isCbr && isReadable;
+  },
+  exec: async function (file, view, dir) {
+    actionHandler(file, dir);
+    return true;
+  }
+}));
+
+registerFileAction(new FileAction({
+  id: 'view-pdf',
+  iconSvgInline: () => '<svg></svg>',
+  displayName: () => 'View',
+  default: DefaultType.DEFAULT,
+  enabled (nodes) {
+    const isPdf = nodes.some(node => node.mime === 'application/pdf')
+    const isReadable = nodes.some(node => node.permissions & Permission.READ);
+
+    return isPdf && isReadable;
+  },
+  exec: async function (file, view, dir) {
+    actionHandler(file, dir);
     return true;
   }
 }));
