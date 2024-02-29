@@ -26,30 +26,32 @@ document.onreadystatechange = function () {
 
     /* functions return jquery promises */
     options.session.getPreference = function (name) {
-      return $.get(options.session.basePath + 'preference/' + options.session.fileId + '/' + options.session.scope + '/' + name);
+      return $.get(
+        options.session.basePath + 'preference/' + options.session.fileId + '/' + options.session.scope + '/' + name
+      );
     };
     options.session.setPreference = function (name, value) {
-      return $.post(options.session.basePath + 'preference',
-        {
-          fileId: options.session.fileId,
-          scope: options.session.scope,
-          name,
-          value: JSON.stringify(value)
-        });
+      return $.post(options.session.basePath + 'preference', {
+        fileId: options.session.fileId,
+        scope: options.session.scope,
+        name,
+        value: JSON.stringify(value),
+      });
     };
     options.session.deletePreference = function (name) {
-      return $.delete(options.session.basePath + 'preference/' + options.session.fileId + '/' + options.session.scope + '/' + name);
+      return $.delete(
+        options.session.basePath + 'preference/' + options.session.fileId + '/' + options.session.scope + '/' + name
+      );
     };
     options.session.getDefault = function (name) {
       return $.get(options.session.basePath + 'preference/default/' + options.session.scope + '/' + name);
     };
     options.session.setDefault = function (name, value) {
-      return $.post(options.session.basePath + 'preference/default',
-        {
-          scope: options.session.scope,
-          name,
-          value: JSON.stringify(value)
-        });
+      return $.post(options.session.basePath + 'preference/default', {
+        scope: options.session.scope,
+        name,
+        value: JSON.stringify(value),
+      });
     };
     options.session.deleteDefault = function (name) {
       return $.delete(options.session.basePath + 'preference/default/' + options.session.scope + '/' + name);
@@ -58,14 +60,13 @@ document.onreadystatechange = function () {
       return $.get(options.session.basePath + 'bookmark/' + options.session.fileId + '/' + type + '/' + name);
     };
     options.session.setBookmark = function (name, value, type, content) {
-      return $.post(options.session.basePath + 'bookmark',
-        {
-          fileId: options.session.fileId,
-          name,
-          value: JSON.stringify(value),
-          type,
-          content: JSON.stringify(content)
-        });
+      return $.post(options.session.basePath + 'bookmark', {
+        fileId: options.session.fileId,
+        name,
+        value: JSON.stringify(value),
+        type,
+        content: JSON.stringify(content),
+      });
     };
     options.session.deleteBookmark = function (name) {
       return $.delete(options.session.basePath + 'bookmark/' + options.session.fileId + '/' + name);
@@ -74,11 +75,10 @@ document.onreadystatechange = function () {
       return $.get(options.session.basePath + 'bookmark/cursor/' + options.session.fileId);
     };
     options.session.setCursor = function (value) {
-      return $.post(options.session.basePath + 'bookmark/cursor',
-        {
-          fileId: options.session.fileId,
-          value: JSON.stringify(value)
-        });
+      return $.post(options.session.basePath + 'bookmark/cursor', {
+        fileId: options.session.fileId,
+        value: JSON.stringify(value),
+      });
     };
     options.session.deleteCursor = function () {
       return $.delete(options.session.basePath + 'bookmark/cursor/' + options.session.fileId);
@@ -112,7 +112,7 @@ document.onreadystatechange = function () {
   }
 
   // start epub.js renderer
-  function renderEpub (file, options) {
+  function renderEpub(file, options) {
     // some parameters...
     const session_el = $('.session');
     const static_path = session_el.data('staticpath');
@@ -130,7 +130,9 @@ document.onreadystatechange = function () {
     if (navigator.userAgent.includes('MSIE')) {
       EPUBJS.Hooks.register('beforeChapterDisplay').wgxpath = function (callback, renderer) {
         wgxpath.install(renderer.render.window);
-        if (callback) { callback(); }
+        if (callback) {
+          callback();
+        }
       };
       wgxpath.install(window);
     }
@@ -139,14 +141,14 @@ document.onreadystatechange = function () {
   }
 
   // start cbr.js renderer
-  function renderCbr (file, options) {
+  function renderCbr(file, options) {
     CBRJS.filePath = 'js/cbrjs/';
 
     const reader = cbReader(file, options);
   }
 
   // start pdf.js renderer
-  function renderPdf (file, options) {
+  function renderPdf(file, options) {
     PDFJS.filePath = 'js/pdfjs/';
     PDFJS.imageResourcesPath = 'js/pdfjs/css/images/';
     PDFJS.workerSrc = options.session.staticPath + 'js/pdfjs/lib/pdf.worker.js';

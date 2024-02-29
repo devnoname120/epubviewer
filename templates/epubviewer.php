@@ -59,7 +59,7 @@
         <link rel="stylesheet" href="<?php p($urlGenerator->linkTo('epubviewer', 'js/bgrins/spectrum.css')) ?>?v=<?php p($version) ?>">
         <?php endif; ?>
 
-		<script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'js/ready.js')) ?>?v=<?php p($version) ?>"> </script>
+		<script type="text/javascript" nonce="<?php p($nonce) ?>" src="<?php p($urlGenerator->linkTo('epubviewer', 'js/epubviewer-ready.mjs')) ?>?v=<?php p($version) ?>"> </script>
     </head>
     <body>
         <div id="outerContainer">
