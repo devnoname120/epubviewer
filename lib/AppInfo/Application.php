@@ -7,6 +7,8 @@ declare(strict_types=1);
 namespace OCA\Epubviewer\AppInfo;
 
 use OCA\Epubviewer\Hooks;
+use OCA\Epubviewer\Listener\BeforeTemplateRenderedListener;
+use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
 use OCA\Epubviewer\Listener\LoadAdditionalListener;
 use OCA\Files\Event\LoadAdditionalScriptsEvent;
 use OCP\Util;
@@ -35,6 +37,7 @@ class Application extends App implements IBootstrap
         // Register the composer autoloader for packages shipped by this app, if applicable
         include_once __DIR__ . '/../../vendor/autoload.php';
 
+        $context->registerEventListener(BeforeTemplateRenderedEvent::class, BeforeTemplateRenderedListener::class);
         $context->registerEventListener(LoadAdditionalScriptsEvent::class, LoadAdditionalListener::class);
 
         $l = \OC::$server->getL10N('epubviewer');

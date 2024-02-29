@@ -12,6 +12,8 @@
 
 namespace OCA\Epubviewer;
 
+use OCA\Epubviewer\AppInfo\Application;
+
 /**
  * Config class for Reader
  */
@@ -26,7 +28,7 @@ class Config
      */
     public static function get($key, $default)
     {
-        return \OC::$server->getConfig()->getUserValue(\OC_User::getUser(), 'epubviewer', $key, $default);
+        return \OC::$server->getConfig()->getUserValue(\OC_User::getUser(), Application::APP_ID, $key, $default);
     }
 
     /**
@@ -38,7 +40,7 @@ class Config
      */
     public static function set($key, $value)
     {
-        return \OC::$server->getConfig()->setUserValue(\OC_User::getUser(), 'epubviewer', $key, $value);
+        return \OC::$server->getConfig()->setUserValue(\OC_User::getUser(), Application::APP_ID, $key, $value);
     }
 
     /**
@@ -50,7 +52,7 @@ class Config
      */
     public static function getApp($key, $default)
     {
-        return \OC::$server->getConfig()->getAppValue('epubviewer', $key, $default);
+        return \OC::$server->getConfig()->getAppValue(Application::APP_ID, $key, $default);
     }
 
     /**
@@ -62,6 +64,6 @@ class Config
      */
     public static function setApp($key, $value)
     {
-        return \OC::$server->getConfig()->setAppValue('epubviewer', $key, $value);
+        return \OC::$server->getConfig()->setAppValue(Application::APP_ID, $key, $value);
     }
 }

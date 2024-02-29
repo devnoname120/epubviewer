@@ -1,8 +1,11 @@
 import {generateUrl} from '@nextcloud/router';
 import {DefaultType, FileAction, type Node, Permission, registerFileAction} from '@nextcloud/files';
+import { loadState } from '@nextcloud/initial-state'
 
 // TODO: use i10n for strings:
 // import { translate as t, translatePlural as n } from '@nextcloud/l10n'
+
+const APP_ID = 'epubviewer'
 
 function hideControls () {
   $('#app-content #controls').hide();
@@ -30,7 +33,7 @@ function hide () {
 }
 
 function show (downloadUrl: string, mimeType: string, isFileList: boolean) {
-  const viewer = generateUrl('/apps/epubviewer/?file={file}&type={type}', { file: downloadUrl, type: mimeType });
+  const viewer = generateUrl('/apps/{APP_ID}/?file={file}&type={type}', { APP_ID, file: downloadUrl, type: mimeType });
   // launch in new window on all devices
   window.open(viewer, downloadUrl);
 }
@@ -56,6 +59,10 @@ function getAbsolutePath(url: string): string {
   return urlObj.pathname + urlObj.search + urlObj.hash;
 }
 
+const isEpubEnabled = loadState<boolean>(APP_ID, 'enableEpub');
+const isPdfEnabled = loadState<boolean>(APP_ID, 'enablePdf');
+const isCbxEnabled = loadState<boolean>(APP_ID, 'enableCbx');
+
 registerFileAction(new FileAction({
   id: 'view-epub',
   iconSvgInline: () => '<svg></svg>',
@@ -65,7 +72,7 @@ registerFileAction(new FileAction({
     const isEpub = nodes.some(node => node.mime === 'application/epub+zip')
     const isReadable = nodes.some(node => node.permissions & Permission.READ);
 
-    return isEpub && isReadable;
+    return isEpubEnabled && isEpub && isReadable;
   },
   exec: async function (file, view, dir) {
     actionHandler(file, dir);
@@ -89,10 +96,10 @@ registerFileAction(new FileAction({
       'application/comicbook+zip'
     ];
 
-    const isCbr = nodes.some(node => cbxMimes.includes(node.mime || ''))
+    const isCbx = nodes.some(node => cbxMimes.includes(node.mime || ''))
     const isReadable = nodes.some(node => node.permissions & Permission.READ);
 
-    return isCbr && isReadable;
+    return isCbxEnabled && isCbx && isReadable;
   },
   exec: async function (file, view, dir) {
     actionHandler(file, dir);
@@ -109,7 +116,7 @@ registerFileAction(new FileAction({
     const isPdf = nodes.some(node => node.mime === 'application/pdf')
     const isReadable = nodes.some(node => node.permissions & Permission.READ);
 
-    return isPdf && isReadable;
+    return isPdfEnabled && isPdf && isReadable;
   },
   exec: async function (file, view, dir) {
     actionHandler(file, dir);
