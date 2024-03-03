@@ -1,15 +1,8 @@
 <?php
-/**
- * @author Frank de Lange
- * @copyright 2017 Frank de Lange
- *
- * This file is licensed under the Affero General Public License version 3 or
- * later.
- * See the COPYING-README file.
- */
 
 namespace OCA\Epubviewer\Service;
 
+use OCA\Files_Opds\Meta;
 use OCP\App\IAppManager;
 
 class MetadataService
@@ -36,7 +29,7 @@ class MetadataService
     public function get($fileId, $name = null)
     {
         if ($this->appManager->isInstalled('files_opds')) {
-            if ($meta = \OCA\Files_Opds\Meta::get($fileId)) {
+            if ($meta = Meta::get($fileId)) {
                 if (!empty($name) && array_key_exists($name, $meta)) {
                     return [$item => $meta[$name]];
                 } else {

@@ -1,3 +1,17 @@
+## 1.6.0 - 2024-03-03
+
+### Added
+
+- (#8) Nextcloud 28: added support
+
+### Fixed
+
+- (#5) CBR: fix public share loading (limitation: it only works for individually shared files, not for shared folders)
+
+### Changed
+
+- Big codebase refactoring (structure, JS bundling, TypeScript, linting, etc.)
+
 ## 1.5.3 - 2023-09-18
 
 ### Fixed

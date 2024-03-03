@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-    <!--
-    SPDX-FileCopyrightText: devnoname120 <devnoname120@gmail.com>
-    SPDX-License-Identifier: CC0-1.0
-    -->
     <id>epubviewer</id>
     <name>EPUB Viewer</name>
     <summary>Ebook viewer that supports EPUB/CBZ/PDF</summary>
@@ -34,7 +30,7 @@ See [README] for more exhaustive information on features and potential misfeatur
    [README]: https://github.com/devnoname120/epubviewer/blob/master/epubviewer/README.md
 	      ]]>
     </description>
-    <version>1.5.3</version>
+    <version>1.6.0</version>
     <licence>agpl</licence>
     <author mail="devnoname120@gmail.com" homepage="https://github.com/devnoname120">devnoname120</author>
     <category>files</category>
@@ -42,14 +38,22 @@ See [README] for more exhaustive information on features and potential misfeatur
     <category>office</category>
     <website>https://github.com/devnoname120/epubviewer</website>
     <bugs>https://github.com/devnoname120/epubviewer</bugs>
-    <screenshot>https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer-1.png?raw=true</screenshot>
-    <screenshot>https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer-3.png?raw=true</screenshot>
-    <screenshot>https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer_PDF_005.png?raw=true</screenshot>
-    <screenshot>https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer_PDF_006.png?raw=true</screenshot>
-    <screenshot>https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-22-00.jpg?raw=true</screenshot>
-    <screenshot>https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-22-02.jpg?raw=true</screenshot>
+    <screenshot>https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer-1.png?raw=true
+    </screenshot>
+    <screenshot>https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer-3.png?raw=true
+    </screenshot>
+    <screenshot>https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer_PDF_005.png?raw=true
+    </screenshot>
+    <screenshot>https://github.com/devnoname120/epubviewer/blob/master/screenshots/epubviewer_PDF_006.png?raw=true
+    </screenshot>
+    <screenshot>
+        https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-22-00.jpg?raw=true
+    </screenshot>
+    <screenshot>
+        https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-22-02.jpg?raw=true
+    </screenshot>
     <dependencies>
-        <nextcloud min-version="25" max-version="29"/>
+        <nextcloud min-version="27" max-version="29"/>
     </dependencies>
     <settings>
         <personal>OCA\Epubviewer\Settings\Personal</personal>

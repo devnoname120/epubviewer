@@ -1,17 +1,9 @@
 <?php
 
-/**
- * ownCloud - Epubviewer App
- *
- * @author Frank de Lange
- * @copyright 2014,2018 Frank de Lange
- *
- * This file is licensed under the Affero General Public License version 3 or
- * later.
- */
-
 namespace OCA\Epubviewer;
 
+use OC;
+use OC_User;
 use OCA\Epubviewer\AppInfo\Application;
 
 /**
@@ -28,7 +20,7 @@ class Config
      */
     public static function get($key, $default)
     {
-        return \OC::$server->getConfig()->getUserValue(\OC_User::getUser(), Application::APP_ID, $key, $default);
+        return OC::$server->getConfig()->getUserValue(OC_User::getUser(), Application::APP_ID, $key, $default);
     }
 
     /**
@@ -40,7 +32,7 @@ class Config
      */
     public static function set($key, $value)
     {
-        return \OC::$server->getConfig()->setUserValue(\OC_User::getUser(), Application::APP_ID, $key, $value);
+        return OC::$server->getConfig()->setUserValue(OC_User::getUser(), Application::APP_ID, $key, $value);
     }
 
     /**
@@ -52,7 +44,7 @@ class Config
      */
     public static function getApp($key, $default)
     {
-        return \OC::$server->getConfig()->getAppValue(Application::APP_ID, $key, $default);
+        return OC::$server->getConfig()->getAppValue(Application::APP_ID, $key, $default);
     }
 
     /**
@@ -64,6 +56,6 @@ class Config
      */
     public static function setApp($key, $value)
     {
-        return \OC::$server->getConfig()->setAppValue(Application::APP_ID, $key, $value);
+        return OC::$server->getConfig()->setAppValue(Application::APP_ID, $key, $value);
     }
 }

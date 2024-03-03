@@ -1,15 +1,8 @@
 <?php
-/**
- * @author Frank de Lange
- * @copyright 2017 Frank de Lange
- *
- * This file is licensed under the Affero General Public License version 3 or
- * later.
- * See the COPYING-README file.
- */
 
 namespace OCA\Epubviewer\Controller;
 
+use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use OCP\IURLGenerator;
 use OCP\AppFramework\Http;
@@ -50,7 +43,7 @@ class PreferenceController extends Controller
      * @param int $fileId
      * @param string $name if null, return all preferences for $scope + $fileId
      *
-     * @return array|\OCP\AppFramework\Http\JSONResponse
+     * @return array|JSONResponse
      */
     public function get($scope, $fileId, $name)
     {
@@ -68,7 +61,7 @@ class PreferenceController extends Controller
      * @param string $name
      * @param string $value
      *
-     * @return array|\OCP\AppFramework\Http\JSONResponse
+     * @return array|JSONResponse
      */
     public function set($scope, $fileId, $name, $value)
     {
@@ -85,7 +78,7 @@ class PreferenceController extends Controller
      * @param string $scope
      * @param string $name if null, return all default preferences for scope
      *
-     * @return array|\OCP\AppFramework\Http\JSONResponse
+     * @return array|JSONResponse
      */
     public function getDefault($scope, $name)
     {
@@ -102,7 +95,7 @@ class PreferenceController extends Controller
      * @param string $name
      * @param string $value
      *
-     * @return array|\OCP\AppFramework\Http\JSONResponse
+     * @return array|JSONResponse
      */
     public function setDefault($scope, $name, $value)
     {

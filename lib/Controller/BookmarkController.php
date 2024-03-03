@@ -1,15 +1,8 @@
 <?php
-/**
- * @author Frank de Lange
- * @copyright 2017 Frank de Lange
- *
- * This file is licensed under the Affero General Public License version 3 or
- * later.
- * See the COPYING-README file.
- */
 
 namespace OCA\Epubviewer\Controller;
 
+use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\DataResponse;
@@ -45,7 +38,7 @@ class BookmarkController extends Controller
      * @param int $fileId
      * @param string $name
      *
-     * @return array|\OCP\AppFramework\Http\JSONResponse
+     * @return array|JSONResponse
      */
     public function get($fileId, $name, $type = null)
     {
@@ -62,7 +55,7 @@ class BookmarkController extends Controller
      * @param string $name
      * @param string $value
      *
-     * @return array|\OCP\AppFramework\Http\JSONResponse
+     * @return array|JSONResponse
      */
     public function set($fileId, $name, $value, $type = null, $content = null)
     {
@@ -78,7 +71,7 @@ class BookmarkController extends Controller
      *
      * @param int $fileId
      *
-     * @return array|\OCP\AppFramework\Http\JSONResponse
+     * @return array|JSONResponse
      */
     public function getCursor($fileId)
     {
@@ -94,7 +87,7 @@ class BookmarkController extends Controller
      * @param int $fileId
      * @param string $value
      *
-     * @return array|\OCP\AppFramework\Http\JSONResponse
+     * @return array|JSONResponse
      */
     public function setCursor($fileId, $value)
     {

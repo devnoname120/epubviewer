@@ -1,8 +1,6 @@
 <?php
 
 declare(strict_types=1);
-// SPDX-FileCopyrightText: devnoname120 <devnoname120@gmail.com>
-// SPDX-License-Identifier: AGPL-3.0-or-later
 
 namespace OCA\Epubviewer\AppInfo;
 
@@ -12,9 +10,7 @@ use OCA\Epubviewer\Listener\PublicShareBeforeTemplateRenderedListener;
 use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
 use OCA\Epubviewer\Listener\FilesLoadAdditionalScriptsListener;
 
-//use OCA\Files_Sharing\Event\BeforeTemplateRenderedEvent as lol;
 use OCA\Files\Event\LoadAdditionalScriptsEvent;
-use OCP\Util;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;

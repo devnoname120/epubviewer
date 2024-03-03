@@ -1,17 +1,8 @@
 <?php
 
-/**
- * ownCloud - Epubviewer App
- *
- * @author Frank de Lange
- * @copyright 2014,2018 Frank de Lange
- *
- * This file is licensed under the Affero General Public License version 3 or
- * later.
- */
-
 namespace OCA\Epubviewer\Controller;
 
+use OC;
 use OCP\IRequest;
 use OCP\IURLGenerator;
 use OCP\AppFramework\Http;
@@ -51,12 +42,12 @@ class SettingsController extends Controller
      * @param int $EpubEnable
      * @param int $CbxEnable
      *
-     * @return array|\OCP\AppFramework\Http\JSONResponse
+     * @return array|JSONResponse
      */
     public function setPreference(string $EpubEnable, string $PdfEnable, string $CbxEnable)
     {
 
-        $l = \OC::$server->getL10N('epubviewer');
+        $l = OC::$server->getL10N('epubviewer');
 
         Config::set('epub_enable', $EpubEnable);
         Config::set('pdf_enable', $PdfEnable);

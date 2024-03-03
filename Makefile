@@ -129,6 +129,7 @@ appstore:
 	tar cvzf $(appstore_package_name).tar.gz \
 	--exclude-vcs \
 	--exclude="../$(app_name)/build" \
+	--exclude="../$(app_name)/src" \
 	--exclude="../$(app_name)/tests" \
 	--exclude="../$(app_name)/Makefile" \
 	--exclude="../$(app_name)/*.log" \
@@ -149,6 +150,8 @@ appstore:
 	--exclude="../$(app_name)/protractor\.*" \
 	--exclude="../$(app_name)/.*" \
 	--exclude="../$(app_name)/js/.*" \
+	--exclude="../$(app_name)/vite.config.ts" \
+	--exclude="../$(app_name)/tsconfig.json" \
 	--exclude="../$(app_name)/stylelint.config.cjs" \
 	--exclude="../$(app_name)/CHANGELOG.md" \
 	--exclude="../$(app_name)/README.md" \

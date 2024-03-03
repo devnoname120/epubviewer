@@ -1,18 +1,12 @@
 <?php
-/**
- * @author Frank de Lange
- * @copyright 2015 Frank de Lange
- *
- * This file is licensed under the Affero General Public License version 3 or
- * later.
- * See the COPYING-README file.
- */
+
 
 namespace OCA\Epubviewer\Db;
 
+use JsonSerializable;
 use OCP\AppFramework\Db\Entity;
 
-class Preference extends ReaderEntity implements \JsonSerializable
+class Preference extends ReaderEntity implements JsonSerializable
 {
 
     protected $userId;  // user for whom this preference is valid

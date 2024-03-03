@@ -1,3 +1,14 @@
 vendor
 build
-js/epubviewer-main.mjs
+js/*
+!js/cbrjs
+!js/lib
+!js/bitjs
+!js/bartaz
+!js/epubjs
+!js/jquery
+!js/bgrins
+!js/icomoon
+!js/pixastic
+!js/sindresorhus
+!js/pdfjs
