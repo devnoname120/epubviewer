@@ -1,5 +1,6 @@
+import { generateUrl } from '@nextcloud/router';
+
 window.addEventListener('DOMContentLoaded', function () {
-  // save settings
   const readerSettings = {
     save: function () {
       const data = {
@@ -9,7 +10,7 @@ window.addEventListener('DOMContentLoaded', function () {
       };
 
       OC.msg.startSaving('#reader-personal .msg');
-      $.post(OC.generateUrl('apps/epubviewer/settings/set'), data, readerSettings.afterSave);
+      $.post(generateUrl('apps/epubviewer/settings/set'), data, readerSettings.afterSave);
     },
     afterSave: function (data) {
       OC.msg.finishedSaving('#reader-personal .msg', data);

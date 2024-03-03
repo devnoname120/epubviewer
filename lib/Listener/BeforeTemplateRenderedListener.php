@@ -14,26 +14,29 @@ use OCP\EventDispatcher\IEventListener;
 use OCP\IConfig;
 use OCP\IUser;
 use OCP\IUserSession;
+use OCP\Util;
 use Psr\Container\ContainerInterface;
 
 /** @template-implements IEventListener<BeforeTemplateRenderedEvent> */
-class BeforeTemplateRenderedListener implements IEventListener {
-	private IInitialState $initialState;
+class BeforeTemplateRenderedListener implements IEventListener
+{
+    private IInitialState $initialState;
     private IUserSession $userSession;
     private IConfig $config;
 
     public function __construct(
-		IInitialState $initialState,
-        IUserSession $userSession,
-        IConfig $config
-    ) {
-		$this->initialState = $initialState;
+        IInitialState $initialState,
+        IUserSession  $userSession,
+        IConfig       $config
+    )
+    {
+        $this->initialState = $initialState;
         $this->userSession = $userSession;
         $this->config = $config;
     }
 
-	public function handle(Event $event): void {
-
+    public function handle(Event $event): void
+    {
         /** @var BeforeTemplateRenderedEvent $event */
         if ($event->getResponse()->getRenderAs() === TemplateResponse::RENDER_AS_USER) {
             $this->initialState->provideLazyInitialState('enableEpub', function () {
@@ -60,45 +63,5 @@ class BeforeTemplateRenderedListener implements IEventListener {
                 return false;
             });
         }
-
-//        if ($user instanceof IUser) {
-//            $userId = $user->getUID();
-//
-//            $this->initialState->provideLazyInitialState(
-//                'enableEpub',
-//                $this->config->getUserValue($userId, Application::APP_ID, 'epub_enable', 'true'),
-//            );
-//
-//            /** User background */
-//            $this->initialState->provideInitialState(
-//                'backgroundImage',
-//                $this->config->getUserValue($userId, Application::APP_ID, 'background_image', BackgroundService::BACKGROUND_DEFAULT),
-//            );
-//
-//            /** User color */
-//            $this->initialState->provideInitialState(
-//                'backgroundColor',
-//                $this->config->getUserValue($userId, Application::APP_ID, 'background_color', BackgroundService::DEFAULT_COLOR),
-//            );
-//
-//            /**
-//             * Admin background. `backgroundColor` if disabled,
-//             * mime type if defined and empty by default
-//             */
-//            $this->initialState->provideInitialState(
-//                'themingDefaultBackground',
-//                $this->config->getAppValue('theming', 'backgroundMime', ''),
-//            );
-//            $this->initialState->provideInitialState(
-//                'defaultShippedBackground',
-//                BackgroundService::DEFAULT_BACKGROUND_IMAGE,
-//            );
-//
-//            /** List of all shipped backgrounds */
-//            $this->initialState->provideInitialState(
-//                'shippedBackgrounds',
-//                BackgroundService::SHIPPED_BACKGROUNDS,
-//            );
-//        }
-	}
+    }
 }

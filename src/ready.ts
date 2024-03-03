@@ -1,8 +1,8 @@
 document.onreadystatechange = function () {
-  if (document.readyState == 'complete') {
+  if (document.readyState === 'complete') {
     const type = decodeURIComponent(getUrlParameter('type'));
     const file = decodeURIComponent(getUrlParameter('file'));
-    const options = {};
+    const options: object = {};
     const $session = $('.session');
 
     options.session = {};
@@ -25,12 +25,12 @@ document.onreadystatechange = function () {
     options.session.downloadLink = $session.data('downloadlink');
 
     /* functions return jquery promises */
-    options.session.getPreference = function (name) {
+    options.session.getPreference = function (name: string) {
       return $.get(
-        options.session.basePath + 'preference/' + options.session.fileId + '/' + options.session.scope + '/' + name
+        options.session.basePath + 'preference/' + options.session.fileId + '/' + options.session.scope + '/' + name,
       );
     };
-    options.session.setPreference = function (name, value) {
+    options.session.setPreference = function (name: string, value) {
       return $.post(options.session.basePath + 'preference', {
         fileId: options.session.fileId,
         scope: options.session.scope,
@@ -38,28 +38,28 @@ document.onreadystatechange = function () {
         value: JSON.stringify(value),
       });
     };
-    options.session.deletePreference = function (name) {
+    options.session.deletePreference = function (name: string) {
       return $.delete(
-        options.session.basePath + 'preference/' + options.session.fileId + '/' + options.session.scope + '/' + name
+        options.session.basePath + 'preference/' + options.session.fileId + '/' + options.session.scope + '/' + name,
       );
     };
-    options.session.getDefault = function (name) {
+    options.session.getDefault = function (name: string) {
       return $.get(options.session.basePath + 'preference/default/' + options.session.scope + '/' + name);
     };
-    options.session.setDefault = function (name, value) {
+    options.session.setDefault = function (name: string, value) {
       return $.post(options.session.basePath + 'preference/default', {
         scope: options.session.scope,
         name,
         value: JSON.stringify(value),
       });
     };
-    options.session.deleteDefault = function (name) {
+    options.session.deleteDefault = function (name: string) {
       return $.delete(options.session.basePath + 'preference/default/' + options.session.scope + '/' + name);
     };
-    options.session.getBookmark = function (name, type) {
+    options.session.getBookmark = function (name: string, type: string) {
       return $.get(options.session.basePath + 'bookmark/' + options.session.fileId + '/' + type + '/' + name);
     };
-    options.session.setBookmark = function (name, value, type, content) {
+    options.session.setBookmark = function (name: string, value: object, type: string, content: object) {
       return $.post(options.session.basePath + 'bookmark', {
         fileId: options.session.fileId,
         name,
@@ -68,13 +68,13 @@ document.onreadystatechange = function () {
         content: JSON.stringify(content),
       });
     };
-    options.session.deleteBookmark = function (name) {
+    options.session.deleteBookmark = function (name: string) {
       return $.delete(options.session.basePath + 'bookmark/' + options.session.fileId + '/' + name);
     };
     options.session.getCursor = function () {
       return $.get(options.session.basePath + 'bookmark/cursor/' + options.session.fileId);
     };
-    options.session.setCursor = function (value) {
+    options.session.setCursor = function (value: object) {
       return $.post(options.session.basePath + 'bookmark/cursor', {
         fileId: options.session.fileId,
         value: JSON.stringify(value),
@@ -90,13 +90,14 @@ document.onreadystatechange = function () {
         renderEpub(file, options);
         break;
       case 'application/x-cbr':
+      case 'application/x-cbz':
       case 'application/comicbook+7z':
       case 'application/comicbook+ace':
       case 'application/comicbook+rar':
       case 'application/comicbook+tar':
       case 'application/comicbook+truecrypt':
       case 'application/comicbook+zip':
-        renderCbr(file, options);
+        renderCbx(file, options);
         break;
       case 'application/pdf':
         renderPdf(file, options);
@@ -106,23 +107,23 @@ document.onreadystatechange = function () {
     }
   }
 
-  function getUrlParameter(param) {
+  function getUrlParameter(param: string): string {
     const params = new URLSearchParams(window.location.search);
-    return params.get(param) || ''; // Returns the parameter value or an empty string if not found
+    return params.get(param) ?? ''; // Returns the parameter value or an empty string if not found
   }
 
   // start epub.js renderer
-  function renderEpub(file, options) {
+  function renderEpub(file: string, options: any): void {
     // some parameters...
-    const session_el = $('.session');
-    const static_path = session_el.data('staticpath');
-    EPUBJS.filePath = location.origin + static_path + 'js/epubjs/';
+    const session = $('.session');
+    const staticPath = session.data('staticpath');
+    EPUBJS.filePath = location.origin + staticPath + 'js/epubjs/';
 
     // epub.js forcibly prepends EPUBJS.basePath to the cssPath.
     // We add a bunch of .. to get rid of this incorrect path.
-    EPUBJS.cssPath = '../../..' + static_path + 'js/epubjs/css/';
-    EPUBJS.basePath = location.origin + session_el.data('basepath');
-    EPUBJS.staticPath = location.origin + static_path;
+    EPUBJS.cssPath = '../../..' + staticPath + 'js/epubjs/css/';
+    EPUBJS.basePath = location.origin + session.data('basepath');
+    EPUBJS.staticPath = location.origin + staticPath;
 
     /* device-specific boilerplate */
 
@@ -137,22 +138,22 @@ document.onreadystatechange = function () {
       wgxpath.install(window);
     }
 
-    const reader = ePubViewer(file, options);
+    ePubViewer(file, options);
   }
 
   // start cbr.js renderer
-  function renderCbr(file, options) {
+  function renderCbx(file: string, options: object): void {
     CBRJS.filePath = 'js/cbrjs/';
 
-    const reader = cbReader(file, options);
+    cbReader(file, options);
   }
 
   // start pdf.js renderer
-  function renderPdf(file, options) {
+  function renderPdf(file: string, options: object): void {
     PDFJS.filePath = 'js/pdfjs/';
     PDFJS.imageResourcesPath = 'js/pdfjs/css/images/';
     PDFJS.workerSrc = options.session.staticPath + 'js/pdfjs/lib/pdf.worker.js';
 
-    const reader = pdfReader(file, options);
+    pdfReader(file, options);
   }
 };

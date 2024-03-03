@@ -76,12 +76,14 @@ class PageController extends Controller
             'application/epub+zip' => 'epubviewer',
             'application/pdf' => 'pdfreader',
             'application/x-cbr' => 'cbreader',
-            'application/comicbook+7z' => 'cbreader',
-            'application/comicbook+ace' => 'cbreader',
+            'application/x-cbz' => 'cbreader',
+            'application/comicbook+zip' => 'cbreader',
             'application/comicbook+rar' => 'cbreader',
             'application/comicbook+tar' => 'cbreader',
+            'application/comicbook+7z' => 'cbreader',
+            'application/comicbook+ace' => 'cbreader',
             'application/comicbook+truecrypt' => 'cbreader',
-            'application/comicbook+zip' => 'cbreader',
+
         ];
 
         /**
@@ -141,7 +143,7 @@ class PageController extends Controller
     private function getFileInfo($path)
     {
         $count = 0;
-        $shareToken = preg_replace("/(?:\/index\.php)?\/s\/([A-Za-z0-9]{15,32})\/download.*/", "$1", $path, 1, $count);
+        $shareToken = preg_replace("/(?:\/index\.php)?\/s\/([A-Za-z0-9_\-+]{3,32})\/download.*/", "$1", $path, 1, $count);
 
         if ($count === 1) {
 

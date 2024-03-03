@@ -35,8 +35,14 @@ CBRJS.Reader = function(bookPath, _options) {
 		    xhr = new XMLHttpRequest(),
 		    filename = decodeURIComponent(url.split('/').pop()),
             re_file_ext = new RegExp(/\.([a-z]+)$/),
-            format = filename.toLowerCase().match(re_file_ext)[1],
-		    archive_class = ({ cbz: 'Unzipper', cbr: 'Unrarrer' })[format],
+		    mime = new URLSearchParams(window.location.search).get('type'), // filename.toLowerCase().match(re_file_ext)[1],
+		    archive_class = {
+		        'application/x-cbr': 'Unrarrer',
+		        'application/x-cbz': 'Unzipper',
+		        'application/comicbook+rar': 'Unrarrer',
+		        'application/comicbook+zip': 'Unzipper',
+		        'application/comicbook+tar': 'Untarrer',
+		    }[mime],
 		    options = $.extend({
 			    start: function () {},
 			    extract: function (page_url) {},
