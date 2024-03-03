@@ -39,6 +39,7 @@
     "@nextcloud/router": "^2.2.0",
     "@nextcloud/sharing": "^0.1.0",
     "@nextcloud/vue": "7.12.6",
+    "vite": "^5.1.4",
     "vue": "^2.7.0"
   },
   "browserslist": [
