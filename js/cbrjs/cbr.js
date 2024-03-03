@@ -35,25 +35,12 @@ CBRJS.Reader = function(bookPath, _options) {
 		    xhr = new XMLHttpRequest(),
 		    filename = decodeURIComponent(url.split('/').pop()),
             re_file_ext = new RegExp(/\.([a-z]+)$/),
-		    mime = new URLSearchParams(window.location.search).get('type'), // filename.toLowerCase().match(re_file_ext)[1],
-		    archive_class = {
-		        'application/x-cbr': 'Unrarrer',
-		        'application/x-cbz': 'Unzipper',
-		        'application/comicbook+rar': 'Unrarrer',
-		        'application/comicbook+zip': 'Unzipper',
-		        'application/comicbook+tar': 'Untarrer',
-		    }[mime],
 		    options = $.extend({
 			    start: function () {},
 			    extract: function (page_url) {},
 			    progress: function (percent_complete) {},
 			    finish: function (images) {}
 		    }, opts);
-
-		if (!archive_class) {
-			alert('invalid file type, only cbz and cbr are supported.');
-			return false;
-		}
 
 		xhr.open('GET',url, true);
 
@@ -79,7 +66,7 @@ CBRJS.Reader = function(bookPath, _options) {
 		xhr.onload = function () {
 			if ((this.status === 200) && this.response) {
 				var done = false;
-				var ua = new bitjs.archive[archive_class](this.response, document.head.dataset.staticpath + 'js/bitjs/');
+				var ua = new bitjs.archive.GetUnarchiver(this.response, document.head.dataset.staticpath + 'js/bitjs/');
 
 				ua.addEventListener(bitjs.archive.UnarchiveEvent.Type.START, function (e) {
 					$progressbar.css('width', '0%');
