@@ -164,7 +164,8 @@ class PageController extends Controller
         } else {
             $filePath = $path;
             $fileId = $this->rootFolder->getUserFolder($this->userId)
-                ->get(preg_replace("/.*\/remote.php\/dav\/files\/[^\/]*\/(.*)/", "$1", rawurldecode($this->request->get['file'])))
+                // TODO: remove the "|webdav" from the RegEx once we stop supporting Nextcloud 27 and below
+                ->get(preg_replace("/.*\/remote.php\/(?:dav\/files\/[^\/]*|webdav)\/(.*)/", "$1", rawurldecode($this->request->get['file'])))
                 ->getId();
         }
 

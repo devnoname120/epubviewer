@@ -30,6 +30,7 @@ class FilesLoadAdditionalScriptsListener implements IEventListener
         // addInitScript was added in Nextcloud 28
         if (method_exists(Util::class, 'addInitScript')) {
             Util::addInitScript(Application::APP_ID, 'epubviewer-main');
+            // TODO: remove me once we drop support for Nextcloud 27 and below
         } else {
             Util::addScript(Application::APP_ID, 'epubviewer-main');
         }

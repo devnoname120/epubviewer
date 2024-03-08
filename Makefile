@@ -81,8 +81,11 @@ endif
 .PHONY: npm
 npm:
 ifeq (,$(wildcard $(CURDIR)/package.json))
-	cd js && $(npm) run build
+	pushd js
+	$(npm) install && $(npm) run build
+	popd js
 else
+	npm install
 	npm run build
 endif
 
@@ -108,11 +111,15 @@ dist:
 
 # Builds the source package
 .PHONY: source
-source:
+source: build
 	rm -rf $(source_build_directory)
 	mkdir -p $(source_build_directory)
 	tar cvzf $(source_package_name).tar.gz -C .. \
 	--exclude-vcs \
+	--exclude=".DS_Store" \
+	--exclude=".Spotlight-V100" \
+	--exclude=".Trashes" \
+	--exclude=".fseventsd" \
 	--exclude="$(app_name)/build" \
 	--exclude="$(app_name)/js/node_modules" \
 	--exclude="$(app_name)/node_modules" \
@@ -128,9 +135,14 @@ appstore:
 	mkdir -p $(appstore_build_directory)
 	tar cvzf $(appstore_package_name).tar.gz -C .. \
 	--exclude-vcs \
+	--exclude=".DS_Store" \
+	--exclude=".Spotlight-V100" \
+	--exclude=".Trashes" \
+	--exclude=".fseventsd" \
 	--exclude="$(app_name)/build" \
 	--exclude="$(app_name)/src" \
 	--exclude="$(app_name)/tests" \
+	--exclude="$(app_name)/screenshots" \
 	--exclude="$(app_name)/Makefile" \
 	--exclude="$(app_name)/*.log" \
 	--exclude="$(app_name)/phpunit*xml" \
