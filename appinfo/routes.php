@@ -1,14 +1,6 @@
 <?php
 
-/**
- * ownCloud - Epubviewer App
- *
- * @author Frank de Lange
- * @copyright 2015 Frank de Lange
- *
- * This file is licensed under the Affero General Public License version 3 or
- * later.
- */
+declare(strict_types=1);
 
 return ['routes' => [
     // Page
@@ -35,7 +27,6 @@ return ['routes' => [
     ['name' => 'preference#set', 'url' => '/preference', 'verb' => 'POST'],
     ['name' => 'preference#delete', 'url' => '/preference/{fileId}/{scope}/{name}', 'verb' => 'DELETE'],
 
-	// User Settings
-	['name' => 'settings#setPreference', 'url' => '/settings/set', 'verb' => 'POST'],
+    // User Settings
+    ['name' => 'settings#setPreference', 'url' => '/settings/set', 'verb' => 'POST'],
 ]];
-

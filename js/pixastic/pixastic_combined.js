@@ -29,7 +29,7 @@
             width = ctx.canvas.width, 
             height = ctx.canvas.height,
             queue = [],
-            workerControlPath = workerControlPath || "vendor/pixastic/";
+            workerControlPath = workerControlPath || "js/pixastic/";
 
         if (!worker) {
             if (typeof window.Worker != "undefined") {

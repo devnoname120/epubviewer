@@ -1,40 +1,34 @@
 <?php
-/**
- * @author Frank de Lange
- * @copyright 2015 Frank de Lange
- *
- * This file is licensed under the Affero General Public License version 3 or
- * later.
- * See the COPYING-README file.
- */
+
+declare(strict_types=1);
 
 namespace OCA\Epubviewer\Controller;
-
-use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http\TemplateResponse;
-use OCP\AppFramework\Http\ContentSecurityPolicy;
-use OCP\IRequest;
-use OCP\IURLGenerator;
-use OCP\Files\IRootFolder;
-use OCP\Share\IManager;
-use OCP\Files\FileInfo;
-use OCP\Files\NotFoundException;
 
 use OCA\Epubviewer\Service\BookmarkService;
 use OCA\Epubviewer\Service\MetadataService;
 use OCA\Epubviewer\Service\PreferenceService;
+use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\ContentSecurityPolicy;
+use OCP\AppFramework\Http\TemplateResponse;
+use OCP\Files\FileInfo;
+use OCP\Files\IRootFolder;
+use OCP\Files\NotFoundException;
+use OCP\IRequest;
+use OCP\IURLGenerator;
+use OCP\Share\IManager;
 
-class PageController extends Controller {
+class PageController extends Controller
+{
 
     /** @var IURLGenerator */
-    private $urlGenerator;
+    private IURLGenerator $urlGenerator;
     /** @var IRootFolder */
-    private $rootFolder;
-    private $shareManager;
-    private $userId;
-    private $bookmarkService;
-    private $metadataService;
-    private $preferenceService;
+    private IRootFolder $rootFolder;
+    private IManager $shareManager;
+    private string $userId;
+    private BookmarkService $bookmarkService;
+    private MetadataService $metadataService;
+    private PreferenceService $preferenceService;
 
     /**
      * @param string $appName
@@ -48,15 +42,16 @@ class PageController extends Controller {
      * @param MetadataService $metadataService
      */
     public function __construct(
-            $appName,
-            IRequest $request,
-            IURLGenerator $urlGenerator,
-            IRootFolder $rootFolder,
-            IManager $shareManager,
-            $userId,
-            BookmarkService $bookmarkService,
-            PreferenceService $preferenceService,
-            MetadataService $metadataService) {
+        $appName,
+        IRequest $request,
+        IURLGenerator $urlGenerator,
+        IRootFolder $rootFolder,
+        IManager $shareManager,
+        $userId,
+        BookmarkService $bookmarkService,
+        PreferenceService $preferenceService,
+        MetadataService $metadataService)
+    {
         parent::__construct($appName, $request);
         $this->urlGenerator = $urlGenerator;
         $this->rootFolder = $rootFolder;
@@ -73,11 +68,20 @@ class PageController extends Controller {
      *
      * @return TemplateResponse
      */
-    public function showReader() {
-        $templates= [
+    public function showReader(): TemplateResponse
+    {
+        $templates = [
             'application/epub+zip' => 'epubviewer',
+            'application/pdf' => 'pdfreader',
             'application/x-cbr' => 'cbreader',
-            'application/pdf' => 'pdfreader'
+            'application/x-cbz' => 'cbreader',
+            'application/comicbook+zip' => 'cbreader',
+            'application/comicbook+rar' => 'cbreader',
+            'application/comicbook+tar' => 'cbreader',
+            'application/comicbook+7z' => 'cbreader',
+            'application/comicbook+ace' => 'cbreader',
+            'application/comicbook+truecrypt' => 'cbreader',
+
         ];
 
         /**
@@ -88,6 +92,7 @@ class PageController extends Controller {
          *  ];
          */
         $fileInfo = $this->getFileInfo($this->request->get['file']);
+
         $fileId = $fileInfo['fileId'];
         $type = $this->request->get["type"];
         $scope = $template = $templates[$type];
@@ -102,24 +107,23 @@ class PageController extends Controller {
             'cursor' => $this->toJson($this->bookmarkService->getCursor($fileId)),
             'defaults' => $this->toJson($this->preferenceService->getDefault($scope)),
             'preferences' => $this->toJson($this->preferenceService->get($scope, $fileId)),
-            'defaults' => $this->toJson($this->preferenceService->getDefault($scope)),
             'metadata' => $this->toJson($this->metadataService->get($fileId)),
             'annotations' => $this->toJson($this->bookmarkService->get($fileId))
         ];
 
         $policy = new ContentSecurityPolicy();
-		$policy->addAllowedStyleDomain('\'self\'');
-		$policy->addAllowedStyleDomain('blob:');
-		$policy->addAllowedScriptDomain('\'self\'');
-		$policy->addAllowedFrameDomain('\'self\'');
-		$policy->addAllowedChildSrcDomain('\'self\'');
-		$policy->addAllowedFontDomain('\'self\'');
-		$policy->addAllowedFontDomain('data:');
-		$policy->addAllowedFontDomain('blob:');
-		$policy->addAllowedImageDomain('blob:');
+        $policy->addAllowedStyleDomain('\'self\'');
+        $policy->addAllowedStyleDomain('blob:');
+        $policy->addAllowedScriptDomain('\'self\'');
+        $policy->addAllowedFrameDomain('\'self\'');
+        $policy->addAllowedChildSrcDomain('\'self\'');
+        $policy->addAllowedFontDomain('\'self\'');
+        $policy->addAllowedFontDomain('data:');
+        $policy->addAllowedFontDomain('blob:');
+        $policy->addAllowedImageDomain('blob:');
 
         $response = new TemplateResponse($this->appName, $template, $params, 'blank');
-		$response->setContentSecurityPolicy($policy);
+        $response->setContentSecurityPolicy($policy);
 
         return $response;
     }
@@ -134,9 +138,10 @@ class PageController extends Controller {
      * @return array
      * @throws NotFoundException
      */
-    private function getFileInfo($path) {
+    private function getFileInfo($path)
+    {
         $count = 0;
-        $shareToken = preg_replace("/(?:\/index\.php)?\/s\/([A-Za-z0-9]{15,32})\/download.*/", "$1", $path, 1,$count);
+        $shareToken = preg_replace("/(?:\/index\.php)?\/s\/([A-Za-z0-9_\-+]{3,32})\/download.*/", "$1", $path, 1, $count);
 
         if ($count === 1) {
 
@@ -145,7 +150,7 @@ class PageController extends Controller {
             $type = $node->getType();
 
             /* shared directory, need file path to continue, */
-            if ($type == \OCP\Files\FileInfo::TYPE_FOLDER) {
+            if ($type == FileInfo::TYPE_FOLDER) {
                 $query = [];
                 parse_str(parse_url($path, PHP_URL_QUERY), $query);
                 if (isset($query['path']) && isset($query['files'])) {
@@ -159,8 +164,8 @@ class PageController extends Controller {
         } else {
             $filePath = $path;
             $fileId = $this->rootFolder->getUserFolder($this->userId)
-                ->get(preg_replace("/.*\/remote.php\/webdav(.*)/", "$1", rawurldecode($this->request->get['file'])))
-                ->getFileInfo()
+                // TODO: remove the "|webdav" from the RegEx once we stop supporting Nextcloud 27 and below
+                ->get(preg_replace("/.*\/remote.php\/(?:dav\/files\/[^\/]*|webdav)\/(.*)/", "$1", rawurldecode($this->request->get['file'])))
                 ->getId();
         }
 
@@ -171,7 +176,8 @@ class PageController extends Controller {
         ];
     }
 
-    private function toJson($value) {
+    private function toJson($value): string
+    {
         return htmlspecialchars(json_encode($value), ENT_QUOTES, 'UTF-8');
     }
 }

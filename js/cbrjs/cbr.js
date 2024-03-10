@@ -35,19 +35,12 @@ CBRJS.Reader = function(bookPath, _options) {
 		    xhr = new XMLHttpRequest(),
 		    filename = decodeURIComponent(url.split('/').pop()),
             re_file_ext = new RegExp(/\.([a-z]+)$/),
-            format = filename.toLowerCase().match(re_file_ext)[1],
-		    archive_class = ({ cbz: 'Unzipper', cbr: 'Unrarrer' })[format],
 		    options = $.extend({
 			    start: function () {},
 			    extract: function (page_url) {},
 			    progress: function (percent_complete) {},
 			    finish: function (images) {}
 		    }, opts);
-
-		if (!archive_class) {
-			alert('invalid file type, only cbz and cbr are supported.');
-			return false;
-		}
 
 		xhr.open('GET',url, true);
 
@@ -73,7 +66,7 @@ CBRJS.Reader = function(bookPath, _options) {
 		xhr.onload = function () {
 			if ((this.status === 200) && this.response) {
 				var done = false;
-				var ua = new bitjs.archive[archive_class](this.response, document.head.dataset.staticpath + 'vendor/bitjs/');
+				var ua = new bitjs.archive.GetUnarchiver(this.response, document.head.dataset.staticpath + 'js/bitjs/');
 
 				ua.addEventListener(bitjs.archive.UnarchiveEvent.Type.START, function (e) {
 					$progressbar.css('width', '0%');
@@ -276,7 +269,7 @@ ComicBook = (function ($) {
                 70: 'toggleFullscreen', // f
                 27: 'closeSidebar' // esc
             },
-            vendorPath: document.head.dataset.staticpath + 'vendor/',
+            vendorPath: document.head.dataset.staticpath + 'js/',
             forward_buffer: 3,
             session: {
                 getCursor: function() {},

@@ -1,12 +1,4 @@
 <?php
-/**
- * @author Frank de Lange
- * @copyright 2017 Frank de Lange
- *
- * This file is licensed under the Affero General Public License version 3 or
- * later.
- * See the COPYING-README file.
- */
 
 namespace OCA\Epubviewer\Db;
 
@@ -14,9 +6,11 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCA\Epubviewer\Utility\Time;
 use OCP\IDBConnection;
 
-class PreferenceMapper extends ReaderMapper {
+class PreferenceMapper extends ReaderMapper
+{
 
-    public function __construct(IDBConnection $db, $userId, Time $time) {
+    public function __construct(IDBConnection $db, $userId, Time $time)
+    {
         parent::__construct($db, 'reader_prefs', Preference::class, $time);
         $this->userId = $userId;
     }
@@ -29,7 +23,8 @@ class PreferenceMapper extends ReaderMapper {
      * @param string $name
      * @return array
      */
-    public function get($scope, $fileId, $name=null) {
+    public function get($scope, $fileId, $name = null)
+    {
         $query = $this->db->getQueryBuilder();
         $query->select('*')
             ->from($this->getTableName())
@@ -54,11 +49,12 @@ class PreferenceMapper extends ReaderMapper {
      *
      * @return Preference the newly created or updated preference
      */
-    public function set($scope, $fileId, $name, $value) {
+    public function set($scope, $fileId, $name, $value)
+    {
 
         $result = $this->get($scope, $fileId, $name);
 
-        if(empty($result)) {
+        if (empty($result)) {
 
             $preference = new Preference();
             $preference->setScope($scope);
@@ -79,22 +75,24 @@ class PreferenceMapper extends ReaderMapper {
     }
 
     /* currently not used*/
-    public function deleteForFileId($fileId) {
+    public function deleteForFileId($fileId)
+    {
         $sql = "SELECT * FROM `*PREFIX*reader_prefs` WHERE file_id=?";
-        $args = [ $fileId ];
+        $args = [$fileId];
         array_map(
-            function($entity) {
+            function ($entity) {
                 $this->delete($entity);
             }, $this->findEntities($sql, $args)
         );
     }
 
     /* currently not used*/
-    public function deleteForUserId($userId) {
+    public function deleteForUserId($userId)
+    {
         $sql = "SELECT * FROM `*PREFIX*reader_prefs` WHERE user_id=?";
-        $args = [ $userId ];
+        $args = [$userId];
         array_map(
-            function($entity) {
+            function ($entity) {
                 $this->delete($entity);
             }, $this->findEntities($sql, $args)
         );

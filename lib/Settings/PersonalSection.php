@@ -1,13 +1,4 @@
 <?php
-/**
- * ownCloud - Epubviewer App
- *
- * @author Frank de Lange
- * @copyright 2014,2018 Frank de Lange
- *
- * This file is licensed under the Affero General Public License version 3 or
- * later.
- */
 
 namespace OCA\Epubviewer\Settings;
 
