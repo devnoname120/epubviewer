@@ -7,7 +7,8 @@ following standards:
 - [PDF]
 - [CBR and CBZ] ("comics")
 
-For Epub Reader uses the futurepress [epub.js] renderer to provide near-native looks, especially when used full-screen.
+For Epub Reader uses the `futurepress` [epub.js] renderer to provide near-native looks, especially when used
+full-screen.
 Turn pages by pressing the left/right hand side of the screen/window or using the cursor keys (if you have those), use
 the sidebar to browse through chapters or bookmarks and add annotations.
 
@@ -27,7 +28,7 @@ quality, a set of image enhancement filters are provided.
 - Go to https://codespaces.new/nextcloud/server and use the default settings. You can also change the branch to
   e.g. `stable28` if you want to use a specific version of Nextcloud. It takes around 5 minutes to initialize. Then it
   starts automatically.
-- In the Codespace vscode interface, click on the burger menu in the upper left corner → `Terminal` → `Ne Terminal` and
+- In the Codespace vscode interface, click on the burger menu in the upper left corner → `Terminal` → `New Terminal` and
   then run the following in the newly-open terminal:
 
 ```shell
@@ -104,12 +105,12 @@ link to the `.tar.gz` file from the GitHub release as well as the signature that
 # Features
 
 Reader remembers the last-visited page in a book and returns to that page when the book is re-opened. As all settings
-are stored on the server these features are device-independent, ie. you can start reading on a mobile device, continue
+are stored on the server these features are device-independent, i.e. you can start reading on a mobile device, continue
 on a PC to finish the book on a tablet.
 
 ### Text-based formats incl. PDF
 
-- seamless full-screen mode supported on browsers which allow full user-control, ie. not on Apple)
+- seamless full-screen mode supported on browsers which allow full user-control, i.e. not on Apple
 - single- and double-page viewing mode
 - user-configurable font and colour settings
 - night mode, toggled by clicking the book title/author on top of the viewer or the night mode button (PDF)
@@ -120,7 +121,7 @@ on a PC to finish the book on a tablet.
 
 ### CBR/CBZ ('Comics')
 
-- seamless full-screen mode supported on browsers which allow full user-control, ie. not on Apple)
+- seamless full-screen mode supported on browsers which allow full user-control, i.e. not on Apple
 - single- and double-page viewing mode
 - optional image enhancement filters
 - Left-to-right and right-to-left (_manga_) modes
@@ -128,12 +129,12 @@ on a PC to finish the book on a tablet.
 - keyboard and pointer/touch-based navigation
 
 PDF support is still somewhat rough around the edges, not all features have been implemented yet. There is a known
-cosmetical issue in that in spread mode the (invisible but selectable) text layer for the left page is offset from the
+cosmetic issue in that in spread mode the (invisible but selectable) text layer for the left page is offset from the
 left when opening a document. As soon as a page is turned this problem disappears.
 
 ### Keyboard navigation
 
-Reader supports both pointer/touch-based as well as keyboard-based navigation. Pointer/touch based is mostly
+Reader supports both pointer/touch-based and keyboard-based navigation. Pointer/touch based is mostly
 self-explanatory,
 
 |                           key | function                                                       |
@@ -155,8 +156,9 @@ self-explanatory,
 
 ### Defaults and Preferences
 
-Reader stores **defaults** - settings which are independent of _fileId_ (ie. independent of the book currently open) -
-and **preferences** - _fileId_-dependent (ie. different for every book) - on the server. Defaults are not shared between
+Reader stores **defaults** - settings which are independent of _fileId_ (i.e. independent of the book currently open) -
+and **preferences** - _fileId_-dependent (i.e. different for every book) - on the server. Defaults are not shared
+between
 renderers, ie. the CBR renderer does not share defaults with the EPUB or PDF renderer. Defaults and preferences are
 removed from the server when the associated book or user is deleted.
 
@@ -176,7 +178,7 @@ or deleted in the sidebar.
 | Reader showing page spread in 'night mode'                  | ![Reader showing page spread in 'night mode'][SS01]                  |
 | Epub single page, full screen on a small-screen device      | ![Epub single page, full screen][SS02]                               |
 | Day mode color selector                                     | ![Day mode color selector][SS03]                                     |
-| Longing for that olde-time terminal feeling...              | ![Longing for that olde-time terminal feeling...][SS04]              |
+| Longing for that old-time terminal feeling...               | ![Longing for that old-time terminal feeling...][SS04]               |
 | Full-text search                                            | ![Full-text search][SS05]                                            |
 | Small screen device, **maximize text area** enabled         | ![Small screen device, maximize text area enabled][SS06]             |
 | Search on small-screen device                               | ![Search on small-screen device][SS07]                               |
