@@ -116,10 +116,24 @@ source: build
 	mkdir -p $(source_build_directory)
 	tar cvzf $(source_package_name).tar.gz -C .. \
 	--exclude-vcs \
+	--exclude="*~" \
+	--exclude="*.sw*" \
+	--exclude="\#*\#" \
+	--exclude="._*" \
+	--exclude="Thumbs.db" \
+	--exclude=".fuse_hidden*" \
+	--exclude=".directory" \
+	--exclude=".nfs*" \
 	--exclude=".DS_Store" \
 	--exclude=".Spotlight-V100" \
 	--exclude=".Trashes" \
 	--exclude=".fseventsd" \
+	--exclude=".AppleDouble" \
+	--exclude=".LSOverride" \
+	--exclude="*.icloud" \
+	--exclude=".idea" \
+	--exclude=".vscode" \
+	--exclude=".history" \
 	--exclude="$(app_name)/build" \
 	--exclude="$(app_name)/js/node_modules" \
 	--exclude="$(app_name)/node_modules" \
@@ -135,10 +149,24 @@ appstore:
 	mkdir -p $(appstore_build_directory)
 	tar cvzf $(appstore_package_name).tar.gz -C .. \
 	--exclude-vcs \
+	--exclude="*~" \
+	--exclude="*.sw*" \
+	--exclude="\#*\#" \
+	--exclude="._*" \
+	--exclude="Thumbs.db" \
+	--exclude=".fuse_hidden*" \
+	--exclude=".directory" \
+	--exclude=".nfs*" \
 	--exclude=".DS_Store" \
 	--exclude=".Spotlight-V100" \
 	--exclude=".Trashes" \
 	--exclude=".fseventsd" \
+	--exclude=".AppleDouble" \
+	--exclude=".LSOverride" \
+	--exclude="*.icloud" \
+	--exclude=".idea" \
+	--exclude=".vscode" \
+	--exclude=".history" \
 	--exclude="$(app_name)/build" \
 	--exclude="$(app_name)/src" \
 	--exclude="$(app_name)/tests" \
