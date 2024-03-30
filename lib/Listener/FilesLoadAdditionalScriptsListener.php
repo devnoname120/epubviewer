@@ -35,6 +35,7 @@ class FilesLoadAdditionalScriptsListener implements IEventListener
             Util::addScript(Application::APP_ID, 'epubviewer-main');
         }
 
-        Util::addStyle(Application::APP_ID, 'epubviewer-main');
+        // We currently don't have a custom stylesheet, but you can uncomment this line the day we need it
+        // Util::addStyle(Application::APP_ID, 'epubviewer-main');
     }
 }
