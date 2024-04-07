@@ -1,7 +1,7 @@
 document.onreadystatechange = function () {
   if (document.readyState === 'complete') {
-    const type = decodeURIComponent(getUrlParameter('type'));
-    const file = decodeURIComponent(getUrlParameter('file'));
+    const type = getUrlParameter('type');
+    const file = getUrlParameter('file');
     const options: object = {};
     const $session = $('.session');
 

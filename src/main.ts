@@ -48,7 +48,7 @@ function actionHandler(file: Node, dir: string) {
       path: dir,
     });
   } else {
-    downloadUrl = getAbsolutePath(file.source);
+    downloadUrl = getAbsolutePath(file.encodedSource);
   }
   show(downloadUrl, file.mime || '', true);
 }
