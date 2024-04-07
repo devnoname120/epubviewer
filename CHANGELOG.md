@@ -1,3 +1,9 @@
+## 1.6.2 - 2024-04-08
+
+### Fixed
+
+- EPUB/CBR/PDF: fix loading when the path of a file contains special characters such as `#`.
+
 ## 1.6.1 - 2024-03-30
 
 ### Fixed
