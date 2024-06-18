@@ -1,6 +1,7 @@
 import { generateUrl } from '@nextcloud/router';
 import { DefaultType, FileAction, type Node, Permission, registerFileAction } from '@nextcloud/files';
 import { loadState } from '@nextcloud/initial-state';
+import { encodePath } from '@nextcloud/paths'
 
 // TODO: use i10n for strings:
 // import { translate as t, translatePlural as n } from '@nextcloud/l10n'
@@ -48,7 +49,13 @@ function actionHandler(file: Node, dir: string) {
       path: dir,
     });
   } else {
-    downloadUrl = getAbsolutePath(file.encodedSource);
+	// NC28 dependency : Node.encodedSource
+	if (!file.encodedSource) {
+		const { origin } = new URL(file.source)
+		downloadUrl = getAbsolutePath(origin + encodePath(file.source.slice(origin.length)))
+	} else {
+	    downloadUrl = getAbsolutePath(file.encodedSource);
+	}
   }
   show(downloadUrl, file.mime || '', true);
 }
