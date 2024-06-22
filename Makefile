@@ -42,7 +42,7 @@ build_tools_directory=$(CURDIR)/build/tools
 source_build_directory=$(CURDIR)/build/artifacts/source
 source_package_name=$(source_build_directory)/$(app_name)
 appstore_build_directory=$(CURDIR)/build/artifacts
-appstore_package_name=$(appstore_build_directory)/$(app_name)
+appstore_package_name=$(appstore_build_directory)/$(app_name)-appstore
 npm=$(shell which npm 2> /dev/null)
 composer=$(shell which composer 2> /dev/null)
 
@@ -82,10 +82,10 @@ endif
 npm:
 ifeq (,$(wildcard $(CURDIR)/package.json))
 	pushd js
-	$(npm) install && $(npm) run build
+	$(npm) clean-install && $(npm) run build
 	popd js
 else
-	npm install
+	npm clean-install
 	npm run build
 endif
 
@@ -105,7 +105,7 @@ distclean: clean
 
 # Builds the source and appstore package
 .PHONY: dist
-dist:
+dist: distclean
 	make source
 	make appstore
 
@@ -197,7 +197,12 @@ appstore:
 	--exclude="$(app_name)/README.md" \
 	--exclude="$(app_name)/package-lock.json" \
 	--exclude="$(app_name)/LICENSES" \
-	$(app_name) \
+	$(app_name)
+	@echo
+	@echo "Signature of $(appstore_package_name).tar.gz:"
+	@echo
+	@openssl dgst -sha512 -sign ~/.nextcloud/certificates/epubviewer.key "$(appstore_package_name).tar.gz" | openssl base64
+
 
 .PHONY: test
 test: composer

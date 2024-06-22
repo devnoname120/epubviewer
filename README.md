@@ -91,12 +91,12 @@ to [Nextcloud's App Store](http://apps.nextcloud.com/):
 make dist
 ```
 
-The `.tar.gz` archive is located in `build/artifacts/appstore` and you can create a new GitHub release.
+The `.tar.gz` archive is located in `build/artifacts` and you can create a new GitHub release.
 
 Before uploading it to Nextcloud's App Store you also need to create a signature of the tarball:
 
 ```shell
-openssl dgst -sha512 -sign ~/.nextcloud/certificates/epubviewer.key build/artifacts/appstore/epubviewer.tar.gz | openssl base64
+openssl dgst -sha512 -sign ~/.nextcloud/certificates/epubviewer.key build/artifacts/epubviewer-appstore.tar.gz | openssl base64
 ```
 
 You can then create a [new app release](https://apps.nextcloud.com/developer/apps/releases/new) specifying the direct
