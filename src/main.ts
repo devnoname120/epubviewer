@@ -1,7 +1,6 @@
 import { generateUrl } from '@nextcloud/router';
 import { DefaultType, FileAction, type Node, Permission, registerFileAction } from '@nextcloud/files';
 import { loadState } from '@nextcloud/initial-state';
-import { encodePath } from '@nextcloud/paths';
 
 // TODO: use i10n for strings:
 // import { translate as t, translatePlural as n } from '@nextcloud/l10n'
@@ -49,7 +48,7 @@ function actionHandler(file: Node, dir: string) {
       path: dir,
     });
   } else {
-    // NC28 dependency : Node.encodedSource
+    // TODO: remove the fallback to file.source once we deprecate NC27 support
     downloadUrl = getAbsolutePath(file.encodedSource ?? file.source);
   }
   show(downloadUrl, file.mime || '', true);
