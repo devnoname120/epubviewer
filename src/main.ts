@@ -48,7 +48,8 @@ function actionHandler(file: Node, dir: string) {
       path: dir,
     });
   } else {
-    downloadUrl = getAbsolutePath(file.encodedSource);
+    // TODO: remove the fallback to file.source once we deprecate NC27 support
+    downloadUrl = getAbsolutePath(file.encodedSource ?? file.source);
   }
   show(downloadUrl, file.mime || '', true);
 }
