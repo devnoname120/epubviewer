@@ -41,7 +41,7 @@
   },
   "require": {
     "ext-json": "*",
-    "nextcloud/ocp": "^27",
+    "nextcloud/ocp": "^28",
     "sabre/dav": "^4.1",
     "sabre/xml": "^2.2",
     "symfony/event-dispatcher": "^5.3.11"

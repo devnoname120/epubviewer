@@ -48,8 +48,7 @@ function actionHandler(file: Node, dir: string) {
       path: dir,
     });
   } else {
-    // TODO: remove the fallback to file.source once we deprecate NC27 support
-    downloadUrl = getAbsolutePath(file.encodedSource ?? file.source);
+    downloadUrl = getAbsolutePath(file.encodedSource);
   }
   show(downloadUrl, file.mime || '', true);
 }
@@ -63,156 +62,70 @@ const isEpubEnabled = loadState<boolean>(APP_ID, 'enableEpub');
 const isPdfEnabled = loadState<boolean>(APP_ID, 'enablePdf');
 const isCbxEnabled = loadState<boolean>(APP_ID, 'enableCbx');
 
-const nextcloudVersion = Number(window.OC?.config?.versionstring?.split('.')?.[0]) || undefined;
+registerFileAction(
+  new FileAction({
+    id: 'view-epub',
+    iconSvgInline: () => '<svg></svg>',
+    displayName: () => 'View',
+    default: DefaultType.DEFAULT,
+    enabled(nodes) {
+      const isEpub = nodes.some((node) => node.mime === 'application/epub+zip');
+      const isReadable = nodes.some((node) => node.permissions & Permission.READ);
 
-// registerFileAction() was introduced in Nextcloud 28
-if (nextcloudVersion === undefined || nextcloudVersion >= 28) {
-  registerFileAction(
-    new FileAction({
-      id: 'view-epub',
-      iconSvgInline: () => '<svg></svg>',
-      displayName: () => 'View',
-      default: DefaultType.DEFAULT,
-      enabled(nodes) {
-        const isEpub = nodes.some((node) => node.mime === 'application/epub+zip');
-        const isReadable = nodes.some((node) => node.permissions & Permission.READ);
+      return isEpubEnabled && isEpub && isReadable;
+    },
+    exec: async function (file, view, dir) {
+      actionHandler(file, dir);
+      return true;
+    },
+  }),
+);
 
-        return isEpubEnabled && isEpub && isReadable;
-      },
-      exec: async function (file, view, dir) {
-        actionHandler(file, dir);
-        return true;
-      },
-    }),
-  );
-
-  registerFileAction(
-    new FileAction({
-      id: 'view-cbr',
-      iconSvgInline: () => '<svg></svg>',
-      displayName: () => 'View',
-      default: DefaultType.DEFAULT,
-      enabled(nodes) {
-        const cbxMimes = [
-          'application/x-cbr',
-          'application/x-cbz',
-          // 'application/comicbook+7z',
-          // 'application/comicbook+ace',
-          'application/comicbook+rar',
-          'application/comicbook+tar',
-          // 'application/comicbook+truecrypt',
-          'application/comicbook+zip',
-        ];
-
-        const isCbx = nodes.some((node) => cbxMimes.includes(node.mime || ''));
-        const isReadable = nodes.some((node) => node.permissions & Permission.READ);
-
-        return isCbxEnabled && isCbx && isReadable;
-      },
-      exec: async function (file, view, dir) {
-        actionHandler(file, dir);
-        return true;
-      },
-    }),
-  );
-
-  registerFileAction(
-    new FileAction({
-      id: 'view-pdf',
-      iconSvgInline: () => '<svg></svg>',
-      displayName: () => 'View',
-      default: DefaultType.DEFAULT,
-      enabled(nodes) {
-        const isPdf = nodes.some((node) => node.mime === 'application/pdf');
-        const isReadable = nodes.some((node) => node.permissions & Permission.READ);
-
-        return isPdfEnabled && isPdf && isReadable;
-      },
-      exec: async function (file, view, dir) {
-        actionHandler(file, dir);
-        return true;
-      },
-    }),
-  );
-  // TODO: remove me once we stop supporting Nextcloud 27 and below
-} else {
-  OC.Plugins.register('OCA.Files.FileList', {
-    attach: function (fileList) {
-      const fileActions = fileList.fileActions;
-
-      fileActions.registerAction({
-        name: 'view-epub',
-        displayName: 'View',
-        mime: 'application/epub+zip',
-        permissions: OC.PERMISSION_READ,
-        actionHandler: (fileName, context) => {
-          const dir = context.dir;
-          const file = {
-            basename: fileName,
-            mime: 'application/epub+zip',
-            source: new URL(Files.getDownloadUrl(fileName, context.dir), document.location.href).toString(),
-          };
-
-          actionHandler(file, dir);
-        },
-      });
-
-      const cbxMime = [
+registerFileAction(
+  new FileAction({
+    id: 'view-cbr',
+    iconSvgInline: () => '<svg></svg>',
+    displayName: () => 'View',
+    default: DefaultType.DEFAULT,
+    enabled(nodes) {
+      const cbxMimes = [
         'application/x-cbr',
-        'application/comicbook+7z',
-        'application/comicbook+ace',
+        'application/x-cbz',
+        // 'application/comicbook+7z',
+        // 'application/comicbook+ace',
         'application/comicbook+rar',
         'application/comicbook+tar',
-        'application/comicbook+truecrypt',
+        // 'application/comicbook+truecrypt',
         'application/comicbook+zip',
       ];
 
-      for (const [i, mime] of Object.entries(cbxMime)) {
-        fileActions.registerAction({
-          name: 'view-cbr-' + i,
-          displayName: 'View',
-          mime,
-          permissions: OC.PERMISSION_READ,
-          actionHandler: (fileName, context) => {
-            const dir = context.dir;
-            const file = {
-              basename: fileName,
-              mime,
-              source: new URL(Files.getDownloadUrl(fileName, context.dir), document.location.href).toString(),
-            };
+      const isCbx = nodes.some((node) => cbxMimes.includes(node.mime || ''));
+      const isReadable = nodes.some((node) => node.permissions & Permission.READ);
 
-            actionHandler(file, dir);
-          },
-        });
-
-        if (isCbxEnabled) {
-          fileActions.setDefault(mime, 'view-cbr-' + i);
-        }
-      }
-
-      fileActions.registerAction({
-        name: 'view-pdf',
-        displayName: 'View',
-        mime: 'application/pdf',
-        permissions: OC.PERMISSION_READ,
-        actionHandler: (fileName, context) => {
-          const dir = context.dir;
-          const file = {
-            basename: fileName,
-            mime: 'application/pdf',
-            source: new URL(Files.getDownloadUrl(fileName, context.dir), document.location.href).toString(),
-          };
-
-          actionHandler(file, dir);
-        },
-      });
-
-      if (isEpubEnabled) {
-        fileActions.setDefault('application/epub+zip', 'view-epub');
-      }
-      if (isPdfEnabled) {
-        fileActions.setDefault('application/pdf', 'view-pdf');
-      }
+      return isCbxEnabled && isCbx && isReadable;
     },
-  });
-}
+    exec: async function (file, view, dir) {
+      actionHandler(file, dir);
+      return true;
+    },
+  }),
+);
+
+registerFileAction(
+  new FileAction({
+    id: 'view-pdf',
+    iconSvgInline: () => '<svg></svg>',
+    displayName: () => 'View',
+    default: DefaultType.DEFAULT,
+    enabled(nodes) {
+      const isPdf = nodes.some((node) => node.mime === 'application/pdf');
+      const isReadable = nodes.some((node) => node.permissions & Permission.READ);
+
+      return isPdfEnabled && isPdf && isReadable;
+    },
+    exec: async function (file, view, dir) {
+      actionHandler(file, dir);
+      return true;
+    },
+  }),
+);
