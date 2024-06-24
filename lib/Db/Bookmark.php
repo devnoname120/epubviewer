@@ -28,7 +28,10 @@ class Bookmark extends ReaderEntity implements JsonSerializable {
 		];
 	}
 
-	public function toService() {
+	/**
+	 * @psalm-return array{name: mixed, type: mixed, value: mixed, content: mixed, lastModified: mixed}
+	 */
+	public function toService(): array {
 		return [
 			'name' => $this->getName(),
 			'type' => $this->getType(),

@@ -91,7 +91,7 @@ class BookmarkMapper extends ReaderMapper {
 	}
 
 	/* currently not used */
-	public function deleteForFileId($fileId) {
+	public function deleteForFileId($fileId): void {
 		$sql = "SELECT * FROM `*PREFIX*reader_bookmarks` WHERE file_id=?";
 		$args = [$fileId];
 		array_map(
@@ -102,7 +102,7 @@ class BookmarkMapper extends ReaderMapper {
 	}
 
 	/* currently not used */
-	public function deleteForUserId($userId) {
+	public function deleteForUserId($userId): void {
 		$sql = "SELECT * FROM `*PREFIX*reader_bookmarks` WHERE user_id=?";
 		$args = [$userId];
 		array_map(

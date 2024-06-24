@@ -25,7 +25,10 @@ class Preference extends ReaderEntity implements JsonSerializable {
 		];
 	}
 
-	public function toService() {
+	/**
+	 * @psalm-return array{name: mixed, value: mixed}
+	 */
+	public function toService(): array {
 		return [
 			'name' => $this->getName(),
 			'value' => $this->conditional_json_decode($this->getValue()),
