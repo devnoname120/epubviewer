@@ -1,5 +1,6 @@
 vendor
 build
+.php-cs-fixer.cache
 js/*
 !js/cbrjs
 !js/lib

@@ -191,6 +191,7 @@ appstore:
 	--exclude="$(app_name)/.*" \
 	--exclude="$(app_name)/js/.*" \
 	--exclude="$(app_name)/vite.config.ts" \
+	--exclude="$(app_name)/*.bash" \
 	--exclude="$(app_name)/tsconfig.json" \
 	--exclude="$(app_name)/stylelint.config.cjs" \
 	--exclude="$(app_name)/CHANGELOG.md" \
