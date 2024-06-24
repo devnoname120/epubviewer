@@ -27,7 +27,7 @@ class BookmarkMapper extends ReaderMapper {
 	 * @param string $name
 	 * @return array
 	 */
-	public function get($fileId, $name, $type = null) {
+	public function get(int $fileId, $name, $type = null) {
 		$query = $this->db->getQueryBuilder();
 		$query->select('*')
 			->from($this->getTableName())

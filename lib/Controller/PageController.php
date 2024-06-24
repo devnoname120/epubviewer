@@ -172,7 +172,7 @@ class PageController extends Controller {
 		];
 	}
 
-	private function toJson($value): string {
+	private function toJson(array $value): string {
 		return htmlspecialchars(json_encode($value), ENT_QUOTES, 'UTF-8');
 	}
 }

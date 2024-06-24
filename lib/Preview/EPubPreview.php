@@ -183,8 +183,10 @@ class EPubPreview implements IProviderV2 {
 
 	/**
 	 * extract XML from Zip path
+	 *
+	 * @psalm-param 'META-INF/container.xml' $path
 	 */
-	private function extractXML($path) {
+	private function extractXML(string $path) {
 		$xml = $this->extractFileData($path);
 		if ($xml) {
 			return simplexml_load_string($xml);
