@@ -47,7 +47,7 @@ class Application extends App implements IBootstrap {
 		//    Hooks::register();
 	}
 
-	private function registerProvider(IRegistrationContext $context) {
+	private function registerProvider(IRegistrationContext $context): void {
 		$context->registerPreviewProvider(EPubPreview::class, '/^application\/epub\+zip$/');
 	}
 

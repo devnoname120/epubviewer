@@ -169,7 +169,7 @@ class EPubPreview implements IProviderV2 {
 	/**
 	 * extract HTML from Zip path
 	 */
-	protected function extractHTML($path) {
+	protected function extractHTML($path): \DOMDocument|null {
 		$html = $this->extractFileData($path);
 		if ($html) {
 			$dom = new \DOMDocument('1.0', 'utf-8');
@@ -186,7 +186,7 @@ class EPubPreview implements IProviderV2 {
 	 *
 	 * @psalm-param 'META-INF/container.xml' $path
 	 */
-	private function extractXML(string $path) {
+	private function extractXML(string $path): \SimpleXMLElement|false|null {
 		$xml = $this->extractFileData($path);
 		if ($xml) {
 			return simplexml_load_string($xml);
@@ -200,8 +200,10 @@ class EPubPreview implements IProviderV2 {
 	 * @param $path file path in zip
 	 *
 	 * @psalm-param 'META-INF/container.xml' $path
+	 *
+	 * @return false|null|string
 	 */
-	private function extractFileData(string $path) {
+	private function extractFileData(string $path): string|false|null {
 		$fp = $this->zip->getStream($path, 'r');
 		if ($fp) {
 			$content = stream_get_contents($fp);
@@ -213,10 +215,11 @@ class EPubPreview implements IProviderV2 {
 
 	/**
 	 * Resolve relative $relPath from $path (removes ./, ../)
+	 *
 	 * @param $path reference path
 	 * @param $relPath relative path
 	 */
-	private function resolvePath($path, $relPath) {
+	private function resolvePath($path, $relPath): string {
 		$path = dirname($path).'/'.$relPath;
 		$pieces = explode('/', $path);
 		$parents = [];
