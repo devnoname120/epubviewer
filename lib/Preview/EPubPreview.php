@@ -22,11 +22,11 @@
 namespace OCA\Epubviewer\Preview;
 
 //.epub
-use OCP\Preview\IProviderV2;
 use OC\Archive\ZIP;
 use OCP\Files\File;
 use OCP\Files\FileInfo;
 use OCP\IImage;
+use OCP\Preview\IProviderV2;
 
 class EPubPreview implements IProviderV2 {
 	private $zip;
@@ -73,15 +73,15 @@ class EPubPreview implements IProviderV2 {
 
 			$img_data = null;
 			$contentPath = $this->getContentPath();
-			if ($contentPath){
+			if ($contentPath) {
 				$package = $this->extractXML($contentPath);
 				if ($package) {
 					$path = $contentPath;
 					$img_src = $cover = null;
 					// Try first through <manifest>
 					$items = $package->manifest->children();
-					foreach( $items as $item) {
-						if (($item['id'] == 'cover' || $item['id'] == 'cover-image') && preg_match('/image\//', (string) $item['media-type'])){
+					foreach($items as $item) {
+						if (($item['id'] == 'cover' || $item['id'] == 'cover-image') && preg_match('/image\//', (string) $item['media-type'])) {
 							$img_src = (string) $item['href'];
 							break;
 						}
@@ -90,7 +90,7 @@ class EPubPreview implements IProviderV2 {
 					// in references
 					if (!$img_src) {
 						$references = $package->guide->children();
-						foreach( $references as $reference) {
+						foreach($references as $reference) {
 							if ($reference['type'] == 'cover' || $reference['type'] == 'title-page') {
 								$cover = (string) $reference['href'];
 								break;
@@ -99,10 +99,10 @@ class EPubPreview implements IProviderV2 {
 					}
 
 					// no cover ? no image ? take the first page
-					if (!$img_src && !$cover){
+					if (!$img_src && !$cover) {
 						$first_page_id = (string) $package->spine->itemref['idref'];
 						if ($first_page_id) {
-							foreach( $items as $item) {
+							foreach($items as $item) {
 								if ($item['id'] == $first_page_id) {
 									$cover = (string) $item['href'];
 									break;
@@ -116,16 +116,16 @@ class EPubPreview implements IProviderV2 {
 					if ($cover) {
 						// relative to container
 						$img_src = null;
-						$path = $this->resolvePath( $path, $cover);
-						$dom = $this->extractHTML( $path);
-						if ($dom){
+						$path = $this->resolvePath($path, $cover);
+						$dom = $this->extractHTML($path);
+						if ($dom) {
 							// search img
-							$images=$dom->getElementsByTagName('img');
-							if ($images->length){
+							$images = $dom->getElementsByTagName('img');
+							if ($images->length) {
 								$img_src = $images[0]->getAttribute('src');
 							} else {
-								$images=$dom->getElementsByTagName('image');
-								if ($images->length){
+								$images = $dom->getElementsByTagName('image');
+								if ($images->length) {
 									$img_src = $images[0]->getAttribute('xlink:href');
 								}
 							}
@@ -134,7 +134,7 @@ class EPubPreview implements IProviderV2 {
 
 					// img ?
 					if ($img_src) {
-						$img_src = $this->resolvePath( $path, $img_src);
+						$img_src = $this->resolvePath($path, $img_src);
 						$img_data = $this->extractFileData($img_src);
 					}
 				}
@@ -157,7 +157,7 @@ class EPubPreview implements IProviderV2 {
 	 */
 	private function getContentPath() {
 		$xml_container = $this->extractXML('META-INF/container.xml');
-		if ($xml_container){
+		if ($xml_container) {
 			$full_path = $xml_container->rootfiles->rootfile['full-path'][0];
 			if ($full_path) {
 				return $full_path->__toString();
@@ -169,11 +169,11 @@ class EPubPreview implements IProviderV2 {
 	/**
 	 * extract HTML from Zip path
 	 */
-	protected function extractHTML( $path) {
+	protected function extractHTML($path) {
 		$html = $this->extractFileData($path);
 		if ($html) {
-			$dom=new \DOMDocument('1.0','utf-8');
-			$dom->strictErrorChecking=false;
+			$dom = new \DOMDocument('1.0', 'utf-8');
+			$dom->strictErrorChecking = false;
 			if (@$dom->loadHTML($html)) {
 				return $dom;
 			}
@@ -184,7 +184,7 @@ class EPubPreview implements IProviderV2 {
 	/**
 	 * extract XML from Zip path
 	 */
-	private function extractXML( $path) {
+	private function extractXML($path) {
 		$xml = $this->extractFileData($path);
 		if ($xml) {
 			return simplexml_load_string($xml);
@@ -196,8 +196,8 @@ class EPubPreview implements IProviderV2 {
 	 * get unzipped data
 	 * @param $path file path in zip
 	 */
-	private function extractFileData( $path) {
-		$fp = $this->zip->getStream( $path, 'r');
+	private function extractFileData($path) {
+		$fp = $this->zip->getStream($path, 'r');
 		if ($fp) {
 			$content = stream_get_contents($fp);
 			fclose($fp);
@@ -211,21 +211,21 @@ class EPubPreview implements IProviderV2 {
 	 * @param $path reference path
 	 * @param $relPath relative path
 	 */
-	private function resolvePath( $path, $relPath) {
-		$path = dirname( $path).'/'.$relPath;
-		$pieces = explode( '/', $path);
-		$parents = array();
-		foreach( $pieces as $dir) {
-			switch( $dir) {
+	private function resolvePath($path, $relPath) {
+		$path = dirname($path).'/'.$relPath;
+		$pieces = explode('/', $path);
+		$parents = [];
+		foreach($pieces as $dir) {
+			switch($dir) {
 				case '.':
 					// Don't need to do anything here
-				break;
+					break;
 				case '..':
-					array_pop( $parents);
+					array_pop($parents);
 					break;
 				default:
 					$parents[] = $dir;
-				break;
+					break;
 			}
 		}
 		return implode('/', $parents);

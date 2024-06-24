@@ -18,13 +18,13 @@ $version = OC::$server->getAppManager()->getAppVersion('epubviewer') . '.' . $re
 
 /* Mobile safari, the new IE6 */
 $idevice = (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone')
-    || strstr($_SERVER['HTTP_USER_AGENT'], 'iPad')
-    || strstr($_SERVER['HTTP_USER_AGENT'], 'iPod'));
+	|| strstr($_SERVER['HTTP_USER_AGENT'], 'iPad')
+	|| strstr($_SERVER['HTTP_USER_AGENT'], 'iPod'));
 
 /* Owncloud currently does not implement CSPv3, remove this test when it does */
 $nonce = class_exists('\OC\Security\CSP\ContentSecurityPolicyNonceManager')
-    ? OC::$server->getContentSecurityPolicyNonceManager()->getNonce()
-    : 'nonce_not_implemented';
+	? OC::$server->getContentSecurityPolicyNonceManager()->getNonce()
+	: 'nonce_not_implemented';
 ?>
 
 <html dir="ltr">

@@ -2,35 +2,31 @@
 
 namespace OCA\Epubviewer\Db;
 
-use OCP\IDBConnection;
-use OCP\AppFramework\Db\QBMapper;
-use OCP\AppFramework\Db\Entity;
-
 use OCA\Epubviewer\Utility\Time;
+use OCP\AppFramework\Db\Entity;
+use OCP\AppFramework\Db\QBMapper;
 
-abstract class ReaderMapper extends QBMapper
-{
+use OCP\IDBConnection;
 
-    /**
-     * @var Time
-     */
-    private $time;
+abstract class ReaderMapper extends QBMapper {
 
-    public function __construct(IDBConnection $db, $table, $entity, Time $time)
-    {
-        parent::__construct($db, $table, $entity);
-        $this->time = $time;
-    }
+	/**
+	 * @var Time
+	 */
+	private $time;
 
-    public function update(Entity $entity): Entity
-    {
-        $entity->setLastModified($this->time->getMicroTime());
-        return parent::update($entity);
-    }
+	public function __construct(IDBConnection $db, $table, $entity, Time $time) {
+		parent::__construct($db, $table, $entity);
+		$this->time = $time;
+	}
 
-    public function insert(Entity $entity): Entity
-    {
-        $entity->setLastModified($this->time->getMicroTime());
-        return parent::insert($entity);
-    }
+	public function update(Entity $entity): Entity {
+		$entity->setLastModified($this->time->getMicroTime());
+		return parent::update($entity);
+	}
+
+	public function insert(Entity $entity): Entity {
+		$entity->setLastModified($this->time->getMicroTime());
+		return parent::insert($entity);
+	}
 }
