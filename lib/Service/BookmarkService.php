@@ -83,9 +83,8 @@ class BookmarkService extends Service {
 	 *
 	 * @param int $fileId
 	 * @param string $name
-	 *
 	 */
-	public function delete($fileId, $name, $type = null) {
+	public function delete($fileId, $name, $type = null): void {
 		foreach ($this->bookmarkMapper->get($fileId, $name, $type) as $bookmark) {
 			$this->bookmarkMapper->delete($bookmark);
 		}
@@ -95,9 +94,8 @@ class BookmarkService extends Service {
 	 * @brief delete cursor
 	 *
 	 * @param int $fileId
-	 *
 	 */
-	public function deleteCursor($fileId) {
+	public function deleteCursor($fileId): void {
 		$this->delete($fileId, static::CURSOR, static::bookmark_type);
 	}
 }

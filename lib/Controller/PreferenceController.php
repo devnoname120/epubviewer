@@ -101,9 +101,8 @@ class PreferenceController extends Controller {
 	 * @param string $scope
 	 * @param int $fileId
 	 * @param string $name
-	 *
 	 */
-	public function delete($scope, $fileId, $name) {
+	public function delete($scope, $fileId, $name): void {
 		$this->preferenceService->delete($scope, $fileId, $name);
 	}
 
@@ -112,9 +111,8 @@ class PreferenceController extends Controller {
 	 *
 	 * @param $scope
 	 * @param $name
-	 *
 	 */
-	public function deleteDefault($scope, $name) {
+	public function deleteDefault($scope, $name): void {
 		$this->preferenceService->deleteDefault($scope, $name);
 	}
 }

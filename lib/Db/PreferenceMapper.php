@@ -70,7 +70,7 @@ class PreferenceMapper extends ReaderMapper {
 	}
 
 	/* currently not used*/
-	public function deleteForFileId($fileId) {
+	public function deleteForFileId($fileId): void {
 		$sql = "SELECT * FROM `*PREFIX*reader_prefs` WHERE file_id=?";
 		$args = [$fileId];
 		array_map(
@@ -81,7 +81,7 @@ class PreferenceMapper extends ReaderMapper {
 	}
 
 	/* currently not used*/
-	public function deleteForUserId($userId) {
+	public function deleteForUserId($userId): void {
 		$sql = "SELECT * FROM `*PREFIX*reader_prefs` WHERE user_id=?";
 		$args = [$userId];
 		array_map(

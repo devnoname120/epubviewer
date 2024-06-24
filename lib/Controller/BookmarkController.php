@@ -91,13 +91,13 @@ class BookmarkController extends Controller {
 	 * @brief delete bookmark
 	 *
 	 * @NoAdminRequired
+	 *
 	 * @NoCSRFRequired
 	 *
 	 * @param int $fileId
 	 * @param string name
-	 *
 	 */
-	public function delete($fileId, $name) {
+	public function delete($fileId, $name): void {
 		$this->bookmarkService->delete($fileId, $name);
 	}
 
@@ -105,12 +105,12 @@ class BookmarkController extends Controller {
 	 * @brief delete cursor
 	 *
 	 * @NoAdminRequired
+	 *
 	 * @NoCSRFRequired
 	 *
 	 * @param int $fileId
-	 *
 	 */
-	public function deleteCursor($fileId) {
+	public function deleteCursor($fileId): void {
 		$this->bookmarkService->deleteCursor($fileId);
 	}
 }

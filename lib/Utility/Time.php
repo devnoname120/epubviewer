@@ -3,7 +3,10 @@
 namespace OCA\Epubviewer\Utility;
 
 class Time {
-	public function getTime() {
+	/**
+	 * @psalm-return int<1, max>
+	 */
+	public function getTime(): int {
 		return time();
 	}
 

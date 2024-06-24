@@ -88,9 +88,8 @@ class PreferenceService extends Service {
 	 * @param string $scope
 	 * @param int $fileId
 	 * @param string $name
-	 *
 	 */
-	public function delete($scope, $fileId, $name) {
+	public function delete($scope, $fileId, $name): void {
 		foreach ($this->preferenceMapper->get($scope, $fileId, $name) as $preference) {
 			$this->preferenceMapper->delete($preference);
 		}
@@ -101,9 +100,8 @@ class PreferenceService extends Service {
 	 *
 	 * @param string $scope
 	 * @param string $name
-	 *
 	 */
-	public function deleteDefault($scope, $name) {
+	public function deleteDefault($scope, $name): void {
 		$this->delete($scope, static::DEFAULTS, $name);
 	}
 }
