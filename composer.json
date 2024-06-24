@@ -1,7 +1,7 @@
 {
   "name": "devnoname120/epubviewer",
   "description": "EPUB/CBR/PDF reader app for Nextcloud",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "type": "project",
   "license": "AGPL-3.0-or-later",
   "autoload": {
@@ -41,7 +41,7 @@
   },
   "require": {
     "ext-json": "*",
-    "nextcloud/ocp": "^27",
+    "nextcloud/ocp": "^28",
     "sabre/dav": "^4.1",
     "sabre/xml": "^2.2",
     "symfony/event-dispatcher": "^5.3.11"

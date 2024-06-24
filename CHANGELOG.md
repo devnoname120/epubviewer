@@ -1,3 +1,9 @@
+## 1.6.3 - 2024-06-22
+
+### Fixed
+
+- Nextcloud 27 compatibility by reverting the fix from 1.6.2 when Nextcloud 27 is running. Thanks to @smarinier for the fix!
+
 ## 1.6.2 - 2024-04-08
 
 ### Fixed

@@ -30,7 +30,7 @@ See [README] for more exhaustive information on features and potential misfeatur
    [README]: https://github.com/devnoname120/epubviewer#readme
 	      ]]>
     </description>
-    <version>1.6.2</version>
+    <version>1.6.3</version>
     <licence>agpl</licence>
     <author mail="devnoname120@gmail.com" homepage="https://github.com/devnoname120">devnoname120</author>
     <category>files</category>
@@ -53,7 +53,7 @@ See [README] for more exhaustive information on features and potential misfeatur
         https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-22-02.jpg?raw=true
     </screenshot>
     <dependencies>
-        <nextcloud min-version="27" max-version="29"/>
+        <nextcloud min-version="28" max-version="29"/>
     </dependencies>
     <settings>
         <personal>OCA\Epubviewer\Settings\Personal</personal>

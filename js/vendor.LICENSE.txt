@@ -1,23 +1,23 @@
 Included dependencies:
 
 @nextcloud/auth
-version: 2.2.1
+version: 2.3.0
 license: GPL-3.0-or-later
 
 @nextcloud/event-bus
-version: 3.1.0
+version: 3.3.1
 license: GPL-3.0-or-later
 
 @nextcloud/files
-version: 3.1.0
+version: 3.5.1
 license: AGPL-3.0-or-later
 
 @nextcloud/initial-state
-version: 2.1.0
+version: 2.2.0
 license: GPL-3.0-or-later
 
 @nextcloud/logger
-version: 2.7.0
+version: 3.0.2
 license: GPL-3.0-or-later
 
 @nextcloud/paths
@@ -25,15 +25,23 @@ version: 2.1.0
 license: GPL-3.0-or-later
 
 @nextcloud/router
-version: 2.2.1
+version: 3.0.1
 license: GPL-3.0-or-later
 
+@nextcloud/sharing
+version: 0.2.2
+license: GPL-3.0-or-later
+
+cancelable-promise
+version: 4.3.1
+license: MIT
+
 core-js
-version: 3.36.0
+version: 3.37.1
 license: MIT
 
 dompurify
-version: 3.0.9
+version: 3.1.5
 license: (MPL-2.0 OR Apache-2.0)
 
 path-browserify
@@ -41,13 +49,13 @@ version: 1.0.1
 license: MIT
 
 semver
-version: 7.6.0
+version: 7.6.2
 license: ISC
 
 vite-plugin-node-polyfills
-version: 0.19.0
+version: 0.22.0
 license: MIT
 
 webdav
-version: 5.3.2
+version: 5.6.0
 license: MIT

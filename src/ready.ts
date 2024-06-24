@@ -125,19 +125,6 @@ document.onreadystatechange = function () {
     EPUBJS.basePath = location.origin + session.data('basepath');
     EPUBJS.staticPath = location.origin + staticPath;
 
-    /* device-specific boilerplate */
-
-    // IE < 11
-    if (navigator.userAgent.includes('MSIE')) {
-      EPUBJS.Hooks.register('beforeChapterDisplay').wgxpath = function (callback, renderer) {
-        wgxpath.install(renderer.render.window);
-        if (callback) {
-          callback();
-        }
-      };
-      wgxpath.install(window);
-    }
-
     ePubViewer(file, options);
   }
 

@@ -1,6 +1,5 @@
 js/lib/typearray.js
 js/lib/typearray.min.js
-js/lib/wgxpath.install.js
 js/bitjs/io/bytebuffer.js
 js/bitjs/io/bytestream.js
 js/bitjs/io/bitstream.js
