@@ -27,9 +27,10 @@ use OCP\Files\File;
 use OCP\Files\FileInfo;
 use OCP\IImage;
 use OCP\Preview\IProviderV2;
+use OCP\ITempManager;
 
 class EPubPreview implements IProviderV2 {
-	private $zip;
+	private ZIP $zip;
 
 	/**
 	 * {@inheritDoc}
@@ -62,7 +63,7 @@ class EPubPreview implements IProviderV2 {
 	 * extractThumbnail from complicated epub format
 	 */
 	private function extractThumbnail(File $file, string $path): ?IImage {
-		$tmpManager = \OC::$server->get(\OCP\ITempManager::class);
+		$tmpManager = \OC::$server->get(ITempManager::class);
 		$sourceTmp = $tmpManager->getTemporaryFile();
 
 		try {
@@ -155,9 +156,9 @@ class EPubPreview implements IProviderV2 {
 	/**
 	 * find the main content XML (usually "content.opf")
 	 */
-	private function getContentPath() {
+	private function getContentPath() : ?string {
 		$xml_container = $this->extractXML('META-INF/container.xml');
-		if ($xml_container) {
+		if (is_object($xml_container)) {
 			$full_path = $xml_container->rootfiles->rootfile['full-path'][0];
 			if ($full_path) {
 				return $full_path->__toString();
@@ -168,10 +169,12 @@ class EPubPreview implements IProviderV2 {
 
 	/**
 	 * extract HTML from Zip path
+	 * @param string $path
+	 * @return \DOMDocument|null
 	 */
-	protected function extractHTML($path): \DOMDocument|null {
+	protected function extractHTML(string $path): \DOMDocument|null {
 		$html = $this->extractFileData($path);
-		if ($html) {
+		if (is_string($html)) {
 			$dom = new \DOMDocument('1.0', 'utf-8');
 			$dom->strictErrorChecking = false;
 			if (@$dom->loadHTML($html)) {
@@ -188,7 +191,7 @@ class EPubPreview implements IProviderV2 {
 	 */
 	private function extractXML(string $path): \SimpleXMLElement|false|null {
 		$xml = $this->extractFileData($path);
-		if ($xml) {
+		if (is_string($xml)) {
 			return simplexml_load_string($xml);
 		}
 		return null;
@@ -197,7 +200,7 @@ class EPubPreview implements IProviderV2 {
 	/**
 	 * get unzipped data
 	 *
-	 * @param $path file path in zip
+	 * @param string $path file path in zip
 	 *
 	 * @psalm-param 'META-INF/container.xml' $path
 	 *
@@ -216,10 +219,11 @@ class EPubPreview implements IProviderV2 {
 	/**
 	 * Resolve relative $relPath from $path (removes ./, ../)
 	 *
-	 * @param $path reference path
-	 * @param $relPath relative path
+	 * @param string $path reference path
+	 * @param string $relPath relative path
+	 * @return string
 	 */
-	private function resolvePath($path, $relPath): string {
+	private function resolvePath(string $path, string $relPath): string {
 		$path = dirname($path).'/'.$relPath;
 		$pieces = explode('/', $path);
 		$parents = [];
