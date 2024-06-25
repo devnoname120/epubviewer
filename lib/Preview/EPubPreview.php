@@ -30,7 +30,7 @@ use OCP\Preview\IProviderV2;
 use OCP\ITempManager;
 
 class EPubPreview implements IProviderV2 {
-	private ZIP $zip;
+	private ?ZIP $zip = null;
 
 	/**
 	 * {@inheritDoc}
@@ -207,6 +207,9 @@ class EPubPreview implements IProviderV2 {
 	 * @return false|null|string
 	 */
 	private function extractFileData(string $path): string|false|null {
+		if ($this->zip === null) {
+			return null;
+		}
 		$fp = $this->zip->getStream($path, 'r');
 		if ($fp) {
 			$content = stream_get_contents($fp);
