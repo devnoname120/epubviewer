@@ -8,6 +8,7 @@ use OC;
 use OCA\Epubviewer\Listener\BeforeTemplateRenderedListener;
 use OCA\Epubviewer\Listener\FilesLoadAdditionalScriptsListener;
 use OCA\Epubviewer\Listener\PublicShareBeforeTemplateRenderedListener;
+use OCA\Epubviewer\Preview\EPubPreview;
 use OCA\Files\Event\LoadAdditionalScriptsEvent;
 
 use OCP\AppFramework\App;
@@ -27,6 +28,8 @@ class Application extends App implements IBootstrap {
 	public function register(IRegistrationContext $context): void {
 		include_once __DIR__ . '/../../vendor/autoload.php';
 
+		$this->registerProvider($context);
+
 		// “Emitted before the rendering step of each TemplateResponse. The event holds a flag that specifies if a user is logged in.”
 		// See: https://docs.nextcloud.com/server/latest/developer_manual/basics/events.html#oca-settings-events-beforetemplaterenderedevent
 		$context->registerEventListener(BeforeTemplateRenderedEvent::class, BeforeTemplateRenderedListener::class);
@@ -42,6 +45,10 @@ class Application extends App implements IBootstrap {
 
 		$l = OC::$server->getL10N('epubviewer');
 		//    Hooks::register();
+	}
+
+	private function registerProvider(IRegistrationContext $context): void {
+		$context->registerPreviewProvider(EPubPreview::class, '/^application\/epub\+zip$/');
 	}
 
 	public function boot(IBootContext $context): void {
