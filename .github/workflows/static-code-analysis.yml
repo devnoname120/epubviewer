@@ -3,6 +3,7 @@
 name: Psalm static code analysis
 
 on:
+  push:
   pull_request:
 
 concurrency:
@@ -12,35 +13,42 @@ concurrency:
 jobs:
   static-code-analysis:
     runs-on: ubuntu-latest
-
-    if: ${{ github.repository_owner != 'nextcloud-gmbh' }}
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29
+      - name: Checkout Nextcloud server
+        uses: actions/checkout@v4
         with:
+          repository: nextcloud/server
+          ref: stable28
+          submodules: true
+
+      - name: Checkout epubviewer app
+        uses: actions/checkout@v4
+        with:
+          path: apps/epubviewer
           submodules: true
 
       - name: Set up php
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
-          extensions: apcu,ctype,curl,dom,fileinfo,ftp,gd,intl,json,ldap,mbstring,openssl,pdo_sqlite,posix,sqlite,xml,zip
+          php-version: 8.1
+          extensions: apcu,ctype,curl,dom,fileinfo,ftp,gd,iconv,intl,json,ldap,mbstring,openssl,pdo_sqlite,posix,sqlite,xml,zip
           coverage: none
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Composer install
-        run: composer i
+        working-directory: apps/epubviewer
+        run: composer install
 
       - name: Psalm
+        working-directory: apps/epubviewer
         run: composer run psalm:ci -- --monochrome --no-progress --output-format=github --update-baseline --report=results.sarif
 
       - name: Show potential changes in Psalm baseline
+        working-directory: apps/epubviewer
         if: always()
         run: git diff -- . ':!lib/composer'
 
       - name: Upload Analysis results to GitHub
+        working-directory: apps/epubviewer
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
@@ -50,8 +58,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29
+      - name: Checkout epubviewer app
+        uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -63,10 +71,10 @@ jobs:
           coverage: none
 
       - name: Composer install
-        run: composer i
+        run: composer install
 
       - name: Psalm taint analysis
-        run: composer run psalm:ci -- --monochrome --no-progress --output-format=github --report=results.sarif --taint-analysis
+        run: composer run psalm -- --monochrome --no-progress --output-format=github --report=results.sarif --taint-analysis
 
       - name: Upload Security Analysis results to GitHub
         if: always()
