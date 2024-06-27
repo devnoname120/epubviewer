@@ -35,9 +35,9 @@ class SettingsController extends Controller {
 	 *
 	 * @NoAdminRequired
 	 *
-	 * @param int $EpubEnable
-	 * @param int $EpubEnable
-	 * @param int $CbxEnable
+	 * @param string $EpubEnable
+	 * @param string $PdfEnable
+	 * @param string $CbxEnable
 	 *
 	 * @return array|JSONResponse
 	 */
