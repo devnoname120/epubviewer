@@ -1,3 +1,13 @@
+## 1.6.4 - 2024-11-25
+
+### Fixed
+
+- (#22) Error when viewing EPUB files from public shares.
+
+### Changed
+
+- Nextcloud 27 support removed (EOL).
+
 ## 1.6.3 - 2024-06-22
 
 ### Fixed
