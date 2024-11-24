@@ -24,7 +24,7 @@ class PageController extends Controller {
 	/** @var IRootFolder */
 	private IRootFolder $rootFolder;
 	private IManager $shareManager;
-	private string $userId;
+	private ?string $userId;
 	private BookmarkService $bookmarkService;
 	private MetadataService $metadataService;
 	private PreferenceService $preferenceService;
@@ -35,7 +35,7 @@ class PageController extends Controller {
 	 * @param IURLGenerator $urlGenerator
 	 * @param IRootFolder $rootFolder
 	 * @param IManager $shareManager
-	 * @param string $userId
+	 * @param ?string $userId
 	 * @param BookmarkService $bookmarkService
 	 * @param PreferenceService $preferenceService
 	 * @param MetadataService $metadataService
