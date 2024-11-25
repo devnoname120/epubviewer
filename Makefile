@@ -37,6 +37,13 @@
 #        "build": "node node_modules/gulp-cli/bin/gulp.js"
 #    },
 
+
+
+# Prevents macOS steathily creating ._* files when creating tar archives (WTF macOS?!)
+# See: https://superuser.com/a/260264
+export COPYFILE_DISABLE := 1
+
+
 app_name=$(notdir $(CURDIR))
 info_file=$(CURDIR)/appinfo/info.xml
 app_version=$(strip $(subst <version>,,$(subst </version>,,$(shell grep "<version>" $(info_file)))))
