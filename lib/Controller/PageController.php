@@ -93,6 +93,7 @@ class PageController extends Controller {
 		$fileId = $fileInfo['fileId'];
 		$type = $this->request->get["type"];
 		$scope = $template = $templates[$type];
+		$cursor = $this->bookmarkService->getCursor($fileId);
 
 		$params = [
 			'urlGenerator' => $this->urlGenerator,
@@ -101,7 +102,7 @@ class PageController extends Controller {
 			'fileId' => $fileInfo['fileId'],
 			'fileName' => $fileInfo['fileName'],
 			'fileType' => $fileInfo['fileType'],
-			'cursor' => $this->toJson($this->bookmarkService->getCursor($fileId)),
+			'cursor' => $cursor ? $this->toJson($cursor) : null,
 			'defaults' => $this->toJson($this->preferenceService->getDefault($scope)),
 			'preferences' => $this->toJson($this->preferenceService->get($scope, $fileId)),
 			'metadata' => $this->toJson($this->metadataService->get($fileId)),
