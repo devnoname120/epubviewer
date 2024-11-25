@@ -18,6 +18,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "update-deps": "npx npm-check-updates",
     "build": "vite --mode production build",
     "dev": "vite --mode development build",
     "watch": "vite --mode development build --watch",
@@ -64,7 +65,6 @@
     "eslint-plugin-promise": "^6.6.0",
     "eslint-plugin-vue": "^9.31.0",
     "prettier": "^3.3.3",
-    "typescript": "^5.7.2",
-    "npm-check-updates": "^17.1.11"
+    "typescript": "^5.7.2"
   }
 }
