@@ -1,3 +1,9 @@
+## 1.6.5 - 2024-11-25
+
+### Fixed
+
+- Crash due to fragile Nextcloud controllers reflection.
+
 ## 1.6.4 - 2024-11-25
 
 ### Fixed
