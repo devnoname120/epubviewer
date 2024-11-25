@@ -1,3 +1,9 @@
+## 1.6.6 - 2024-11-25
+
+### Fixed
+
+- (#26) Fix error `Class "OCA\Epubviewer\Controller\._PageController" does not exist` in `Router.php` due to packaging from macOS (https://superuser.com/a/260264).
+
 ## 1.6.5 - 2024-11-25
 
 ### Fixed
