@@ -1,3 +1,9 @@
+## 1.6.7 - 2024-11-25
+
+### Fixed
+
+- Fix opening the viewer in public shares for anonymous (not logged-in) users.
+
 ## 1.6.6 - 2024-11-25
 
 ### Fixed
