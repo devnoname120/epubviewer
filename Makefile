@@ -38,13 +38,16 @@
 #    },
 
 app_name=$(notdir $(CURDIR))
+info_file=$(CURDIR)/appinfo/info.xml
+app_version=$(strip $(subst <version>,,$(subst </version>,,$(shell grep "<version>" $(info_file)))))
 build_tools_directory=$(CURDIR)/build/tools
 source_build_directory=$(CURDIR)/build/artifacts/source
 source_package_name=$(source_build_directory)/$(app_name)
 appstore_build_directory=$(CURDIR)/build/artifacts
-appstore_package_name=$(appstore_build_directory)/$(app_name)-appstore
+appstore_package_name=$(appstore_build_directory)/$(app_name)-$(app_version)
 npm=$(shell which npm 2> /dev/null)
 composer=$(shell which composer 2> /dev/null)
+
 
 all: build
 
@@ -146,6 +149,7 @@ source: build
 # and build related folders that are unnecessary for an appstore release
 .PHONY: appstore
 appstore:
+	@echo "Building app version: $(app_version)"
 	rm -rf $(appstore_build_directory)
 	mkdir -p $(appstore_build_directory)
 	tar cvzf $(appstore_package_name).tar.gz -C .. \
@@ -200,6 +204,8 @@ appstore:
 	--exclude="$(app_name)/package-lock.json" \
 	--exclude="$(app_name)/LICENSES" \
 	$(app_name)
+	@echo
+	@echo "You can now create a GitHub release and upload the build here: https://apps.nextcloud.com/developer/apps/releases/new"
 	@echo
 	@echo "Signature of $(appstore_package_name).tar.gz:"
 	@echo
