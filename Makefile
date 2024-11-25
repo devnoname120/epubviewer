@@ -93,6 +93,7 @@ endif
 .PHONY: clean
 clean:
 	rm -rf ./build
+	find . -iname '._*' -delete
 
 # Same as clean but also removes dependencies installed by composer, bower and
 # npm
