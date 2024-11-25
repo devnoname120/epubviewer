@@ -4,6 +4,8 @@ namespace OCA\Epubviewer\Controller;
 
 use OCA\Epubviewer\Service\MetadataService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\JSONResponse;
 
 use OCP\IRequest;
@@ -29,13 +31,12 @@ class MetadataController extends Controller {
 	/**
 	 * @brief write metadata
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $fileId
 	 * @param string $value
 	 *
 	 * @return array|JSONResponse
 	 */
+	#[NoAdminRequired]
 	public function setAll($fileId, $value) {
 		return $this->metadataService->setAll($fileId, $value);
 	}
@@ -43,14 +44,13 @@ class MetadataController extends Controller {
 	/**
 	 * @brief return metadata item
 	 *
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @param int $fileId
 	 * @param string $name
 	 *
 	 * @return array|JSONResponse
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function get($fileId, $name) {
 		return $this->metadataService->get($fileId, $name);
 	}
@@ -58,14 +58,13 @@ class MetadataController extends Controller {
 	/**
 	 * @brief write metadata item
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param int $fileId
 	 * @param string $name
 	 * @param string $value
 	 *
 	 * @return array|JSONResponse
 	 */
+	#[NoAdminRequired]
 	public function set($fileId, $name, $value) {
 		return $this->metadataService->set($fileId, $name, $value);
 	}

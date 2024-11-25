@@ -6,6 +6,7 @@ use OC;
 use OCA\Epubviewer\Config;
 use OCA\Epubviewer\Service\PreferenceService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use OCP\IURLGenerator;
@@ -33,14 +34,13 @@ class SettingsController extends Controller {
 	/**
 	 * @brief set preference for file type association
 	 *
-	 * @NoAdminRequired
-	 *
 	 * @param string $EpubEnable
 	 * @param string $PdfEnable
 	 * @param string $CbxEnable
 	 *
 	 * @return array|JSONResponse
 	 */
+	#[NoAdminRequired]
 	public function setPreference(string $EpubEnable, string $PdfEnable, string $CbxEnable) {
 
 		$l = OC::$server->getL10N('epubviewer');

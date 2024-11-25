@@ -8,6 +8,8 @@ use OCA\Epubviewer\Service\BookmarkService;
 use OCA\Epubviewer\Service\MetadataService;
 use OCA\Epubviewer\Service\PreferenceService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Files\FileInfo;
@@ -61,11 +63,10 @@ class PageController extends Controller {
 	}
 
 	/**
-	 * @PublicPage
-	 * @NoCSRFRequired
-	 *
 	 * @return TemplateResponse
 	 */
+	#[PublicPage]
+	#[NoCSRFRequired]
 	public function showReader(): TemplateResponse {
 		$templates = [
 			'application/epub+zip' => 'epubviewer',

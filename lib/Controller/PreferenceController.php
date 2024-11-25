@@ -4,6 +4,8 @@ namespace OCA\Epubviewer\Controller;
 
 use OCA\Epubviewer\Service\PreferenceService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 
@@ -33,24 +35,20 @@ class PreferenceController extends Controller {
 	/**
 	 * @brief return preference for $fileId
 	 *
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @param string $scope
 	 * @param int $fileId
 	 * @param string $name if null, return all preferences for $scope + $fileId
 	 *
 	 * @return array|JSONResponse
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function get($scope, $fileId, $name) {
 		return $this->preferenceService->get($scope, $fileId, $name);
 	}
 
 	/**
 	 * @brief write preference for $fileId
-	 *
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
 	 *
 	 * @param string $scope
 	 * @param int $fileId
@@ -59,6 +57,8 @@ class PreferenceController extends Controller {
 	 *
 	 * @return array|JSONResponse
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function set($scope, $fileId, $name, $value) {
 		return $this->preferenceService->set($scope, $fileId, $name, $value);
 	}
@@ -67,14 +67,13 @@ class PreferenceController extends Controller {
 	/**
 	 * @brief return default preference
 	 *
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @param string $scope
 	 * @param string $name if null, return all default preferences for scope
 	 *
 	 * @return array|JSONResponse
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function getDefault($scope, $name) {
 		return $this->preferenceService->getDefault($scope, $name);
 	}
@@ -82,15 +81,14 @@ class PreferenceController extends Controller {
 	/**
 	 * @brief write default preference
 	 *
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @param string $scope
 	 * @param string $name
 	 * @param string $value
 	 *
 	 * @return array|JSONResponse
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function setDefault($scope, $name, $value) {
 		return $this->preferenceService->setDefault($scope, $name, $value);
 	}
