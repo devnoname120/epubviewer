@@ -119,6 +119,7 @@ class PageController extends Controller {
 		$policy->addAllowedFontDomain('data:');
 		$policy->addAllowedFontDomain('blob:');
 		$policy->addAllowedImageDomain('blob:');
+		$policy->addAllowedWorkerSrcDomain('\'self\''); 
 
 		$response = new TemplateResponse($this->appName, $template, $params, 'blank');
 		$response->setContentSecurityPolicy($policy);
