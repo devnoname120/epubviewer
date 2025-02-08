@@ -1,3 +1,10 @@
+## 1.6.8 - 2025-02-08
+
+### Fixed
+
+- (#27) Fix decompression error in some browsers due to a too strict `Content-Security-Policyt. Thanks to @lesensei for the fix!
+
+
 ## 1.6.7 - 2024-11-25
 
 ### Fixed

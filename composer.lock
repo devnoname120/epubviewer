@@ -4,7 +4,7 @@
     "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
     "This file is @generated automatically"
   ],
-  "content-hash": "31f06a43704b4cd9e577237cf3df731c",
+  "content-hash": "1741e53b8b6186ee3eaf9e4ab8a3ce54",
   "packages": [
     {
       "name": "nextcloud/ocp",
@@ -12,12 +12,12 @@
       "source": {
         "type": "git",
         "url": "https://github.com/nextcloud-deps/ocp.git",
-        "reference": "13e5e3b853c9e8e632195a4f8bd6a0c8ef34ccee"
+        "reference": "d1399b589aa6c0393b4f62bd7022315a711d8c09"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/13e5e3b853c9e8e632195a4f8bd6a0c8ef34ccee",
-        "reference": "13e5e3b853c9e8e632195a4f8bd6a0c8ef34ccee",
+        "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/d1399b589aa6c0393b4f62bd7022315a711d8c09",
+        "reference": "d1399b589aa6c0393b4f62bd7022315a711d8c09",
         "shasum": ""
       },
       "require": {
@@ -48,7 +48,7 @@
         "issues": "https://github.com/nextcloud-deps/ocp/issues",
         "source": "https://github.com/nextcloud-deps/ocp/tree/stable28"
       },
-      "time": "2024-09-17T00:34:06+00:00"
+      "time": "2025-01-08T00:43:56+00:00"
     },
     {
       "name": "psr/clock",
@@ -698,16 +698,16 @@
     },
     {
       "name": "symfony/deprecation-contracts",
-      "version": "v2.5.3",
+      "version": "v2.5.4",
       "source": {
         "type": "git",
         "url": "https://github.com/symfony/deprecation-contracts.git",
-        "reference": "80d075412b557d41002320b96a096ca65aa2c98d"
+        "reference": "605389f2a7e5625f273b53960dc46aeaf9c62918"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/80d075412b557d41002320b96a096ca65aa2c98d",
-        "reference": "80d075412b557d41002320b96a096ca65aa2c98d",
+        "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/605389f2a7e5625f273b53960dc46aeaf9c62918",
+        "reference": "605389f2a7e5625f273b53960dc46aeaf9c62918",
         "shasum": ""
       },
       "require": {
@@ -715,12 +715,12 @@
       },
       "type": "library",
       "extra": {
+        "thanks": {
+          "url": "https://github.com/symfony/contracts",
+          "name": "symfony/contracts"
+        },
         "branch-alias": {
           "dev-main": "2.5-dev"
-        },
-        "thanks": {
-          "name": "symfony/contracts",
-          "url": "https://github.com/symfony/contracts"
         }
       },
       "autoload": {
@@ -745,7 +745,7 @@
       "description": "A generic function and convention to trigger deprecation notices",
       "homepage": "https://symfony.com",
       "support": {
-        "source": "https://github.com/symfony/deprecation-contracts/tree/v2.5.3"
+        "source": "https://github.com/symfony/deprecation-contracts/tree/v2.5.4"
       },
       "funding": [
         {
@@ -761,7 +761,7 @@
           "type": "tidelift"
         }
       ],
-      "time": "2023-01-24T14:02:46+00:00"
+      "time": "2024-09-25T14:11:13+00:00"
     },
     {
       "name": "symfony/event-dispatcher",
@@ -850,16 +850,16 @@
     },
     {
       "name": "symfony/event-dispatcher-contracts",
-      "version": "v2.5.3",
+      "version": "v2.5.4",
       "source": {
         "type": "git",
         "url": "https://github.com/symfony/event-dispatcher-contracts.git",
-        "reference": "540f4c73e87fd0c71ca44a6aa305d024ac68cb73"
+        "reference": "e0fe3d79b516eb75126ac6fa4cbf19b79b08c99f"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/symfony/event-dispatcher-contracts/zipball/540f4c73e87fd0c71ca44a6aa305d024ac68cb73",
-        "reference": "540f4c73e87fd0c71ca44a6aa305d024ac68cb73",
+        "url": "https://api.github.com/repos/symfony/event-dispatcher-contracts/zipball/e0fe3d79b516eb75126ac6fa4cbf19b79b08c99f",
+        "reference": "e0fe3d79b516eb75126ac6fa4cbf19b79b08c99f",
         "shasum": ""
       },
       "require": {
@@ -871,12 +871,12 @@
       },
       "type": "library",
       "extra": {
+        "thanks": {
+          "url": "https://github.com/symfony/contracts",
+          "name": "symfony/contracts"
+        },
         "branch-alias": {
           "dev-main": "2.5-dev"
-        },
-        "thanks": {
-          "name": "symfony/contracts",
-          "url": "https://github.com/symfony/contracts"
         }
       },
       "autoload": {
@@ -909,7 +909,7 @@
         "standards"
       ],
       "support": {
-        "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v2.5.3"
+        "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v2.5.4"
       },
       "funding": [
         {
@@ -925,7 +925,7 @@
           "type": "tidelift"
         }
       ],
-      "time": "2024-01-23T13:51:25+00:00"
+      "time": "2024-09-25T14:11:13+00:00"
     },
     {
       "name": "symfony/polyfill-php80",
@@ -947,8 +947,8 @@
       "type": "library",
       "extra": {
         "thanks": {
-          "name": "symfony/polyfill",
-          "url": "https://github.com/symfony/polyfill"
+          "url": "https://github.com/symfony/polyfill",
+          "name": "symfony/polyfill"
         }
       },
       "autoload": {
@@ -1229,16 +1229,16 @@
     },
     {
       "name": "nikic/php-parser",
-      "version": "v5.3.1",
+      "version": "v5.4.0",
       "source": {
         "type": "git",
         "url": "https://github.com/nikic/PHP-Parser.git",
-        "reference": "8eea230464783aa9671db8eea6f8c6ac5285794b"
+        "reference": "447a020a1f875a434d62f2a401f53b82a396e494"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/8eea230464783aa9671db8eea6f8c6ac5285794b",
-        "reference": "8eea230464783aa9671db8eea6f8c6ac5285794b",
+        "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/447a020a1f875a434d62f2a401f53b82a396e494",
+        "reference": "447a020a1f875a434d62f2a401f53b82a396e494",
         "shasum": ""
       },
       "require": {
@@ -1281,9 +1281,9 @@
       ],
       "support": {
         "issues": "https://github.com/nikic/PHP-Parser/issues",
-        "source": "https://github.com/nikic/PHP-Parser/tree/v5.3.1"
+        "source": "https://github.com/nikic/PHP-Parser/tree/v5.4.0"
       },
-      "time": "2024-10-08T18:51:32+00:00"
+      "time": "2024-12-30T11:07:19+00:00"
     },
     {
       "name": "phar-io/manifest",
@@ -1405,16 +1405,16 @@
     },
     {
       "name": "php-cs-fixer/shim",
-      "version": "v3.65.0",
+      "version": "v3.68.5",
       "source": {
         "type": "git",
         "url": "https://github.com/PHP-CS-Fixer/shim.git",
-        "reference": "4983ec79b9dee926695ac324ea6e8d291935525d"
+        "reference": "4a0a5cfd39b0677017a85f0fc252d3e8a6a6c02c"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/PHP-CS-Fixer/shim/zipball/4983ec79b9dee926695ac324ea6e8d291935525d",
-        "reference": "4983ec79b9dee926695ac324ea6e8d291935525d",
+        "url": "https://api.github.com/repos/PHP-CS-Fixer/shim/zipball/4a0a5cfd39b0677017a85f0fc252d3e8a6a6c02c",
+        "reference": "4a0a5cfd39b0677017a85f0fc252d3e8a6a6c02c",
         "shasum": ""
       },
       "require": {
@@ -1451,9 +1451,9 @@
       "description": "A tool to automatically fix PHP code style",
       "support": {
         "issues": "https://github.com/PHP-CS-Fixer/shim/issues",
-        "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.65.0"
+        "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.68.5"
       },
-      "time": "2024-11-25T00:39:41+00:00"
+      "time": "2025-01-30T17:01:41+00:00"
     },
     {
       "name": "phpunit/php-code-coverage",
@@ -1776,16 +1776,16 @@
     },
     {
       "name": "phpunit/phpunit",
-      "version": "9.6.21",
+      "version": "9.6.22",
       "source": {
         "type": "git",
         "url": "https://github.com/sebastianbergmann/phpunit.git",
-        "reference": "de6abf3b6f8dd955fac3caad3af7a9504e8c2ffa"
+        "reference": "f80235cb4d3caa59ae09be3adf1ded27521d1a9c"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/de6abf3b6f8dd955fac3caad3af7a9504e8c2ffa",
-        "reference": "de6abf3b6f8dd955fac3caad3af7a9504e8c2ffa",
+        "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/f80235cb4d3caa59ae09be3adf1ded27521d1a9c",
+        "reference": "f80235cb4d3caa59ae09be3adf1ded27521d1a9c",
         "shasum": ""
       },
       "require": {
@@ -1796,7 +1796,7 @@
         "ext-mbstring": "*",
         "ext-xml": "*",
         "ext-xmlwriter": "*",
-        "myclabs/deep-copy": "^1.12.0",
+        "myclabs/deep-copy": "^1.12.1",
         "phar-io/manifest": "^2.0.4",
         "phar-io/version": "^3.2.1",
         "php": ">=7.3",
@@ -1859,7 +1859,7 @@
       "support": {
         "issues": "https://github.com/sebastianbergmann/phpunit/issues",
         "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-        "source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.21"
+        "source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.22"
       },
       "funding": [
         {
@@ -1875,7 +1875,7 @@
           "type": "tidelift"
         }
       ],
-      "time": "2024-09-19T10:50:18+00:00"
+      "time": "2024-12-05T13:48:26+00:00"
     },
     {
       "name": "psalm/phar",
