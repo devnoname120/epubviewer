@@ -144,6 +144,7 @@ source: build
 	--exclude=".idea" \
 	--exclude=".vscode" \
 	--exclude=".history" \
+	--exclude="$(app_name)/nextcloud-server" \
 	--exclude="$(app_name)/build" \
 	--exclude="$(app_name)/js/node_modules" \
 	--exclude="$(app_name)/node_modules" \
@@ -178,6 +179,7 @@ appstore:
 	--exclude=".idea" \
 	--exclude=".vscode" \
 	--exclude=".history" \
+	--exclude="$(app_name)/nextcloud-server" \
 	--exclude="$(app_name)/build" \
 	--exclude="$(app_name)/src" \
 	--exclude="$(app_name)/tests" \

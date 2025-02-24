@@ -10,7 +10,7 @@
     "plugins": [{ "name": "typescript-plugin-css-modules" }],
     "sourceMap": true
   },
-  "exclude": ["js", "lib", "node_modules", "vendor"],
+  "exclude": ["js", "lib", "node_modules", "vendor", "nextcloud-server"],
   "vueCompilerOptions": {
     "target": 2.7
   }
