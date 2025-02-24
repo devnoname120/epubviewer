@@ -2,11 +2,11 @@
 
 namespace OCA\Epubviewer;
 
-use OC;
 use OCA\Epubviewer\AppInfo\Application;
+use OCP\IAppConfig;
 use OCP\IConfig;
 use OCP\IUserSession;
-use OCP\IAppConfig;
+
 /**
  * Config class for Reader
  */

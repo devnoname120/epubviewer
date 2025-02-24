@@ -20,7 +20,7 @@ class SettingsController extends Controller {
 		string $appName,
 		IRequest $request,
 		Config $config,
-		IL10N $l10n
+		IL10N $l10n,
 	) {
 		parent::__construct($appName, $request);
 		$this->config = $config;

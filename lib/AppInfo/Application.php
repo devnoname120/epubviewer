@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace OCA\Epubviewer\AppInfo;
 
-use OC;
 use OCA\Epubviewer\Listener\BeforeTemplateRenderedListener;
+use OCA\Epubviewer\Listener\FileNodeDeletedListener;
 use OCA\Epubviewer\Listener\FilesLoadAdditionalScriptsListener;
 use OCA\Epubviewer\Listener\PublicShareBeforeTemplateRenderedListener;
-use OCA\Epubviewer\Listener\FileNodeDeletedListener;
 use OCA\Epubviewer\Listener\UserDeletedListener;
 
 use OCP\AppFramework\App;

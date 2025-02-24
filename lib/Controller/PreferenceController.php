@@ -7,7 +7,6 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 
-
 class PreferenceController extends Controller {
 
 	private $preferenceService;
