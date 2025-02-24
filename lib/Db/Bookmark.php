@@ -29,7 +29,7 @@ class Bookmark extends ReaderEntity implements JsonSerializable {
 	}
 
 	/**
-	 * @psalm-return array{name: mixed, type: mixed, value: mixed, content: mixed, lastModified: mixed}
+	 * @psalm-return array{name: string, type: string, value: mixed, content: mixed, lastModified: int}
 	 */
 	public function toService(): array {
 		return [

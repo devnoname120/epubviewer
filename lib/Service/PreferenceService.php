@@ -2,15 +2,19 @@
 
 namespace OCA\Epubviewer\Service;
 
+use OCA\Epubviewer\Db\Preference;
 use OCA\Epubviewer\Db\PreferenceMapper;
 
+/**
+ * @template-extends Service<Preference>
+ */
 class PreferenceService extends Service {
 
 	// (ab)use the fact that $fileId never goes below 1 by using the
 	// value 0 to indicate a default preference
 	public const DEFAULTS = 0;
 
-	private $preferenceMapper;
+	private PreferenceMapper $preferenceMapper;
 
 	/**
 	 * @param PreferenceMapper $preferenceMapper
@@ -35,7 +39,7 @@ class PreferenceService extends Service {
 	public function get($scope, $fileId, $name = null) {
 		$result = $this->preferenceMapper->get($scope, $fileId, $name);
 		return array_map(
-			function ($entity) {
+			function ($entity): array {
 				return $entity->toService();
 			}, $result);
 	}
@@ -50,10 +54,9 @@ class PreferenceService extends Service {
 	 * @param int $fileId
 	 * @param string $name
 	 * @param string $value
-	 *
-	 * @return array
+	 * @return Preference
 	 */
-	public function set($scope, $fileId, $name, $value) {
+	public function set($scope, $fileId, $name, $value): Preference {
 		return $this->preferenceMapper->set($scope, $fileId, $name, $value);
 	}
 
@@ -75,10 +78,9 @@ class PreferenceService extends Service {
 	 * @param string $scope
 	 * @param string $name
 	 * @param string $value
-	 *
-	 * @return array
+	 * @return Preference
 	 */
-	public function setDefault($scope, $name, $value) {
+	public function setDefault($scope, $name, $value): Preference {
 		return $this->preferenceMapper->set($scope, static::DEFAULTS, $name, $value);
 	}
 

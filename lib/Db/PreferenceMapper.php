@@ -5,9 +5,14 @@ namespace OCA\Epubviewer\Db;
 use OCA\Epubviewer\Utility\Time;
 use OCP\IDBConnection;
 
+/**
+ * @template-extends ReaderMapper<Preference>
+ */
 class PreferenceMapper extends ReaderMapper {
 
-	public function __construct(IDBConnection $db, $userId, Time $time) {
+	protected string $userId;
+
+	public function __construct(IDBConnection $db, Time $time, string $userId) {
 		parent::__construct($db, 'reader_prefs', Preference::class, $time);
 		$this->userId = $userId;
 	}
@@ -28,7 +33,7 @@ class PreferenceMapper extends ReaderMapper {
 			->andWhere($query->expr()->eq('file_id', $query->createNamedParameter($fileId)))
 			->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($this->userId)));
 
-		if (!empty($name)) {
+		if ($name !== null && !empty($name)) {
 			$query->andWhere($query->expr()->eq('name', $query->createNamedParameter($name)));
 		}
 

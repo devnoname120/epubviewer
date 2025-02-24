@@ -259,7 +259,7 @@ $nonce = class_exists('\OC\Security\CSP\ContentSecurityPolicyNonceManager')
     <div id="titlebar">
       <div id="opener">
         <a id="slider" class="icon-menu">
-            <?php p($l->t("menu")); ?>
+            <?php p($l->t('menu')); ?>
         </a>
       </div>
       <div id="metainfo" class="nightshift">

@@ -21,8 +21,8 @@ class BeforeTemplateRenderedListener implements IEventListener {
 
 	public function __construct(
 		IInitialState $initialState,
-		IUserSession  $userSession,
-		IConfig       $config
+		IUserSession $userSession,
+		IConfig $config,
 	) {
 		$this->initialState = $initialState;
 		$this->userSession = $userSession;
@@ -33,27 +33,30 @@ class BeforeTemplateRenderedListener implements IEventListener {
 		/** @var BeforeTemplateRenderedEvent $event */
 		if ($event->getResponse()->getRenderAs() === TemplateResponse::RENDER_AS_USER) {
 			$this->initialState->provideLazyInitialState('enableEpub', function () {
-				if ($this->userSession->getUser()) {
-					$uid = $this->userSession->getUser()->getUID();
+				$user = $this->userSession->getUser();
+				if ($user !== null) {
+					$uid = $user->getUID();
 					return $this->config->getUserValue($uid, Application::APP_ID, 'epub_enable', 'true') === 'true';
 				}
-				return false;
+				return true;
 			});
 
 			$this->initialState->provideLazyInitialState('enablePdf', function () {
-				if ($this->userSession->getUser()) {
-					$uid = $this->userSession->getUser()->getUID();
+				$user = $this->userSession->getUser();
+				if ($user !== null) {
+					$uid = $user->getUID();
 					return $this->config->getUserValue($uid, Application::APP_ID, 'pdf_enable', 'false') === 'true';
 				}
 				return false;
 			});
 
 			$this->initialState->provideLazyInitialState('enableCbx', function () {
-				if ($this->userSession->getUser()) {
-					$uid = $this->userSession->getUser()->getUID();
+				$user = $this->userSession->getUser();
+				if ($user !== null) {
+					$uid = $user->getUID();
 					return $this->config->getUserValue($uid, Application::APP_ID, 'cbx_enable', 'true') === 'true';
 				}
-				return false;
+				return true;
 			});
 		}
 	}

@@ -6,28 +6,31 @@ use OCA\Epubviewer\Utility\Time;
 
 use OCP\IDBConnection;
 
+/**
+ * @template-extends ReaderMapper<Bookmark>
+ */
 class BookmarkMapper extends ReaderMapper {
 
-	private $userId;
+	private string $userId;
 
 	/**
 	 * @param IDbConnection $db
-	 * @param $userId
+	 * @param string $userId
 	 * @param Time $time
 	 */
-	public function __construct(IDBConnection $db, $userId, Time $time) {
+	public function __construct(IDBConnection $db, string $userId, Time $time) {
 		parent::__construct($db, 'reader_bookmarks', Bookmark::class, $time);
-		/** @var int $userId */
 		$this->userId = $userId;
 	}
 
 	/**
 	 * @brief get bookmarks for $fileId+$userId(+$name)
-	 * @param $fileId
+	 * @param int $fileId
 	 * @param string $name
-	 * @return array
+	 * @param string|null $type
+	 * @return array<Bookmark>
 	 */
-	public function get(int $fileId, $name, $type = null) {
+	public function get(int $fileId, ?string $name = null, ?string $type = null): array {
 		$query = $this->db->getQueryBuilder();
 		$query->select('*')
 			->from($this->getTableName())
@@ -51,23 +54,23 @@ class BookmarkMapper extends ReaderMapper {
 	 * @param int $fileId
 	 * @param string $name
 	 * @param string $value
+	 * @param string|null $type
+	 * @param string|null $content
 	 *
 	 * @return Bookmark the newly created or updated bookmark
 	 */
-	public function set($fileId, $name, $value, $type, $content = null) {
-
+	public function set(int $fileId, string $name, string $value, ?string $type = null, ?string $content = null) {
 		$result = $this->get($fileId, $name);
 
 		if (empty($result)) {
-
 			// anonymous bookmarks are named after their contents
-			if ($name === null) {
+			if ($name === '') {
 				$name = $value;
 			}
 
 			// default type is "bookmark"
 			if ($type === null) {
-				$type = "bookmark";
+				$type = 'bookmark';
 			}
 
 			$bookmark = new Bookmark();

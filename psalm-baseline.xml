@@ -1,123 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="5.25.0@01a8eb06b9e9cc6cfb6a320bf9fb14331919d505">
-  <file src="lib/AppInfo/Application.php">
-    <InvalidArgument>
-      <code><![CDATA[registerEventListener]]></code>
-    </InvalidArgument>
-  </file>
-  <file src="lib/Config.php">
-    <InvalidNullableReturnType>
-      <code><![CDATA[bool]]></code>
-    </InvalidNullableReturnType>
-    <NullableReturnStatement>
-      <code><![CDATA[OC::$server->getConfig()->setAppValue(Application::APP_ID, $key, $value)]]></code>
-    </NullableReturnStatement>
-    <PossiblyFalseArgument>
-      <code><![CDATA[OC_User::getUser()]]></code>
-      <code><![CDATA[OC_User::getUser()]]></code>
-    </PossiblyFalseArgument>
-  </file>
+<files psalm-version="5.26.1@d747f6500b38ac4f7dfc5edbcae6e4b637d7add0">
   <file src="lib/Controller/PageController.php">
-    <NoInterfaceProperties>
-      <code><![CDATA[$this->request->get]]></code>
-      <code><![CDATA[$this->request->get]]></code>
-    </NoInterfaceProperties>
-    <PossiblyInvalidArgument>
-      <code><![CDATA[pathInfo($filePath, PATHINFO_EXTENSION)]]></code>
-    </PossiblyInvalidArgument>
     <PossiblyUndefinedMethod>
       <code><![CDATA[get]]></code>
     </PossiblyUndefinedMethod>
   </file>
-  <file src="lib/Db/Bookmark.php">
-    <UndefinedMagicMethod>
-      <code><![CDATA[getContent]]></code>
-      <code><![CDATA[getContent]]></code>
-      <code><![CDATA[getFileId]]></code>
-      <code><![CDATA[getLastModified]]></code>
-      <code><![CDATA[getLastModified]]></code>
-      <code><![CDATA[getName]]></code>
-      <code><![CDATA[getName]]></code>
-      <code><![CDATA[getType]]></code>
-      <code><![CDATA[getType]]></code>
-      <code><![CDATA[getUserId]]></code>
-      <code><![CDATA[getValue]]></code>
-      <code><![CDATA[getValue]]></code>
-    </UndefinedMagicMethod>
-  </file>
-  <file src="lib/Db/BookmarkMapper.php">
-    <InvalidArgument>
-      <code><![CDATA[$sql]]></code>
-      <code><![CDATA[$sql]]></code>
-    </InvalidArgument>
-    <LessSpecificReturnStatement>
-      <code><![CDATA[$bookmark]]></code>
-    </LessSpecificReturnStatement>
-    <MoreSpecificReturnType>
-      <code><![CDATA[Bookmark]]></code>
-    </MoreSpecificReturnType>
-    <TooManyArguments>
-      <code><![CDATA[findEntities]]></code>
-      <code><![CDATA[findEntities]]></code>
-    </TooManyArguments>
-    <UndefinedMagicMethod>
-      <code><![CDATA[setContent]]></code>
-      <code><![CDATA[setFileId]]></code>
-      <code><![CDATA[setName]]></code>
-      <code><![CDATA[setType]]></code>
-      <code><![CDATA[setUserId]]></code>
-      <code><![CDATA[setValue]]></code>
-    </UndefinedMagicMethod>
-  </file>
-  <file src="lib/Db/Preference.php">
-    <UndefinedMagicMethod>
-      <code><![CDATA[getFileId]]></code>
-      <code><![CDATA[getLastModified]]></code>
-      <code><![CDATA[getName]]></code>
-      <code><![CDATA[getName]]></code>
-      <code><![CDATA[getScope]]></code>
-      <code><![CDATA[getValue]]></code>
-      <code><![CDATA[getValue]]></code>
-    </UndefinedMagicMethod>
-  </file>
   <file src="lib/Db/PreferenceMapper.php">
-    <InvalidArgument>
-      <code><![CDATA[$sql]]></code>
-      <code><![CDATA[$sql]]></code>
-    </InvalidArgument>
     <LessSpecificReturnStatement>
       <code><![CDATA[$preference]]></code>
     </LessSpecificReturnStatement>
     <MoreSpecificReturnType>
       <code><![CDATA[Preference]]></code>
     </MoreSpecificReturnType>
-    <TooManyArguments>
-      <code><![CDATA[findEntities]]></code>
-      <code><![CDATA[findEntities]]></code>
-    </TooManyArguments>
-    <UndefinedMagicMethod>
-      <code><![CDATA[setFileId]]></code>
-      <code><![CDATA[setName]]></code>
-      <code><![CDATA[setScope]]></code>
-      <code><![CDATA[setUserId]]></code>
-      <code><![CDATA[setValue]]></code>
-    </UndefinedMagicMethod>
-    <UndefinedThisPropertyAssignment>
-      <code><![CDATA[$this->userId]]></code>
-    </UndefinedThisPropertyAssignment>
-    <UndefinedThisPropertyFetch>
-      <code><![CDATA[$this->userId]]></code>
-      <code><![CDATA[$this->userId]]></code>
-    </UndefinedThisPropertyFetch>
-  </file>
-  <file src="lib/Db/ReaderMapper.php">
-    <MissingTemplateParam>
-      <code><![CDATA[ReaderMapper]]></code>
-    </MissingTemplateParam>
-    <UndefinedMagicMethod>
-      <code><![CDATA[setLastModified]]></code>
-      <code><![CDATA[setLastModified]]></code>
-    </UndefinedMagicMethod>
   </file>
   <file src="lib/Listener/BeforeTemplateRenderedListener.php">
     <PossiblyNullReference>
@@ -125,18 +19,5 @@
       <code><![CDATA[getUID]]></code>
       <code><![CDATA[getUID]]></code>
     </PossiblyNullReference>
-  </file>
-  <file src="lib/Listener/FilesLoadAdditionalScriptsListener.php">
-    <MissingTemplateParam>
-      <code><![CDATA[IEventListener]]></code>
-    </MissingTemplateParam>
-    <UndefinedThisPropertyAssignment>
-      <code><![CDATA[$this->initialState]]></code>
-    </UndefinedThisPropertyAssignment>
-  </file>
-  <file src="lib/Service/MetadataService.php">
-    <UndefinedClass>
-      <code><![CDATA[Meta]]></code>
-    </UndefinedClass>
   </file>
 </files>

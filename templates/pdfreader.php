@@ -256,7 +256,7 @@ $nonce = class_exists('\OC\Security\CSP\ContentSecurityPolicyNonceManager')
     <div id="titlebar">
       <div id="opener">
         <a id="slider" class="icon-menu">
-            <?php p($l->t("menu")); ?>
+            <?php p($l->t('menu')); ?>
         </a>
         <div id="status_message_left">
         </div>
@@ -362,7 +362,7 @@ $nonce = class_exists('\OC\Security\CSP\ContentSecurityPolicyNonceManager')
   </div>
 
   <!-- /main -->
-  
+
   <div class="overlay">
   </div>
 </div>

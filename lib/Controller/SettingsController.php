@@ -2,32 +2,23 @@
 
 namespace OCA\Epubviewer\Controller;
 
-use OC;
 use OCA\Epubviewer\Config;
-use OCA\Epubviewer\Service\PreferenceService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
-use OCP\IURLGenerator;
 
 class SettingsController extends Controller {
-	private $urlGenerator;
-	private $preferenceService;
 
 	/**
 	 * @param string $appName
 	 * @param IRequest $request
-	 * @param IURLGenerator $urlGenerator
-	 * @param PreferenceService $preferenceService
 	 */
-	public function __construct($appName,
+	public function __construct(
+		string $appName,
 		IRequest $request,
-		IURLGenerator $urlGenerator,
-		PreferenceService $preferenceService) {
-
+		Config $config,
+	) {
 		parent::__construct($appName, $request);
-		$this->urlGenerator = $urlGenerator;
-		$this->preferenceService = $preferenceService;
 	}
 
 	/**

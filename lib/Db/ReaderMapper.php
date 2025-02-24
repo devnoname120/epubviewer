@@ -8,12 +8,13 @@ use OCP\AppFramework\Db\QBMapper;
 
 use OCP\IDBConnection;
 
+/**
+ * @template T of Entity
+ * @extends QBMapper<T>
+ */
 abstract class ReaderMapper extends QBMapper {
 
-	/**
-	 * @var Time
-	 */
-	private $time;
+	private Time $time;
 
 	public function __construct(IDBConnection $db, $table, $entity, Time $time) {
 		parent::__construct($db, $table, $entity);
