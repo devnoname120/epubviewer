@@ -6,28 +6,31 @@ use OCA\Epubviewer\Utility\Time;
 
 use OCP\IDBConnection;
 
+/**
+ * @template-extends ReaderMapper<Bookmark>
+ */
 class BookmarkMapper extends ReaderMapper {
 
-	private $userId;
+	private string $userId;
 
 	/**
 	 * @param IDbConnection $db
-	 * @param $userId
+	 * @param string $userId
 	 * @param Time $time
 	 */
-	public function __construct(IDBConnection $db, $userId, Time $time) {
+	public function __construct(IDBConnection $db, string $userId, Time $time) {
 		parent::__construct($db, 'reader_bookmarks', Bookmark::class, $time);
-		/** @var int $userId */
 		$this->userId = $userId;
 	}
 
 	/**
 	 * @brief get bookmarks for $fileId+$userId(+$name)
-	 * @param $fileId
-	 * @param string $name
-	 * @return array
+	 * @param int $fileId
+	 * @param string|null $name
+	 * @param string|null $type
+	 * @return array<Bookmark>
 	 */
-	public function get(int $fileId, $name, $type = null) {
+	public function get(int $fileId, ?string $name = null, ?string $type = null): array {
 		$query = $this->db->getQueryBuilder();
 		$query->select('*')
 			->from($this->getTableName())
@@ -51,23 +54,23 @@ class BookmarkMapper extends ReaderMapper {
 	 * @param int $fileId
 	 * @param string $name
 	 * @param string $value
+	 * @param string|null $type
+	 * @param string|null $content
 	 *
 	 * @return Bookmark the newly created or updated bookmark
 	 */
-	public function set($fileId, $name, $value, $type, $content = null) {
-
+	public function set(int $fileId, string $name, string $value, ?string $type = null, ?string $content = null) {
 		$result = $this->get($fileId, $name);
 
 		if (empty($result)) {
-
 			// anonymous bookmarks are named after their contents
-			if ($name === null) {
+			if ($name === '') {
 				$name = $value;
 			}
 
 			// default type is "bookmark"
 			if ($type === null) {
-				$type = "bookmark";
+				$type = 'bookmark';
 			}
 
 			$bookmark = new Bookmark();
@@ -90,25 +93,35 @@ class BookmarkMapper extends ReaderMapper {
 		return $bookmark;
 	}
 
-	/* currently not used */
-	public function deleteForFileId($fileId): void {
-		$sql = "SELECT * FROM `*PREFIX*reader_bookmarks` WHERE file_id=?";
-		$args = [$fileId];
-		array_map(
-			function ($entity) {
-				$this->delete($entity);
-			}, $this->findEntities($sql, $args)
-		);
+	public function deleteForFileId(int $fileId): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->getTableName())
+			->where($qb->expr()->eq('file_id', $qb->createNamedParameter($fileId)));
+		$qb->executeStatement();
 	}
 
-	/* currently not used */
-	public function deleteForUserId($userId): void {
-		$sql = "SELECT * FROM `*PREFIX*reader_bookmarks` WHERE user_id=?";
-		$args = [$userId];
-		array_map(
-			function ($entity) {
-				$this->delete($entity);
-			}, $this->findEntities($sql, $args)
-		);
+	public function deleteForUserId(string $userId): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->getTableName())
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
+		$qb->executeStatement();
+	}
+
+	public function findAll(int $fileId) {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->eq('file_id', $qb->createNamedParameter($fileId)));
+
+		return $this->findEntities($qb);
+	}
+
+	public function findAllForUser() {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($this->userId)));
+
+		return $this->findEntities($qb);
 	}
 }

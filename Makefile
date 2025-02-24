@@ -82,9 +82,9 @@ ifeq (, $(composer))
 	mkdir -p $(build_tools_directory)
 	curl -sS https://getcomposer.org/installer | php
 	mv composer.phar $(build_tools_directory)
-	php $(build_tools_directory)/composer.phar install --prefer-dist --no-dev && php $(build_tools_directory)/composer.phar dump-autoload
+	php $(build_tools_directory)/composer.phar install --prefer-dist --no-dev && php $(build_tools_directory)/composer.phar dump-autoload --no-dev
 else
-	composer install --prefer-dist --no-dev && composer dump-autoload
+	composer install --prefer-dist --no-dev && composer dump-autoload --no-dev
 endif
 
 # Installs npm dependencies
@@ -144,6 +144,8 @@ source: build
 	--exclude=".idea" \
 	--exclude=".vscode" \
 	--exclude=".history" \
+	--exclude="$(app_name)/nextcloud-docker-dev" \
+	--exclude="$(app_name)/nextcloud-server" \
 	--exclude="$(app_name)/build" \
 	--exclude="$(app_name)/js/node_modules" \
 	--exclude="$(app_name)/node_modules" \
@@ -178,6 +180,8 @@ appstore:
 	--exclude=".idea" \
 	--exclude=".vscode" \
 	--exclude=".history" \
+	--exclude="$(app_name)/nextcloud-docker-dev" \
+	--exclude="$(app_name)/nextcloud-server" \
 	--exclude="$(app_name)/build" \
 	--exclude="$(app_name)/src" \
 	--exclude="$(app_name)/tests" \

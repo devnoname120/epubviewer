@@ -5,9 +5,14 @@ namespace OCA\Epubviewer\Db;
 use OCA\Epubviewer\Utility\Time;
 use OCP\IDBConnection;
 
+/**
+ * @template-extends ReaderMapper<Preference>
+ */
 class PreferenceMapper extends ReaderMapper {
 
-	public function __construct(IDBConnection $db, $userId, Time $time) {
+	protected string $userId;
+
+	public function __construct(IDBConnection $db, Time $time, string $userId) {
 		parent::__construct($db, 'reader_prefs', Preference::class, $time);
 		$this->userId = $userId;
 	}
@@ -28,7 +33,7 @@ class PreferenceMapper extends ReaderMapper {
 			->andWhere($query->expr()->eq('file_id', $query->createNamedParameter($fileId)))
 			->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($this->userId)));
 
-		if (!empty($name)) {
+		if ($name !== null && !empty($name)) {
 			$query->andWhere($query->expr()->eq('name', $query->createNamedParameter($name)));
 		}
 
@@ -69,25 +74,35 @@ class PreferenceMapper extends ReaderMapper {
 		return $preference;
 	}
 
-	/* currently not used*/
 	public function deleteForFileId($fileId): void {
-		$sql = "SELECT * FROM `*PREFIX*reader_prefs` WHERE file_id=?";
-		$args = [$fileId];
-		array_map(
-			function ($entity) {
-				$this->delete($entity);
-			}, $this->findEntities($sql, $args)
-		);
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->getTableName())
+			->where($qb->expr()->eq('file_id', $qb->createNamedParameter($fileId)));
+		$qb->executeStatement();
 	}
 
-	/* currently not used*/
 	public function deleteForUserId($userId): void {
-		$sql = "SELECT * FROM `*PREFIX*reader_prefs` WHERE user_id=?";
-		$args = [$userId];
-		array_map(
-			function ($entity) {
-				$this->delete($entity);
-			}, $this->findEntities($sql, $args)
-		);
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->getTableName())
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
+		$qb->executeStatement();
+	}
+
+	public function findAll($fileId) {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->eq('file_id', $qb->createNamedParameter($fileId)));
+		
+		return $this->findEntities($qb);
+	}
+
+	public function findAllForUser() {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($this->userId)));
+		
+		return $this->findEntities($qb);
 	}
 }

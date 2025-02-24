@@ -10,7 +10,6 @@ $scope = $_['scope'];
 $cursor = $_['cursor'];
 $defaults = $_['defaults'];
 $preferences = $_['preferences'];
-$metadata = $_['metadata'];
 $annotations = $_['annotations'];
 $title = htmlentities(basename($downloadLink));
 $revision = '0130';
@@ -35,7 +34,7 @@ $nonce = class_exists('\OC\Security\CSP\ContentSecurityPolicyNonceManager')
       data-staticpath='<?php p($urlGenerator->linkTo('epubviewer', '')); ?>'
       data-scope='<?php print_unescaped($scope); ?>' data-cursor='<?php print_unescaped($cursor); ?>'
       data-defaults='<?php print_unescaped($defaults); ?>' data-preferences='<?php print_unescaped($preferences); ?>'
-      data-metadata='<?php print_unescaped($metadata); ?>' data-annotations='<?php print_unescaped($annotations); ?>'>
+      data-annotations='<?php print_unescaped($annotations); ?>'>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -257,7 +256,7 @@ $nonce = class_exists('\OC\Security\CSP\ContentSecurityPolicyNonceManager')
     <div id="titlebar">
       <div id="opener">
         <a id="slider" class="icon-menu">
-            <?php p($l->t("menu")); ?>
+            <?php p($l->t('menu')); ?>
         </a>
         <div id="status_message_left">
         </div>
@@ -363,7 +362,7 @@ $nonce = class_exists('\OC\Security\CSP\ContentSecurityPolicyNonceManager')
   </div>
 
   <!-- /main -->
-  
+
   <div class="overlay">
   </div>
 </div>

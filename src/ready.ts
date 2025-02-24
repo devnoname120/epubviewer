@@ -12,7 +12,6 @@ document.onreadystatechange = function () {
     options.session.title = options.session.filename;
     options.session.nonce = $session.data('nonce') || '';
     options.session.version = $session.data('version') || '';
-    options.session.metadata = $session.data('metadata') || {};
     options.session.annotations = $session.data('annotations') || {};
     options.session.fileId = $session.data('fileid') || '';
     options.session.scope = $session.data('scope') || '';

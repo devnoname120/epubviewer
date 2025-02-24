@@ -5,7 +5,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
-    phpVersion="8.0"
+    phpVersion="8.1"
 >
     <!-- The language server works slightly differently and has a different file -->
     <projectFiles>
@@ -30,17 +30,6 @@
         <directory name="../../3rdparty/psr" />
         <directory name="../../3rdparty/guzzlehttp" />
     </extraFiles>
-    <issueHandlers>
-        <UndefinedDocblockClass>
-            <errorLevel type="suppress">
-                <referencedClass name="Doctrine\DBAL\Schema\Schema" />
-                <referencedClass name="Doctrine\DBAL\Schema\SchemaException" />
-                <referencedClass name="Doctrine\DBAL\Driver\Statement" />
-                <referencedClass name="Doctrine\DBAL\Schema\Table" />
-                <referencedClass name="Doctrine\DBAL\Platforms\AbstractPlatform" />
-            </errorLevel>
-        </UndefinedDocblockClass>
-    </issueHandlers>
     <forbiddenFunctions>
             <function name="var_dump" />
             <function name="print" />

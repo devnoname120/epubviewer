@@ -9,6 +9,20 @@
       "OCA\\Epubviewer\\": "lib/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "OC\\": "nextcloud-server/lib/private",
+      "OC\\Core\\": "nextcloud-server/core/",
+      "OCP\\": "nextcloud-server/lib/public"
+    },
+    "classmap": [
+      "nextcloud-server/lib/private/legacy/"
+    ],
+    "exclude-from-classmap": ["**/bamarni/composer-bin-plugin/**"],
+    "files": [
+      "nextcloud-server/lib/public/Log/functions.php"
+    ]
+  },
   "authors": [
     {
       "name": "Paul",
@@ -16,15 +30,15 @@
     }
   ],
   "scripts": {
-    "lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
+    "lint": "find . -name \\*.php -not -path './vendor/*' -not -path './nextcloud-server/*' -not -path './nextcloud-docker-dev/*' -print0 | xargs -0 -n1 php -l",
     "cs:check": "php-cs-fixer fix --dry-run --diff",
     "cs:fix": "php-cs-fixer fix",
-    "psalm": "psalm.phar --no-cache --threads=$(nproc)",
-    "psalm:ci": "psalm.phar --config=psalm-ci.xml --no-cache --threads=1 --use-baseline=psalm-baseline.xml",
-    "psalm:update-baseline": "psalm.phar --config=psalm-ci.xml --threads=1 --use-baseline=psalm-baseline.xml --update-baseline",
-    "psalm:update-baseline:force": "psalm.phar --config=psalm-ci.xml --threads=1 --update-baseline --set-baseline=tests/psalm-baseline.xml",
-    "psalm:clear": "psalm.phar --config=psalm-ci.xml --clear-cache && psalm.phar --config=psalm-ci.xml --clear-global-cache",
-    "psalm:fix": "psalm.phar --config=psalm-ci.xml --alter --issues=InvalidReturnType,InvalidNullableReturnType,MissingReturnType,MissingParamType,InvalidFalsableReturnType"
+    "psalm": "psalm.phar --config=psalm.xml --show-info=true --threads=$(nproc)",
+    "psalm:ci": "psalm.phar --config=psalm.xml --no-cache --threads=1 --use-baseline=psalm-baseline.xml",
+    "psalm:update-baseline": "psalm.phar --config=psalm.xml --threads=1 --use-baseline=psalm-baseline.xml --update-baseline",
+    "psalm:update-baseline:force": "psalm.phar --config=psalm.xml --threads=1 --update-baseline --set-baseline=tests/psalm-baseline.xml",
+    "psalm:clear": "psalm.phar --config=psalm.xml --clear-cache && psalm.phar --config=psalm.xml --clear-global-cache",
+    "psalm:fix": "psalm.phar --config=psalm.xml --alter --issues=InvalidReturnType,InvalidNullableReturnType,MissingReturnType,MissingParamType,InvalidFalsableReturnType"
   },
   "config": {
     "autoloader-suffix": "Epubviewer",
@@ -32,21 +46,20 @@
       "composer/package-versions-deprecated": true
     },
     "platform": {
-      "php": "8.0"
+      "php": "8.1"
     }
   },
   "require-dev": {
-    "phpunit/phpunit": "^9",
+    "phpunit/phpunit": "^9.6.22",
+    "nextcloud/ocp": "^30.0.6",
     "friendsofphp/php-cs-fixer": "^3.59.3",
-    "psalm/phar": "^5.17.0",
-    "nextcloud/coding-standard": "^v1.2.1",
-    "nextcloud/ocp": "dev-stable28"
+    "psalm/phar": "^5.26.1",
+    "nextcloud/coding-standard": "^v1.3.2"
   },
   "require": {
     "ext-json": "*",
-    "nextcloud/ocp": "^28",
-    "sabre/dav": "^4.1",
-    "sabre/xml": "^2.2",
-    "symfony/event-dispatcher": "^5.3.11"
+    "sabre/dav": "^4.7.0",
+    "sabre/xml": "^2.2.11",
+    "symfony/event-dispatcher": "^5.4.45"
   }
 }

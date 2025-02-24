@@ -16,7 +16,7 @@ style('epubviewer', 'settings');
 
   <p>
     <input type="checkbox" name="EpubEnable" id="EpubEnable" class="checkbox"
-           value="1" <?php if ($_['EpubEnable'] === "true") {
+           value="1" <?php if ($_['EpubEnable'] === 'true') {
            	print_unescaped('checked="checked"');
            } ?> />
     <label for="EpubEnable">
@@ -26,7 +26,7 @@ style('epubviewer', 'settings');
 
   <p>
     <input type="checkbox" name="PdfEnable" id="PdfEnable" class="checkbox"
-           value="1" <?php if ($_['PdfEnable'] === "true") {
+           value="1" <?php if ($_['PdfEnable'] === 'true') {
            	print_unescaped('checked="checked"');
            } ?> />
     <label for="PdfEnable">
@@ -35,7 +35,7 @@ style('epubviewer', 'settings');
   </p>
   <p>
     <input type="checkbox" name="CbxEnable" id="CbxEnable" class="checkbox"
-           value="1" <?php if ($_['CbxEnable'] === "true") {
+           value="1" <?php if ($_['CbxEnable'] === 'true') {
            	print_unescaped('checked="checked"');
            } ?> />
     <label for="CbxEnable">

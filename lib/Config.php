@@ -2,14 +2,25 @@
 
 namespace OCA\Epubviewer;
 
-use OC;
-use OC_User;
 use OCA\Epubviewer\AppInfo\Application;
+use OCP\IAppConfig;
+use OCP\IConfig;
+use OCP\IUserSession;
 
 /**
  * Config class for Reader
  */
 class Config {
+	private IConfig $config;
+	private IAppConfig $appConfig;
+	private IUserSession $userSession;
+
+	public function __construct(IConfig $config, IAppConfig $appConfig, IUserSession $userSession) {
+		$this->config = $config;
+		$this->appConfig = $appConfig;
+		$this->userSession = $userSession;
+	}
+
 	/**
 	 * @brief get user config value
 	 *
@@ -17,8 +28,12 @@ class Config {
 	 * @param string $default default value to use
 	 * @return string retrieved value or default
 	 */
-	public static function get($key, $default) {
-		return OC::$server->getConfig()->getUserValue(OC_User::getUser(), Application::APP_ID, $key, $default);
+	public function getUserValue(string $key, string $default = ''): string {
+		$user = $this->userSession->getUser();
+		if (!$user) {
+			return $default;
+		}
+		return $this->config->getUserValue($user->getUID(), Application::APP_ID, $key, $default);
 	}
 
 	/**
@@ -26,10 +41,13 @@ class Config {
 	 *
 	 * @param string $key key for value to change
 	 * @param string $value value to use
-	 * @return bool success
 	 */
-	public static function set($key, $value) {
-		return OC::$server->getConfig()->setUserValue(OC_User::getUser(), Application::APP_ID, $key, $value);
+	public function setUserValue(string $key, string $value): void {
+		$user = $this->userSession->getUser();
+		if (!$user) {
+			return;
+		}
+		$this->config->setUserValue($user->getUID(), Application::APP_ID, $key, $value);
 	}
 
 	/**
@@ -39,8 +57,8 @@ class Config {
 	 * @param string $default default value to use
 	 * @return string retrieved value or default
 	 */
-	public static function getApp($key, $default) {
-		return OC::$server->getConfig()->getAppValue(Application::APP_ID, $key, $default);
+	public function getApp(string $key, string $default): string {
+		return $this->appConfig->getValueString(Application::APP_ID, $key, $default);
 	}
 
 	/**
@@ -48,9 +66,8 @@ class Config {
 	 *
 	 * @param string $key key for value to change
 	 * @param string $value value to use
-	 * @return bool success
 	 */
-	public static function setApp($key, $value) {
-		return OC::$server->getConfig()->setAppValue(Application::APP_ID, $key, $value);
+	public function setApp(string $key, string $value): void {
+		$this->appConfig->setValueString(Application::APP_ID, $key, $value);
 	}
 }

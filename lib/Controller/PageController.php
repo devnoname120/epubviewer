@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OCA\Epubviewer\Controller;
 
 use OCA\Epubviewer\Service\BookmarkService;
-use OCA\Epubviewer\Service\MetadataService;
 use OCA\Epubviewer\Service\PreferenceService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
+use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Files\FileInfo;
 use OCP\Files\IRootFolder;
@@ -16,6 +16,7 @@ use OCP\Files\NotFoundException;
 use OCP\IRequest;
 use OCP\IURLGenerator;
 use OCP\Share\IManager;
+use function pathinfo;
 
 class PageController extends Controller {
 
@@ -26,7 +27,6 @@ class PageController extends Controller {
 	private IManager $shareManager;
 	private ?string $userId;
 	private BookmarkService $bookmarkService;
-	private MetadataService $metadataService;
 	private PreferenceService $preferenceService;
 
 	/**
@@ -38,7 +38,6 @@ class PageController extends Controller {
 	 * @param ?string $userId
 	 * @param BookmarkService $bookmarkService
 	 * @param PreferenceService $preferenceService
-	 * @param MetadataService $metadataService
 	 */
 	public function __construct(
 		$appName,
@@ -49,14 +48,13 @@ class PageController extends Controller {
 		$userId,
 		BookmarkService $bookmarkService,
 		PreferenceService $preferenceService,
-		MetadataService $metadataService) {
+	) {
 		parent::__construct($appName, $request);
 		$this->urlGenerator = $urlGenerator;
 		$this->rootFolder = $rootFolder;
 		$this->shareManager = $shareManager;
 		$this->userId = $userId;
 		$this->bookmarkService = $bookmarkService;
-		$this->metadataService = $metadataService;
 		$this->preferenceService = $preferenceService;
 	}
 
@@ -67,6 +65,15 @@ class PageController extends Controller {
 	 * @return TemplateResponse
 	 */
 	public function showReader(): TemplateResponse {
+		$params = [];
+		$file = $this->request->getParam('file');
+		$type = $this->request->getParam('type');
+
+		if (!$file || !$type) {
+			throw new NotFoundException('file or type missing from request params');
+		}
+
+		$fileInfo = $this->getFileInfo($file);
 		$templates = [
 			'application/epub+zip' => 'epubviewer',
 			'application/pdf' => 'pdfreader',
@@ -78,35 +85,22 @@ class PageController extends Controller {
 			'application/comicbook+7z' => 'cbreader',
 			'application/comicbook+ace' => 'cbreader',
 			'application/comicbook+truecrypt' => 'cbreader',
-
 		];
 
-		/**
-		 *  $fileInfo = [
-		 *      fileId => null,
-		 *      fileName => null,
-		 *      fileType => null
-		 *  ];
-		 */
-		$fileInfo = $this->getFileInfo($this->request->get['file']);
-
-		$fileId = $fileInfo['fileId'];
-		$type = $this->request->get["type"];
 		$scope = $template = $templates[$type];
-		$cursor = $this->bookmarkService->getCursor($fileId);
+		$cursor = $this->bookmarkService->getCursor($fileInfo['fileId']);
 
 		$params = [
 			'urlGenerator' => $this->urlGenerator,
-			'downloadLink' => $this->request->get['file'],
+			'downloadLink' => $file,
 			'scope' => $scope,
 			'fileId' => $fileInfo['fileId'],
 			'fileName' => $fileInfo['fileName'],
 			'fileType' => $fileInfo['fileType'],
 			'cursor' => $cursor ? $this->toJson($cursor) : null,
 			'defaults' => $this->toJson($this->preferenceService->getDefault($scope)),
-			'preferences' => $this->toJson($this->preferenceService->get($scope, $fileId)),
-			'metadata' => $this->toJson($this->metadataService->get($fileId)),
-			'annotations' => $this->toJson($this->bookmarkService->get($fileId))
+			'preferences' => $this->toJson($this->preferenceService->get($scope, $fileInfo['fileId'])),
+			'annotations' => $this->toJson($this->bookmarkService->get($fileInfo['fileId']))
 		];
 
 		$policy = new ContentSecurityPolicy();
@@ -114,12 +108,11 @@ class PageController extends Controller {
 		$policy->addAllowedStyleDomain('blob:');
 		$policy->addAllowedScriptDomain('\'self\'');
 		$policy->addAllowedFrameDomain('\'self\'');
-		$policy->addAllowedChildSrcDomain('\'self\'');
 		$policy->addAllowedFontDomain('\'self\'');
 		$policy->addAllowedFontDomain('data:');
 		$policy->addAllowedFontDomain('blob:');
 		$policy->addAllowedImageDomain('blob:');
-		$policy->addAllowedWorkerSrcDomain('\'self\''); 
+		$policy->addAllowedWorkerSrcDomain('\'self\'');
 
 		$response = new TemplateResponse($this->appName, $template, $params, 'blank');
 		$response->setContentSecurityPolicy($policy);
@@ -130,19 +123,18 @@ class PageController extends Controller {
 	/**
 	 * @brief sharing-aware file info retriever
 	 *
-	 * Work around the differences between normal and shared file access
-	 * (this should be abstracted away in OC/NC IMnsHO)
-	 *
 	 * @param string $path path-fragment from url
-	 * @return array
+	 * @return array{fileName: string, fileType: string, fileId: int}
 	 * @throws NotFoundException
 	 */
 	private function getFileInfo($path) {
+		if (!$this->userId) {
+			throw new NotFoundException('User not found');
+		}
+
 		$count = 0;
-		$shareToken = preg_replace("/(?:\/index\.php)?\/s\/([A-Za-z0-9_\-+]{3,32})\/download.*/", "$1", $path, 1, $count);
-
+		$shareToken = preg_replace("/(?:\/index\.php)?\/s\/([A-Za-z0-9_\-+]{3,32})\/download.*/", '$1', $path, 1, $count);
 		if ($count === 1) {
-
 			/* shared file or directory */
 			$node = $this->shareManager->getShareByToken($shareToken)->getNode();
 			$type = $node->getType();
@@ -161,19 +153,38 @@ class PageController extends Controller {
 			$fileId = $node->getId();
 		} else {
 			$filePath = $path;
-			$fileId = $this->rootFolder->getUserFolder($this->userId)
-				->get(preg_replace("/.*\/remote.php\/dav\/files\/[^\/]*\/(.*)/", "$1", rawurldecode($this->request->get['file'])))
-				->getId();
+			$userFolder = $this->rootFolder->getUserFolder($this->userId);
+			$fileId = $userFolder->get(preg_replace("/.*\/remote.php\/dav\/files\/[^\/]*\/(.*)/", '$1', rawurldecode($path)))->getId();
 		}
 
-		return [
-			'fileName' => pathInfo($filePath, PATHINFO_FILENAME),
-			'fileType' => strtolower(pathInfo($filePath, PATHINFO_EXTENSION)),
-			'fileId' => $fileId
+		$filename = pathinfo($filePath, PATHINFO_FILENAME);
+		$extension = pathinfo($filePath, PATHINFO_EXTENSION);
+
+		/** @var array{fileName: string, fileType: string, fileId: int} */
+		$result = [
+			'fileName' => $filename,
+			'fileType' => strtolower($extension),
+			'fileId' => (int)$fileId
 		];
+
+		return $result;
 	}
 
 	private function toJson(array $value): string {
 		return htmlspecialchars(json_encode($value), ENT_QUOTES, 'UTF-8');
+	}
+
+	public function load(): JSONResponse {
+		if (!$this->userId) {
+			return new JSONResponse(['success' => false, 'error' => 'User not found']);
+		}
+
+		$file = $this->request->getParam('file');
+		if ($file) {
+			$userFolder = $this->rootFolder->getUserFolder($this->userId);
+			$node = $userFolder->get(preg_replace("/.*\/remote.php\/dav\/files\/[^\/]*\/(.*)/", '$1', rawurldecode($file)));
+			return new JSONResponse(['success' => true, 'node' => $node]);
+		}
+		return new JSONResponse(['success' => false]);
 	}
 }

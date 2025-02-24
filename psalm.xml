@@ -6,6 +6,9 @@
         xmlns="https://getpsalm.org/schema/config"
         xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
         errorBaseline="tests/psalm-baseline.xml"
+        findUnusedBaselineEntry="true"
+        findUnusedCode="false"
+        phpVersion="8.1"
 >
     <stubs>
         <file name="stub.phpstub" preloadClasses="true"/>
@@ -14,32 +17,60 @@
         <directory name="lib"/>
         <ignoreFiles>
             <directory name="vendor"/>
+            <directory name="nextcloud-server"/>
+            <directory name="nextcloud-docker-dev"/>
         </ignoreFiles>
     </projectFiles>
     <extraFiles>
         <directory name="vendor"/>
+
+        <!--
+        The lines below were grabbed from the projectFiles section of nextcloud-server/psalm.xml
+        These extraFiles are needed so that psalm can find the OCA\ stuff when checking the epubviewer project
+
+        For example here is an error if you remove those:
+
+        ERROR: UndefinedClass - lib/Listener/FilesLoadAdditionalScriptsListener.php:26:27 - Class, interface or enum named OCA\Files\Event\LoadAdditionalScriptsEvent does not exist (see https://psalm.dev/019)
+        -->
+        <directory name="nextcloud-server/3rdparty"/>
+        <directory name="nextcloud-server/apps/files_external/3rdparty"/>
+
+        <directory name="nextcloud-server/apps/admin_audit"/>
+        <directory name="nextcloud-server/apps/cloud_federation_api"/>
+        <directory name="nextcloud-server/apps/comments"/>
+        <directory name="nextcloud-server/apps/contactsinteraction"/>
+        <directory name="nextcloud-server/apps/dashboard"/>
+        <directory name="nextcloud-server/apps/dav"/>
+        <directory name="nextcloud-server/apps/encryption"/>
+        <directory name="nextcloud-server/apps/federatedfilesharing"/>
+        <directory name="nextcloud-server/apps/federation"/>
+        <directory name="nextcloud-server/apps/files"/>
+        <directory name="nextcloud-server/apps/files_external"/>
+        <directory name="nextcloud-server/apps/files_sharing"/>
+        <directory name="nextcloud-server/apps/files_trashbin"/>
+        <directory name="nextcloud-server/apps/files_versions"/>
+        <directory name="nextcloud-server/apps/lookup_server_connector"/>
+        <directory name="nextcloud-server/apps/oauth2"/>
+        <directory name="nextcloud-server/apps/provisioning_api"/>
+        <directory name="nextcloud-server/apps/settings"/>
+        <directory name="nextcloud-server/apps/sharebymail"/>
+        <directory name="nextcloud-server/apps/systemtags"/>
+        <directory name="nextcloud-server/apps/testing"/>
+        <directory name="nextcloud-server/apps/theming"/>
+        <directory name="nextcloud-server/apps/twofactor_backupcodes"/>
+        <directory name="nextcloud-server/apps/updatenotification"/>
+        <directory name="nextcloud-server/apps/user_ldap"/>
+        <directory name="nextcloud-server/apps/user_status"/>
+        <directory name="nextcloud-server/apps/weather_status"/>
+        <directory name="nextcloud-server/apps/webhook_listeners"/>
+        <directory name="nextcloud-server/apps/workflowengine"/>
+        <directory name="nextcloud-server/core"/>
+        <directory name="nextcloud-server/lib"/>
+        <directory name="nextcloud-server/ocs"/>
+        <directory name="nextcloud-server/ocs-provider"/>
         <ignoreFiles>
             <directory name="vendor/phpunit/php-code-coverage"/>
             <directory name="vendor/psalm"/>
         </ignoreFiles>
     </extraFiles>
-    <issueHandlers>
-        <UndefinedClass>
-            <errorLevel type="suppress">
-                <referencedClass name="OC" />
-                <referencedClass name="OCA\Files_Opds\Meta" />
-                <referencedClass name="OCA\Files_Sharing\Event\BeforeTemplateRenderedEvent" />
-                <referencedClass name="OCA\Files\Event\LoadAdditionalScriptsEvent" />
-            </errorLevel>
-        </UndefinedClass>
-        <UndefinedDocblockClass>
-            <errorLevel type="suppress">
-                <referencedClass name="OC\AppFramework\OCS\BaseResponse"/>
-                <referencedClass name="Doctrine\DBAL\Schema\Schema"/>
-                <referencedClass name="Doctrine\DBAL\Schema\SchemaException"/>
-                <referencedClass name="Doctrine\DBAL\Driver\Statement"/>
-                <referencedClass name="Doctrine\DBAL\Schema\Table"/>
-            </errorLevel>
-        </UndefinedDocblockClass>
-    </issueHandlers>
 </psalm>

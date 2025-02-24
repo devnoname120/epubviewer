@@ -20,7 +20,7 @@ class PersonalSection implements IIconSection {
 	/**
 	 * returns the relative path to an 16*16 icon describing the section.
 	 *
-	 * @returns string
+	 * @return string
 	 */
 	public function getIcon() {
 		return $this->urlGenerator->imagePath('epubviewer', 'app.svg');
@@ -29,7 +29,7 @@ class PersonalSection implements IIconSection {
 	/**
 	 * returns the ID of the section. It is supposed to be a lower case string,
 	 *
-	 * @returns string
+	 * @return string
 	 */
 	public function getID() {
 		return 'epubviewer';

@@ -8,12 +8,12 @@ use OCP\Settings\ISettings;
 
 class Personal implements ISettings {
 
-	private $userId;
-	private $configManager;
+	private string $userId;
+	private IConfig $configManager;
 
 	public function __construct(
-		$userId,
-		IConfig $configManager
+		string $userId,
+		IConfig $configManager,
 	) {
 		$this->userId = $userId;
 		$this->configManager = $configManager;
@@ -61,8 +61,8 @@ class Personal implements ISettings {
 
 	/**
 	 * @return int whether the form should be rather on the top or bottom of
-	 * the admin section. The forms are arranged in ascending order of the
-	 * priority values. It is required to return a value between 0 and 100.
+	 *             the admin section. The forms are arranged in ascending order of the
+	 *             priority values. It is required to return a value between 0 and 100.
 	 *
 	 * E.g.: 70
 	 * @since 9.1
