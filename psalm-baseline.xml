@@ -1,23 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="5.26.1@d747f6500b38ac4f7dfc5edbcae6e4b637d7add0">
-  <file src="lib/Controller/PageController.php">
-    <PossiblyUndefinedMethod>
-      <code><![CDATA[get]]></code>
-    </PossiblyUndefinedMethod>
-  </file>
-  <file src="lib/Db/PreferenceMapper.php">
-    <LessSpecificReturnStatement>
-      <code><![CDATA[$preference]]></code>
-    </LessSpecificReturnStatement>
-    <MoreSpecificReturnType>
-      <code><![CDATA[Preference]]></code>
-    </MoreSpecificReturnType>
-  </file>
-  <file src="lib/Listener/BeforeTemplateRenderedListener.php">
-    <PossiblyNullReference>
-      <code><![CDATA[getUID]]></code>
-      <code><![CDATA[getUID]]></code>
-      <code><![CDATA[getUID]]></code>
-    </PossiblyNullReference>
-  </file>
-</files>
+<files psalm-version="5.26.1@d747f6500b38ac4f7dfc5edbcae6e4b637d7add0"/>
