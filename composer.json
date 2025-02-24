@@ -51,13 +51,13 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^9.6.22",
+    "nextcloud/ocp": "^30.0.6",
     "friendsofphp/php-cs-fixer": "^3.59.3",
     "psalm/phar": "^5.26.1",
     "nextcloud/coding-standard": "^v1.3.2"
   },
   "require": {
     "ext-json": "*",
-    "nextcloud/ocp": "^30.0.6",
     "sabre/dav": "^4.7.0",
     "sabre/xml": "^2.2.11",
     "symfony/event-dispatcher": "^5.4.45"
