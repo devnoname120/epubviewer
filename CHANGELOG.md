@@ -1,9 +1,17 @@
+## 1.7.0 - 2025-02-24
+
+### Changed
+
+- Huge refactoring that fixed all (100+) Psalm linter errors.
+- Added support for Nextcloud 31.
+- Minimum PHP version updated to 8.1 (required by Nextcloud 31).
+- Dropped support for Nextcloud 29.
+
 ## 1.6.8 - 2025-02-08
 
 ### Fixed
 
-- (#27) Fix decompression error in some browsers due to a too strict `Content-Security-Policyt. Thanks to @lesensei for the fix!
-
+- (#27) Fix decompression error in some browsers due to a too strict `Content-Security-Policy`. Thanks to @lesensei for the fix!
 
 ## 1.6.7 - 2024-11-25
 

@@ -1,7 +1,7 @@
 {
   "name": "epubviewer",
   "description": "EPUB/CBR/PDF reader app for Nextcloud",
-  "version": "1.6.8",
+  "version": "1.7.0",
   "author": "devnoname120 <devnoname120@gmail.com>",
   "contributors": [
     "devnoname120 <devnoname120@gmail.com>"
