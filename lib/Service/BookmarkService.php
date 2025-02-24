@@ -33,7 +33,7 @@ class BookmarkService extends Service {
 	 */
 	public function get($fileId, $name = null, $type = null) {
 		/** @var array<Bookmark> */
-		$result = $this->bookmarkMapper->get($fileId, $name ?? '', $type);
+		$result = $this->bookmarkMapper->get($fileId, $name, $type);
 		return array_map(
 			function ($entity) {
 				return $entity->toService();

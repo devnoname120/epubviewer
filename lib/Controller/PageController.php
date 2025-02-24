@@ -8,6 +8,7 @@ use OCA\Epubviewer\Service\BookmarkService;
 use OCA\Epubviewer\Service\PreferenceService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
+use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Files\FileInfo;
 use OCP\Files\IRootFolder;
@@ -46,7 +47,8 @@ class PageController extends Controller {
 		IManager $shareManager,
 		$userId,
 		BookmarkService $bookmarkService,
-		PreferenceService $preferenceService) {
+		PreferenceService $preferenceService
+	) {
 		parent::__construct($appName, $request);
 		$this->urlGenerator = $urlGenerator;
 		$this->rootFolder = $rootFolder;
@@ -132,7 +134,6 @@ class PageController extends Controller {
 
 		$count = 0;
 		$shareToken = preg_replace("/(?:\/index\.php)?\/s\/([A-Za-z0-9_\-+]{3,32})\/download.*/", '$1', $path, 1, $count);
-
 		if ($count === 1) {
 			/* shared file or directory */
 			$node = $this->shareManager->getShareByToken($shareToken)->getNode();
@@ -171,5 +172,19 @@ class PageController extends Controller {
 
 	private function toJson(array $value): string {
 		return htmlspecialchars(json_encode($value), ENT_QUOTES, 'UTF-8');
+	}
+
+	public function load(): JSONResponse {
+		if (!$this->userId) {
+			return new JSONResponse(['success' => false, 'error' => 'User not found']);
+		}
+
+		$file = $this->request->getParam('file');
+		if ($file) {
+			$userFolder = $this->rootFolder->getUserFolder($this->userId);
+			$node = $userFolder->get(preg_replace("/.*\/remote.php\/dav\/files\/[^\/]*\/(.*)/", '$1', rawurldecode($file)));
+			return new JSONResponse(['success' => true, 'node' => $node]);
+		}
+		return new JSONResponse(['success' => false]);
 	}
 }

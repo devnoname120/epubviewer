@@ -5,20 +5,26 @@ namespace OCA\Epubviewer\Controller;
 use OCA\Epubviewer\Config;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
+use OCP\IL10N;
 use OCP\IRequest;
 
 class SettingsController extends Controller {
-
+	private $config;
+	private $l10n;
 	/**
 	 * @param string $appName
 	 * @param IRequest $request
+	 * @param Config $config
 	 */
 	public function __construct(
 		string $appName,
 		IRequest $request,
 		Config $config,
+		IL10N $l10n
 	) {
 		parent::__construct($appName, $request);
+		$this->config = $config;
+		$this->l10n = $l10n;
 	}
 
 	/**
@@ -34,14 +40,12 @@ class SettingsController extends Controller {
 	 */
 	public function setPreference(string $EpubEnable, string $PdfEnable, string $CbxEnable) {
 
-		$l = OC::$server->getL10N('epubviewer');
-
-		Config::set('epub_enable', $EpubEnable);
-		Config::set('pdf_enable', $PdfEnable);
-		Config::set('cbx_enable', $CbxEnable);
+		$this->config->setUserValue('epub_enable', $EpubEnable);
+		$this->config->setUserValue('pdf_enable', $PdfEnable);
+		$this->config->setUserValue('cbx_enable', $CbxEnable);
 
 		$response = [
-			'data' => ['message' => $l->t('Settings updated successfully.')],
+			'data' => ['message' => $this->l10n->t('Settings updated successfully.')],
 			'status' => 'success'
 		];
 

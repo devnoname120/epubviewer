@@ -26,7 +26,7 @@ class BookmarkMapper extends ReaderMapper {
 	/**
 	 * @brief get bookmarks for $fileId+$userId(+$name)
 	 * @param int $fileId
-	 * @param string $name
+	 * @param string|null $name
 	 * @param string|null $type
 	 * @return array<Bookmark>
 	 */
@@ -93,25 +93,35 @@ class BookmarkMapper extends ReaderMapper {
 		return $bookmark;
 	}
 
-	/* currently not used */
-	public function deleteForFileId($fileId): void {
-		$sql = "SELECT * FROM `*PREFIX*reader_bookmarks` WHERE file_id=?";
-		$args = [$fileId];
-		array_map(
-			function ($entity) {
-				$this->delete($entity);
-			}, $this->findEntities($sql, $args)
-		);
+	public function deleteForFileId(int $fileId): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->getTableName())
+			->where($qb->expr()->eq('file_id', $qb->createNamedParameter($fileId)));
+		$qb->executeStatement();
 	}
 
-	/* currently not used */
-	public function deleteForUserId($userId): void {
-		$sql = "SELECT * FROM `*PREFIX*reader_bookmarks` WHERE user_id=?";
-		$args = [$userId];
-		array_map(
-			function ($entity) {
-				$this->delete($entity);
-			}, $this->findEntities($sql, $args)
-		);
+	public function deleteForUserId(string $userId): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->getTableName())
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
+		$qb->executeStatement();
+	}
+
+	public function findAll(int $fileId) {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->eq('file_id', $qb->createNamedParameter($fileId)));
+
+		return $this->findEntities($qb);
+	}
+
+	public function findAllForUser() {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($this->userId)));
+
+		return $this->findEntities($qb);
 	}
 }
