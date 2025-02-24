@@ -18,6 +18,8 @@
         <ignoreFiles>
             <directory name="vendor"/>
             <directory name="nextcloud-server"/>
+        </ignoreFiles>
+        <ignoreFiles allowMissingFiles="true">
             <directory name="nextcloud-docker-dev"/>
         </ignoreFiles>
     </projectFiles>
