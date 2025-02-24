@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OCA\Epubviewer\Controller;
 
 use OCA\Epubviewer\Service\BookmarkService;
-use OCA\Epubviewer\Service\MetadataService;
 use OCA\Epubviewer\Service\PreferenceService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
@@ -26,7 +25,6 @@ class PageController extends Controller {
 	private IManager $shareManager;
 	private ?string $userId;
 	private BookmarkService $bookmarkService;
-	private MetadataService $metadataService;
 	private PreferenceService $preferenceService;
 
 	/**
@@ -38,7 +36,6 @@ class PageController extends Controller {
 	 * @param ?string $userId
 	 * @param BookmarkService $bookmarkService
 	 * @param PreferenceService $preferenceService
-	 * @param MetadataService $metadataService
 	 */
 	public function __construct(
 		$appName,
@@ -48,15 +45,13 @@ class PageController extends Controller {
 		IManager $shareManager,
 		$userId,
 		BookmarkService $bookmarkService,
-		PreferenceService $preferenceService,
-		MetadataService $metadataService) {
+		PreferenceService $preferenceService) {
 		parent::__construct($appName, $request);
 		$this->urlGenerator = $urlGenerator;
 		$this->rootFolder = $rootFolder;
 		$this->shareManager = $shareManager;
 		$this->userId = $userId;
 		$this->bookmarkService = $bookmarkService;
-		$this->metadataService = $metadataService;
 		$this->preferenceService = $preferenceService;
 	}
 
