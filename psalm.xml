@@ -8,6 +8,7 @@
         errorBaseline="tests/psalm-baseline.xml"
         findUnusedBaselineEntry="true"
         findUnusedCode="false"
+        phpVersion="8.1"
 >
     <stubs>
         <file name="stub.phpstub" preloadClasses="true"/>

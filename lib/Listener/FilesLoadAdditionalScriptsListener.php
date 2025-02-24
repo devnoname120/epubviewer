@@ -22,8 +22,6 @@ class FilesLoadAdditionalScriptsListener implements IEventListener {
 		if (!($event instanceof LoadAdditionalScriptsEvent)) {
 			return;
 		}
-
-		// addInitScript was added in Nextcloud 28
 		Util::addInitScript(Application::APP_ID, 'epubviewer-main');
 
 		// We currently don't have a custom stylesheet, but you can uncomment this line the day we need it

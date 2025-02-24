@@ -26,11 +26,6 @@ class PublicShareBeforeTemplateRenderedListener implements IEventListener {
 	}
 
 	public function handle(Event $event): void {
-		// addInitScript was added in Nextcloud 28
-		if (method_exists(Util::class, 'addInitScript')) {
-			Util::addInitScript(Application::APP_ID, 'epubviewer-public');
-		} else {
-			Util::addScript(Application::APP_ID, 'epubviewer-public');
-		}
+		Util::addInitScript(Application::APP_ID, 'epubviewer-public');
 	}
 }
