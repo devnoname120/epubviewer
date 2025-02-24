@@ -2,4 +2,4 @@
  - rtl and ltr
  - test canvas size restriction
  - add IDs to highlights so they can be marked when hovered - or when related list item is hovered
-
+ - Use this GitHub Action for releasing: https://github.com/R0Wi/nextcloud-appstore-push-action
