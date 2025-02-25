@@ -2,23 +2,23 @@
 
 namespace OCA\Epubviewer\Service;
 
-use OCA\Epubviewer\Db\ReaderEntity;
-use OCA\Epubviewer\Db\ReaderMapper;
+use OCP\AppFramework\Db\Entity;
+use OCP\AppFramework\Db\QBMapper;
 
 /**
- * @template T of ReaderEntity
+ * @template T of Entity
  */
 abstract class Service {
 
 	/**
-	 * @var ReaderMapper<T>
+	 * @var QBMapper<T>
 	 */
 	protected $mapper;
 
 	/**
-	 * @param ReaderMapper<T> $mapper
+	 * @param QBMapper<T> $mapper
 	 */
-	public function __construct(ReaderMapper $mapper) {
+	public function __construct(QBMapper $mapper) {
 		$this->mapper = $mapper;
 	}
 }

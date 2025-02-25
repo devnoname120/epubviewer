@@ -3,6 +3,7 @@
 namespace OCA\Epubviewer\Db;
 
 use JsonSerializable;
+use OCP\AppFramework\Db\Entity;
 
 /**
  * @method string getUserId()
@@ -17,8 +18,10 @@ use JsonSerializable;
  * @method void setValue(string $value)
  * @method string|null getContent()
  * @method void setContent(?string $content)
+ * @method string getLastModified()
+ * @method void setLastModified(string $lastModified)
  */
-class Bookmark extends ReaderEntity implements JsonSerializable {
+class Bookmark extends Entity implements JsonSerializable {
 
 	protected $userId;  // user
 	protected $fileId;  // book (identified by fileId) for which this mark is valid
@@ -26,15 +29,16 @@ class Bookmark extends ReaderEntity implements JsonSerializable {
 	protected $name;    // name, defaults to $location
 	protected $value;   // bookmark value (format-specific, eg. page number for PDF, CFI for epub, etc)
 	protected $content; // bookmark content (annotations, etc.), can be empty
+	protected $lastModified;
 
 	public function __construct() {
-		parent::__construct();
 		$this->addType('userId', 'string');
 		$this->addType('fileId', 'integer');
 		$this->addType('type', 'string');
 		$this->addType('name', 'string');
 		$this->addType('value', 'string');
 		$this->addType('content', 'string');
+		$this->addType('lastModified', 'string');
 	}
 
 	public function jsonSerialize(): array {
@@ -45,12 +49,12 @@ class Bookmark extends ReaderEntity implements JsonSerializable {
 			'name' => $this->name,
 			'value' => self::conditional_json_decode($this->value),
 			'content' => self::conditional_json_decode($this->content),
-			'lastModified' => $this->getLastModified(),
+			'lastModified' => $this->lastModified,
 		];
 	}
 
 	/**
-	 * @psalm-return array{name: string, type: string, value: mixed, content: mixed, lastModified: int}
+	 * @psalm-return array{name: string, type: string, value: mixed, content: mixed, lastModified: string}
 	 */
 	public function toService(): array {
 		return [

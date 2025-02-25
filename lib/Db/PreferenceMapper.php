@@ -3,18 +3,44 @@
 namespace OCA\Epubviewer\Db;
 
 use OCA\Epubviewer\Utility\Time;
+use OCP\AppFramework\Db\Entity;
+use OCP\AppFramework\Db\QBMapper;
 use OCP\IDBConnection;
 
 /**
- * @template-extends ReaderMapper<Preference>
+ * @template-extends QBMapper<Preference>
  */
-class PreferenceMapper extends ReaderMapper {
+class PreferenceMapper extends QBMapper {
 
 	protected string $userId;
+	private Time $time;
 
 	public function __construct(IDBConnection $db, Time $time, string $userId) {
-		parent::__construct($db, 'reader_prefs', Preference::class, $time);
+		parent::__construct($db, 'reader_prefs', Preference::class);
 		$this->userId = $userId;
+		$this->time = $time;
+	}
+
+	/**
+	 * @param Preference $entity
+	 * @return Preference
+	 */
+	public function update($entity): Entity {
+		$entity->setLastModified($this->time->getMicroTime());
+		/** @var Preference $updated */
+		$updated = parent::update($entity);
+		return $updated;
+	}
+
+	/**
+	 * @param Preference $entity
+	 * @return Preference
+	 */
+	public function insert($entity): Entity {
+		$entity->setLastModified($this->time->getMicroTime());
+		/** @var Preference $inserted */
+		$inserted = parent::insert($entity);
+		return $inserted;
 	}
 
 	/**

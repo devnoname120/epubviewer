@@ -3,15 +3,17 @@
 namespace OCA\Epubviewer\Db;
 
 use OCA\Epubviewer\Utility\Time;
-
+use OCP\AppFramework\Db\Entity;
+use OCP\AppFramework\Db\QBMapper;
 use OCP\IDBConnection;
 
 /**
- * @template-extends ReaderMapper<Bookmark>
+ * @template-extends QBMapper<Bookmark>
  */
-class BookmarkMapper extends ReaderMapper {
+class BookmarkMapper extends QBMapper {
 
 	private string $userId;
+	private Time $time;
 
 	/**
 	 * @param IDbConnection $db
@@ -19,8 +21,31 @@ class BookmarkMapper extends ReaderMapper {
 	 * @param Time $time
 	 */
 	public function __construct(IDBConnection $db, string $userId, Time $time) {
-		parent::__construct($db, 'reader_bookmarks', Bookmark::class, $time);
+		parent::__construct($db, 'reader_bookmarks', Bookmark::class);
 		$this->userId = $userId;
+		$this->time = $time;
+	}
+
+	/**
+	 * @param Bookmark $entity
+	 * @return Bookmark
+	 */
+	public function update($entity): Entity {
+		$entity->setLastModified($this->time->getMicroTime());
+		/** @var Bookmark $updated */
+		$updated = parent::update($entity);
+		return $updated;
+	}
+
+	/**
+	 * @param Bookmark $entity
+	 * @return Bookmark
+	 */
+	public function insert($entity): Entity {
+		$entity->setLastModified($this->time->getMicroTime());
+		/** @var Bookmark $inserted */
+		$inserted = parent::insert($entity);
+		return $inserted;
 	}
 
 	/**
