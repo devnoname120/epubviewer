@@ -82,9 +82,9 @@ ifeq (, $(composer))
 	mkdir -p $(build_tools_directory)
 	curl -sS https://getcomposer.org/installer | php
 	mv composer.phar $(build_tools_directory)
-	COMPOSER_NO_DEV=0 php $(build_tools_directory)/composer.phar install --prefer-dist && php $(build_tools_directory)/composer.phar dump-autoload --no-dev
+	COMPOSER_NO_DEV=1 php $(build_tools_directory)/composer.phar install --prefer-dist && php $(build_tools_directory)/composer.phar dump-autoload --no-dev
 else
-	COMPOSER_NO_DEV=0 composer install --prefer-dist && composer dump-autoload --no-dev
+	COMPOSER_NO_DEV=1 composer install --prefer-dist && composer dump-autoload --no-dev
 endif
 
 # Installs npm dependencies
