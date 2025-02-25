@@ -1,3 +1,15 @@
+## 1.7.1 - 2025-02-26
+
+### Changed
+
+- Made database code more robust
+- Improved the type checking for Event Listeners
+
+### Fixed
+
+- Fixed remaining Psalm errors when using a baseline
+- Use `COMPOSER_NO_DEV=0` instead of `--dev`, and `COMPOSER_NO_DEV=1` for production. The reason is that Composer inexplicably decided to deprecate the `--dev` parameter in favor of this cryptic env variable (!?)
+
 ## 1.7.0 - 2025-02-24
 
 ### Changed
