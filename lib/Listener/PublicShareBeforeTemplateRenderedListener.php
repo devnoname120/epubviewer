@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace OCA\Epubviewer\Listener;
 
 use OCA\Epubviewer\AppInfo\Application;
-use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Util;
 
-/** @template-implements IEventListener<BeforeTemplateRenderedEvent> */
+/** @template-implements IEventListener<\OCA\Files_Sharing\Event\BeforeTemplateRenderedEvent> */
 class PublicShareBeforeTemplateRenderedListener implements IEventListener {
-
 
 	public function __construct() {
 	}

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OCA\Epubviewer\Listener;
 
 use OCA\Epubviewer\AppInfo\Application;
-use OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\EventDispatcher\Event;
@@ -13,7 +12,7 @@ use OCP\EventDispatcher\IEventListener;
 use OCP\IConfig;
 use OCP\IUserSession;
 
-/** @template-implements IEventListener<BeforeTemplateRenderedEvent> */
+/** @template-implements IEventListener<\OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent> */
 class BeforeTemplateRenderedListener implements IEventListener {
 	private IInitialState $initialState;
 	private IUserSession $userSession;
@@ -30,7 +29,7 @@ class BeforeTemplateRenderedListener implements IEventListener {
 	}
 
 	public function handle(Event $event): void {
-		/** @var BeforeTemplateRenderedEvent $event */
+		/** @var \OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent $event */
 		if ($event->getResponse()->getRenderAs() === TemplateResponse::RENDER_AS_USER) {
 			$this->initialState->provideLazyInitialState('enableEpub', function () {
 				$user = $this->userSession->getUser();
