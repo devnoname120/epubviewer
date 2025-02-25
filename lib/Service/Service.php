@@ -2,11 +2,11 @@
 
 namespace OCA\Epubviewer\Service;
 
+use OCA\Epubviewer\Db\ReaderEntity;
 use OCA\Epubviewer\Db\ReaderMapper;
-use OCP\AppFramework\Db\Entity;
 
 /**
- * @template T of Entity
+ * @template T of ReaderEntity
  */
 abstract class Service {
 

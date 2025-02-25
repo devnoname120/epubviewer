@@ -1,13 +1,18 @@
 <?php
 
-
 namespace OCA\Epubviewer\Db;
 
 use OCP\AppFramework\Db\Entity;
 
 class ReaderEntity extends Entity {
 
-	/* returns decoded json if input is json, otherwise returns input */
+	/** @var int */
+	protected int $lastModified;
+
+	public function __construct() {
+		$this->addType('lastModified', 'integer');
+	}
+
 	public static function conditional_json_decode($el) {
 		$result = json_decode($el);
 		if (json_last_error() === JSON_ERROR_NONE) {
@@ -17,15 +22,11 @@ class ReaderEntity extends Entity {
 		}
 	}
 
-	/*
-		public function toService() {
-			return [
-				'name' => $this->getName(),
-				'type' => $this->getType(),
-				'value' => $this->conditional_json_decode($this->getValue()),
-				'content' => $this->conditional_json_decode($this->getContent()),
-				'lastModified' => $this->getLastModified(),
-			];
-		}
-	*/
+	public function getLastModified(): int {
+		return $this->lastModified;
+	}
+
+	public function setLastModified(int $lastModified): void {
+		$this->lastModified = $lastModified;
+	}
 }

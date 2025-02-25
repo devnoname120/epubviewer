@@ -1,10 +1,8 @@
 <?php
 
-
 namespace OCA\Epubviewer\Db;
 
 use JsonSerializable;
-use OCP\AppFramework\Db\Entity;
 
 /**
  * @method string getUserId()
@@ -19,10 +17,8 @@ use OCP\AppFramework\Db\Entity;
  * @method void setValue(string $value)
  * @method string|null getContent()
  * @method void setContent(?string $content)
- * @method int getLastModified()
- * @method void setLastModified(int $lastModified)
  */
-class Bookmark extends Entity implements JsonSerializable {
+class Bookmark extends ReaderEntity implements JsonSerializable {
 
 	protected $userId;  // user
 	protected $fileId;  // book (identified by fileId) for which this mark is valid
@@ -30,16 +26,15 @@ class Bookmark extends Entity implements JsonSerializable {
 	protected $name;    // name, defaults to $location
 	protected $value;   // bookmark value (format-specific, eg. page number for PDF, CFI for epub, etc)
 	protected $content; // bookmark content (annotations, etc.), can be empty
-	protected $lastModified;    // modification timestamp
 
 	public function __construct() {
+		parent::__construct();
 		$this->addType('userId', 'string');
 		$this->addType('fileId', 'integer');
 		$this->addType('type', 'string');
 		$this->addType('name', 'string');
 		$this->addType('value', 'string');
 		$this->addType('content', 'string');
-		$this->addType('lastModified', 'integer');
 	}
 
 	public function jsonSerialize(): array {
@@ -50,7 +45,7 @@ class Bookmark extends Entity implements JsonSerializable {
 			'name' => $this->name,
 			'value' => self::conditional_json_decode($this->value),
 			'content' => self::conditional_json_decode($this->content),
-			'lastModified' => $this->lastModified
+			'lastModified' => $this->getLastModified(),
 		];
 	}
 
@@ -61,17 +56,17 @@ class Bookmark extends Entity implements JsonSerializable {
 		return [
 			'name' => $this->getName(),
 			'type' => $this->getType(),
-			'value' => $this->conditional_json_decode($this->getValue()),
-			'content' => $this->conditional_json_decode($this->getContent()),
+			'value' => self::conditional_json_decode($this->getValue()),
+			'content' => self::conditional_json_decode($this->getContent()),
 			'lastModified' => $this->getLastModified(),
 		];
 	}
 
-	protected static function conditional_json_decode($value) {
-		if (empty($value)) {
-			return $value;
+	public static function conditional_json_decode($el) {
+		if (empty($el)) {
+			return $el;
 		}
-		$decoded = json_decode($value, true);
-		return (json_last_error() === JSON_ERROR_NONE) ? $decoded : $value;
+		$decoded = json_decode($el, true);
+		return (json_last_error() === JSON_ERROR_NONE) ? $decoded : $el;
 	}
 }

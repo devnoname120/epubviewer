@@ -88,7 +88,12 @@ class PreferenceMapper extends ReaderMapper {
 		$qb->executeStatement();
 	}
 
-	public function findAll($fileId) {
+	/**
+	 * @return Preference[]
+	 *
+	 * @psalm-return array<Preference>
+	 */
+	public function findAll($fileId): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
@@ -97,7 +102,12 @@ class PreferenceMapper extends ReaderMapper {
 		return $this->findEntities($qb);
 	}
 
-	public function findAllForUser() {
+	/**
+	 * @return Preference[]
+	 *
+	 * @psalm-return array<Preference>
+	 */
+	public function findAllForUser(): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())

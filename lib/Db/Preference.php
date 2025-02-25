@@ -1,10 +1,8 @@
 <?php
 
-
 namespace OCA\Epubviewer\Db;
 
 use JsonSerializable;
-use OCP\AppFramework\Db\Entity;
 
 /**
  * @method string getUserId()
@@ -17,33 +15,30 @@ use OCP\AppFramework\Db\Entity;
  * @method void setName(string $name)
  * @method string getValue()
  * @method void setValue(string $value)
- * @method int getLastModified()
- * @method void setLastModified(int $lastModified)
  */
-class Preference extends Entity implements JsonSerializable {
+class Preference extends ReaderEntity implements JsonSerializable {
 
 	protected $userId;  // user for whom this preference is valid
 	protected $scope;   // scope (default or specific renderer)
 	protected $fileId;  // file for which this preference is set
 	protected $name;    // preference name
 	protected $value;   // preference value
-	protected $lastModified;    // modification timestamp
 
 	public function __construct() {
+		parent::__construct();
 		$this->addType('userId', 'string');
 		$this->addType('scope', 'string');
 		$this->addType('fileId', 'integer');
 		$this->addType('name', 'string');
 		$this->addType('value', 'string');
-		$this->addType('lastModified', 'integer');
 	}
 
-	protected static function conditional_json_decode($value) {
-		if (empty($value)) {
-			return $value;
+	public static function conditional_json_decode($el) {
+		if (empty($el)) {
+			return $el;
 		}
-		$decoded = json_decode($value, true);
-		return (json_last_error() === JSON_ERROR_NONE) ? $decoded : $value;
+		$decoded = json_decode($el, true);
+		return (json_last_error() === JSON_ERROR_NONE) ? $decoded : $el;
 	}
 
 	public function jsonSerialize(): array {
@@ -52,7 +47,7 @@ class Preference extends Entity implements JsonSerializable {
 			'fileId' => $this->fileId,
 			'name' => $this->name,
 			'value' => self::conditional_json_decode($this->value),
-			'lastModified' => $this->lastModified,
+			'lastModified' => $this->getLastModified(),
 		];
 	}
 
@@ -62,7 +57,7 @@ class Preference extends Entity implements JsonSerializable {
 	public function toService(): array {
 		return [
 			'name' => $this->getName(),
-			'value' => $this->conditional_json_decode($this->getValue()),
+			'value' => self::conditional_json_decode($this->getValue()),
 		];
 	}
 }

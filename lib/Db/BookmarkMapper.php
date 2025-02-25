@@ -107,7 +107,12 @@ class BookmarkMapper extends ReaderMapper {
 		$qb->executeStatement();
 	}
 
-	public function findAll(int $fileId) {
+	/**
+	 * @return Bookmark[]
+	 *
+	 * @psalm-return array<Bookmark>
+	 */
+	public function findAll(int $fileId): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
@@ -116,7 +121,12 @@ class BookmarkMapper extends ReaderMapper {
 		return $this->findEntities($qb);
 	}
 
-	public function findAllForUser() {
+	/**
+	 * @return Bookmark[]
+	 *
+	 * @psalm-return array<Bookmark>
+	 */
+	public function findAllForUser(): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
