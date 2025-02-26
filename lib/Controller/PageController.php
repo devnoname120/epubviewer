@@ -26,8 +26,8 @@ class PageController extends Controller {
 	private IRootFolder $rootFolder;
 	private IManager $shareManager;
 	private ?string $userId;
-	private BookmarkService $bookmarkService;
-	private PreferenceService $preferenceService;
+	private ?BookmarkService $bookmarkService; // Optional because bookmarks/preferences are not available for anonymous users
+	private ?PreferenceService $preferenceService; // Optional because bookmarks/preferences are not available for anonymous users
 
 	/**
 	 * @param string $appName
@@ -36,8 +36,8 @@ class PageController extends Controller {
 	 * @param IRootFolder $rootFolder
 	 * @param IManager $shareManager
 	 * @param ?string $userId
-	 * @param BookmarkService $bookmarkService
-	 * @param PreferenceService $preferenceService
+	 * @param ?BookmarkService $bookmarkService
+	 * @param ?PreferenceService $preferenceService
 	 */
 	public function __construct(
 		$appName,
@@ -45,9 +45,9 @@ class PageController extends Controller {
 		IURLGenerator $urlGenerator,
 		IRootFolder $rootFolder,
 		IManager $shareManager,
-		$userId,
-		BookmarkService $bookmarkService,
-		PreferenceService $preferenceService,
+		?string $userId,
+		?BookmarkService $bookmarkService,
+		?PreferenceService $preferenceService,
 	) {
 		parent::__construct($appName, $request);
 		$this->urlGenerator = $urlGenerator;
@@ -88,7 +88,19 @@ class PageController extends Controller {
 		];
 
 		$scope = $template = $templates[$type];
-		$cursor = $this->bookmarkService->getCursor($fileInfo['fileId']);
+
+		if ($this->userId !== null) {
+			$cursor = $this->bookmarkService->getCursor($fileInfo['fileId']);
+			$annotations = $this->bookmarkService->get($fileInfo['fileId']);
+
+			$defaults = $this->preferenceService->getDefault($scope);
+			$preferences = $this->preferenceService->get($scope, $fileInfo['fileId']);
+		} else {
+			$cursor = null;
+			$annotations = [];
+			$defaults = [];
+			$preferences = [];
+		}
 
 		$params = [
 			'urlGenerator' => $this->urlGenerator,
@@ -98,9 +110,9 @@ class PageController extends Controller {
 			'fileName' => $fileInfo['fileName'],
 			'fileType' => $fileInfo['fileType'],
 			'cursor' => $cursor ? $this->toJson($cursor) : null,
-			'defaults' => $this->toJson($this->preferenceService->getDefault($scope)),
-			'preferences' => $this->toJson($this->preferenceService->get($scope, $fileInfo['fileId'])),
-			'annotations' => $this->toJson($this->bookmarkService->get($fileInfo['fileId']))
+			'defaults' => $this->toJson($defaults),
+			'preferences' => $this->toJson($preferences),
+			'annotations' => $this->toJson($annotations)
 		];
 
 		$policy = new ContentSecurityPolicy();
