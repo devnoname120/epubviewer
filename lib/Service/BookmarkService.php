@@ -22,16 +22,14 @@ class BookmarkService extends Service {
 	}
 
 	/**
-	 * @brief get bookmark
-	 *
-	 * bookmark type is format-dependent, eg CFI for epub, page number for CBR/CBZ, etc
+	 * Get bookmarks for $fileId
 	 *
 	 * @param int $fileId
 	 * @param string|null $name
 	 * @param string|null $type
 	 * @return array
 	 */
-	public function get($fileId, $name = null, $type = null) {
+	public function get(int $fileId, ?string $name = null, ?string $type = null): array {
 		/** @var array<Bookmark> */
 		$result = $this->bookmarkMapper->get($fileId, $name, $type);
 		return array_map(

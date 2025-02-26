@@ -17,12 +17,12 @@ class BookmarkMapper extends QBMapper {
 
 	/**
 	 * @param IDbConnection $db
-	 * @param string $userId
+	 * @param string|null $userId
 	 * @param Time $time
 	 */
-	public function __construct(IDBConnection $db, string $userId, Time $time) {
+	public function __construct(IDBConnection $db, ?string $userId, Time $time) {
 		parent::__construct($db, 'reader_bookmarks', Bookmark::class);
-		$this->userId = $userId;
+		$this->userId = $userId ?? '';
 		$this->time = $time;
 	}
 

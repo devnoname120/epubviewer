@@ -15,9 +15,9 @@ class PreferenceMapper extends QBMapper {
 	protected string $userId;
 	private Time $time;
 
-	public function __construct(IDBConnection $db, Time $time, string $userId) {
+	public function __construct(IDBConnection $db, Time $time, ?string $userId) {
 		parent::__construct($db, 'reader_prefs', Preference::class);
-		$this->userId = $userId;
+		$this->userId = $userId ?? '';
 		$this->time = $time;
 	}
 
@@ -44,11 +44,11 @@ class PreferenceMapper extends QBMapper {
 	}
 
 	/**
-	 * @brief get preferences for $scope+$fileId+$userId(+$name)
+	 * Get preferences for $scope+$fileId+$userId(+$name)
 	 *
 	 * @param string $scope
 	 * @param int $fileId
-	 * @param string $name
+	 * @param string|null $name
 	 * @return array
 	 */
 	public function get($scope, $fileId, $name = null) {

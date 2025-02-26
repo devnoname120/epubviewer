@@ -89,7 +89,7 @@ class PageController extends Controller {
 
 		$scope = $template = $templates[$type];
 		$cursor = $this->bookmarkService->getCursor($fileInfo['fileId']);
-
+		
 		$params = [
 			'urlGenerator' => $this->urlGenerator,
 			'downloadLink' => $file,
@@ -99,8 +99,8 @@ class PageController extends Controller {
 			'fileType' => $fileInfo['fileType'],
 			'cursor' => $cursor ? $this->toJson($cursor) : null,
 			'defaults' => $this->toJson($this->preferenceService->getDefault($scope)),
-			'preferences' => $this->toJson($this->preferenceService->get($scope, $fileInfo['fileId'])),
-			'annotations' => $this->toJson($this->bookmarkService->get($fileInfo['fileId']))
+			'preferences' => $this->toJson($this->preferenceService->get($scope, (int)$fileInfo['fileId'])),
+			'annotations' => $this->toJson($this->bookmarkService->get((int)$fileInfo['fileId']))
 		];
 
 		$policy = new ContentSecurityPolicy();
@@ -128,10 +128,7 @@ class PageController extends Controller {
 	 * @throws NotFoundException
 	 */
 	private function getFileInfo($path) {
-		if (!$this->userId) {
-			throw new NotFoundException('User not found');
-		}
-
+		// Anonymous users can access shared files
 		$count = 0;
 		$shareToken = preg_replace("/(?:\/index\.php)?\/s\/([A-Za-z0-9_\-+]{3,32})\/download.*/", '$1', $path, 1, $count);
 		if ($count === 1) {
@@ -152,6 +149,11 @@ class PageController extends Controller {
 			$filePath = $node->getPath();
 			$fileId = $node->getId();
 		} else {
+			// For user files, we need a logged in user
+			if (!$this->userId) {
+				throw new NotFoundException('User not found');
+			}
+			
 			$filePath = $path;
 			$userFolder = $this->rootFolder->getUserFolder($this->userId);
 			$fileId = $userFolder->get(preg_replace("/.*\/remote.php\/dav\/files\/[^\/]*\/(.*)/", '$1', rawurldecode($path)))->getId();

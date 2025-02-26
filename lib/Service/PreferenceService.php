@@ -25,18 +25,14 @@ class PreferenceService extends Service {
 	}
 
 	/**
-	 * @brief get preference
-	 *
-	 * scope identifies preference source, i.e. which renderer the preference applies to
-	 * preference type is format-dependent, e.g. CFI for epub, page number for CBR/CBZ, etc
+	 * Get preferences for $scope+$fileId
 	 *
 	 * @param string $scope
 	 * @param int $fileId
-	 * @param string $name
-	 *
+	 * @param string|null $name
 	 * @return array
 	 */
-	public function get($scope, $fileId, $name = null) {
+	public function get(string $scope, int $fileId, ?string $name = null) {
 		$result = $this->preferenceMapper->get($scope, $fileId, $name);
 		return array_map(
 			function ($entity): array {
