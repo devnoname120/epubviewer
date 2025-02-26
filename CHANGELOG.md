@@ -1,3 +1,9 @@
+## 1.7.2 - 2025-02-26
+
+### Fixed
+
+- Temporary workaround for dependency injection breaking public share viewer when user is not connected
+
 ## 1.7.1 - 2025-02-26
 
 ### Changed
