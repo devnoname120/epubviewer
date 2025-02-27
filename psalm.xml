@@ -10,9 +10,6 @@
         findUnusedCode="false"
         phpVersion="8.1"
 >
-    <stubs>
-        <file name="stub.phpstub" preloadClasses="true"/>
-    </stubs>
     <projectFiles>
         <directory name="lib"/>
         <ignoreFiles>
