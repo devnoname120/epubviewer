@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   changes:
-    runs-on: ubuntu-latest-low
+    runs-on: ubuntu-24.04  # Latest LTS version at time of writing
 
     outputs:
       src: ${{ steps.changes.outputs.src}}
@@ -42,7 +42,7 @@ jobs:
               - '**.php'
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # Latest LTS version at time of writing
 
     name: PHP CS fixer lint
 
@@ -69,7 +69,7 @@ jobs:
   summary:
     permissions:
       contents: none
-    runs-on: ubuntu-latest-low
+    runs-on: ubuntu-24.04  # Latest LTS version at time of writing
     needs: [changes, lint]
 
     if: always()

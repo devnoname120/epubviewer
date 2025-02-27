@@ -21,17 +21,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout epubviewer app
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           submodules: true
+          persist-credentials: false
 
       - name: Checkout Nextcloud server
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           path: nextcloud-server
           repository: nextcloud/server
           ref: stable30
           submodules: true
+          persist-credentials: false
 
       - name: Composer install nextcloud-server
         working-directory: nextcloud-server
@@ -62,20 +64,22 @@ jobs:
 
     steps:
       - name: Checkout epubviewer app
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           submodules: true
+          persist-credentials: false
 
       - name: Checkout Nextcloud server
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           path: nextcloud-server
           repository: nextcloud/server
           ref: stable30
           submodules: true
+          persist-credentials: false
 
       - name: Set up php
-        uses: shivammathur/setup-php@master
+        uses: shivammathur/setup-php@3209251719395a11279642c89c6fd159cdf5dc82 # main (21 commits after latest release (v2.32.0) at time of writing)
         with:
           php-version: '8.1'
           extensions: ctype,curl,dom,fileinfo,ftp,gd,intl,json,ldap,mbstring,openssl,pdo_sqlite,posix,sqlite,xml,zip
