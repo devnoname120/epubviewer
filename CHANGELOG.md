@@ -1,3 +1,13 @@
+## 1.7.3 - 2025-02-26
+
+### Fixed
+
+- Fixed PHP compatibility issues with PSR Log package on Nextcloud 31
+
+### Changed
+
+- Dropped support for Nextcloud 30
+
 ## 1.7.2 - 2025-02-26
 
 ### Fixed
