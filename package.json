@@ -18,6 +18,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "lint-github-actions": "go run github.com/rhysd/actionlint/cmd/actionlint@latest",
+    "pin-github-actions": "pin-github-action .github/workflows/",
     "update-deps": "npx npm-check-updates",
     "build": "vite --mode production build",
     "dev": "vite --mode development build",
@@ -64,6 +66,7 @@
     "eslint-plugin-promise": "^6.6.0",
     "eslint-plugin-vue": "^9.31.0",
     "prettier": "^3.3.3",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "pin-github-action": "*"
   }
 }
