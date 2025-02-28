@@ -14,14 +14,11 @@ class PreferenceService extends Service {
 	// value 0 to indicate a default preference
 	public const DEFAULTS = 0;
 
-	private PreferenceMapper $preferenceMapper;
-
 	/**
 	 * @param PreferenceMapper $preferenceMapper
 	 */
-	public function __construct(PreferenceMapper $preferenceMapper) {
+	public function __construct(private PreferenceMapper $preferenceMapper) {
 		parent::__construct($preferenceMapper);
-		$this->preferenceMapper = $preferenceMapper;
 	}
 
 	/**

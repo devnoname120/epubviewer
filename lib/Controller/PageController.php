@@ -20,15 +20,6 @@ use function pathinfo;
 
 class PageController extends Controller {
 
-	/** @var IURLGenerator */
-	private IURLGenerator $urlGenerator;
-	/** @var IRootFolder */
-	private IRootFolder $rootFolder;
-	private IManager $shareManager;
-	private ?string $userId;
-	private BookmarkService $bookmarkService;
-	private PreferenceService $preferenceService;
-
 	/**
 	 * @param string $appName
 	 * @param IRequest $request
@@ -42,20 +33,14 @@ class PageController extends Controller {
 	public function __construct(
 		$appName,
 		IRequest $request,
-		IURLGenerator $urlGenerator,
-		IRootFolder $rootFolder,
-		IManager $shareManager,
-		$userId,
-		BookmarkService $bookmarkService,
-		PreferenceService $preferenceService,
+		private IURLGenerator $urlGenerator,
+		private IRootFolder $rootFolder,
+		private IManager $shareManager,
+		private ?string $userId,
+		private BookmarkService $bookmarkService,
+		private PreferenceService $preferenceService,
 	) {
 		parent::__construct($appName, $request);
-		$this->urlGenerator = $urlGenerator;
-		$this->rootFolder = $rootFolder;
-		$this->shareManager = $shareManager;
-		$this->userId = $userId;
-		$this->bookmarkService = $bookmarkService;
-		$this->preferenceService = $preferenceService;
 	}
 
 	/**

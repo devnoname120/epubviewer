@@ -9,8 +9,6 @@ use OCP\IL10N;
 use OCP\IRequest;
 
 class SettingsController extends Controller {
-	private $config;
-	private $l10n;
 	/**
 	 * @param string $appName
 	 * @param IRequest $request
@@ -19,12 +17,10 @@ class SettingsController extends Controller {
 	public function __construct(
 		string $appName,
 		IRequest $request,
-		Config $config,
-		IL10N $l10n,
+		private Config $config,
+		private IL10N $l10n,
 	) {
 		parent::__construct($appName, $request);
-		$this->config = $config;
-		$this->l10n = $l10n;
 	}
 
 	/**

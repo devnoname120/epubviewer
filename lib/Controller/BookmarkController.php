@@ -11,8 +11,6 @@ use OCP\IRequest;
 
 class BookmarkController extends Controller {
 
-	private $bookmarkService;
-
 	/**
 	 * @param string $appName
 	 * @param IRequest $request
@@ -20,10 +18,9 @@ class BookmarkController extends Controller {
 	 */
 	public function __construct($appName,
 		IRequest $request,
-		BookmarkService $bookmarkService) {
+		private BookmarkService $bookmarkService) {
 
 		parent::__construct($appName, $request);
-		$this->bookmarkService = $bookmarkService;
 	}
 
 	/**

@@ -11,14 +11,11 @@ use OCP\IUserSession;
  * Config class for Reader
  */
 class Config {
-	private IConfig $config;
-	private IAppConfig $appConfig;
-	private IUserSession $userSession;
-
-	public function __construct(IConfig $config, IAppConfig $appConfig, IUserSession $userSession) {
-		$this->config = $config;
-		$this->appConfig = $appConfig;
-		$this->userSession = $userSession;
+	public function __construct(
+		private IConfig $config,
+		private IAppConfig $appConfig,
+		private IUserSession $userSession
+	) {
 	}
 
 	/**

@@ -14,18 +14,11 @@ use OCP\IUserSession;
 
 /** @template-implements IEventListener<\OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent> */
 class BeforeTemplateRenderedListener implements IEventListener {
-	private IInitialState $initialState;
-	private IUserSession $userSession;
-	private IConfig $config;
-
 	public function __construct(
-		IInitialState $initialState,
-		IUserSession $userSession,
-		IConfig $config,
+		private IInitialState $initialState,
+		private IUserSession $userSession,
+		private IConfig $config,
 	) {
-		$this->initialState = $initialState;
-		$this->userSession = $userSession;
-		$this->config = $config;
 	}
 
 	public function handle(Event $event): void {

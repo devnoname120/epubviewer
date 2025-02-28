@@ -12,10 +12,7 @@ use OCP\Migration\SimpleMigrationStep;
 use OCP\IDBConnection;
 
 class Version010701Date20250225222318 extends SimpleMigrationStep {
-	private IDBConnection $connection;
-
-	public function __construct(IDBConnection $connection) {
-		$this->connection = $connection;
+	public function __construct(private IDBConnection $connection) {
 	}
 
 	public function preSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {

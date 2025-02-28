@@ -12,18 +12,18 @@ use OCP\IDBConnection;
  */
 class BookmarkMapper extends QBMapper {
 
-	private string $userId;
-	private Time $time;
-
 	/**
 	 * @param IDbConnection $db
 	 * @param string|null $userId
 	 * @param Time $time
 	 */
-	public function __construct(IDBConnection $db, ?string $userId, Time $time) {
+	public function __construct(
+		IDBConnection $db, 
+		private ?string $userId, 
+		private Time $time
+	) {
 		parent::__construct($db, 'reader_bookmarks', Bookmark::class);
 		$this->userId = $userId ?? '';
-		$this->time = $time;
 	}
 
 	/**

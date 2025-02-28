@@ -9,8 +9,6 @@ use OCP\IRequest;
 
 class PreferenceController extends Controller {
 
-	private $preferenceService;
-
 	/**
 	 * @param string $appName
 	 * @param IRequest $request
@@ -18,10 +16,9 @@ class PreferenceController extends Controller {
 	 */
 	public function __construct($appName,
 		IRequest $request,
-		PreferenceService $preferenceService) {
+		private PreferenceService $preferenceService) {
 
 		parent::__construct($appName, $request);
-		$this->preferenceService = $preferenceService;
 	}
 
 	/**

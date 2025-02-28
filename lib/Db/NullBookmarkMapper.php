@@ -12,7 +12,7 @@ use OCP\IDBConnection;
  */
 class NullBookmarkMapper extends BookmarkMapper {
 
-	public function __construct(IDBConnection $db, Time $time) {
+	public function __construct(IDBConnection $db, private Time $time) {
 		parent::__construct($db, 'anonymous', $time);
 	}
 

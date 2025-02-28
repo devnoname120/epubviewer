@@ -12,13 +12,13 @@ use OCP\IDBConnection;
  */
 class PreferenceMapper extends QBMapper {
 
-	protected string $userId;
-	private Time $time;
-
-	public function __construct(IDBConnection $db, Time $time, ?string $userId) {
+	public function __construct(
+		IDBConnection $db, 
+		private Time $time, 
+		private ?string $userId
+	) {
 		parent::__construct($db, 'reader_prefs', Preference::class);
 		$this->userId = $userId ?? '';
-		$this->time = $time;
 	}
 
 	/**
