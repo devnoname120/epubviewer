@@ -1,7 +1,9 @@
 <?php
 
-script('epubviewer', 'epubviewer-settings');
-style('epubviewer', 'settings');
+use OCP\Util;
+
+Util::addScript('epubviewer', 'epubviewer-settings', 'core');
+Util::addStyle('epubviewer', 'settings');
 
 ?>
 
