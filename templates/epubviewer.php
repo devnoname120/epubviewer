@@ -20,10 +20,8 @@ $idevice = (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone')
 	|| strstr($_SERVER['HTTP_USER_AGENT'], 'iPad')
 	|| strstr($_SERVER['HTTP_USER_AGENT'], 'iPod'));
 
-/* Owncloud currently does not implement CSPv3, remove this test when it does */
-$nonce = class_exists('\OC\Security\CSP\ContentSecurityPolicyNonceManager')
-	? OC::$server->getContentSecurityPolicyNonceManager()->getNonce()
-	: 'nonce_not_implemented';
+/* Get the content security policy nonce */
+$nonce = \OC::$server->getContentSecurityPolicyNonceManager()->getNonce();
 ?>
 
 <html dir="ltr">
