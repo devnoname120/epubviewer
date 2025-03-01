@@ -41,16 +41,15 @@ class PreferenceController extends Controller {
 	 * @brief write preference for $fileId
 	 *
 	 * @NoAdminRequired
+	 *
 	 * @NoCSRFRequired
 	 *
 	 * @param string $scope
 	 * @param int $fileId
 	 * @param string $name
 	 * @param string $value
-	 *
-	 * @return array|JSONResponse
 	 */
-	public function set($scope, $fileId, $name, $value) {
+	public function set($scope, $fileId, $name, $value): \OCA\Epubviewer\Db\Preference {
 		return $this->preferenceService->set($scope, $fileId, $name, $value);
 	}
 
@@ -74,15 +73,14 @@ class PreferenceController extends Controller {
 	 * @brief write default preference
 	 *
 	 * @NoAdminRequired
+	 *
 	 * @NoCSRFRequired
 	 *
 	 * @param string $scope
 	 * @param string $name
 	 * @param string $value
-	 *
-	 * @return array|JSONResponse
 	 */
-	public function setDefault($scope, $name, $value) {
+	public function setDefault($scope, $name, $value): \OCA\Epubviewer\Db\Preference {
 		return $this->preferenceService->setDefault($scope, $name, $value);
 	}
 
