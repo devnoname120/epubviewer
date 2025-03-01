@@ -28,9 +28,6 @@ class BookmarkController extends Controller {
 	/**
 	 * @brief return bookmark
 	 *
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @param int $fileId
 	 * @param string $name
 	 *
@@ -45,31 +42,39 @@ class BookmarkController extends Controller {
 	/**
 	 * @brief write bookmark
 	 *
-	 * @NoAdminRequired
-	 *
-	 * @NoCSRFRequired
-	 *
 	 * @param int $fileId
 	 * @param string $name
 	 * @param string $value
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function set(int $fileId, string $name, string $value, ?string $type = null, ?string $content = null): \OCA\Epubviewer\Db\Bookmark {
-		return $this->bookmarkService->set($fileId, $name, $value, $type, $content);
+	public function set(int $fileId, string $name, string $value, ?string $type = null, ?string $content = null): void {
+		$this->bookmarkService->set($fileId, $name, $value, $type, $content);
 	}
 
-
+	/**
+	 * @brief return cursor for $fileId
+	 *
+	 * @param int $fileId
+	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function getCursor($fileId): array|null {
 		return $this->bookmarkService->getCursor($fileId);
 	}
 
+
+
+	/**
+	 * @brief write cursor for $fileId
+	 *
+	 * @param int $fileId
+	 * @param string $value
+	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function setCursor($fileId, $value): \OCA\Epubviewer\Db\Bookmark {
-		return $this->bookmarkService->setCursor($fileId, $value);
+	public function setCursor($fileId, $value): void {
+		$this->bookmarkService->setCursor($fileId, $value);
 	}
 
 	/**

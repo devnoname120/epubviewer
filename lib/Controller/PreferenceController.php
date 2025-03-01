@@ -41,6 +41,10 @@ class PreferenceController extends Controller {
 	/**
 	 * @brief write preference for $fileId
 	 *
+	 * @NoAdminRequired
+	 *
+	 * @NoCSRFRequired
+	 *
 	 * @param string $scope
 	 * @param int $fileId
 	 * @param string $name
