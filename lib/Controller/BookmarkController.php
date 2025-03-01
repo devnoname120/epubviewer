@@ -80,10 +80,6 @@ class BookmarkController extends Controller {
 	/**
 	 * @brief delete bookmark
 	 *
-	 * @NoAdminRequired
-	 *
-	 * @NoCSRFRequired
-	 *
 	 * @param int $fileId
 	 * @param string name
 	 */
