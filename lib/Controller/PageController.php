@@ -7,6 +7,8 @@ namespace OCA\Epubviewer\Controller;
 use OCA\Epubviewer\Service\BookmarkService;
 use OCA\Epubviewer\Service\PreferenceService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -37,18 +39,14 @@ class PageController extends Controller {
 		private IRootFolder $rootFolder,
 		private IManager $shareManager,
 		private ?string $userId,
-		private BookmarkService $bookmarkService,
-		private PreferenceService $preferenceService,
+		private ?BookmarkService $bookmarkService,
+		private ?PreferenceService $preferenceService,
 	) {
 		parent::__construct($appName, $request);
 	}
 
-	/**
-	 * @PublicPage
-	 * @NoCSRFRequired
-	 *
-	 * @return TemplateResponse
-	 */
+	#[NoCSRFRequired]
+	#[PublicPage]
 	public function showReader(): TemplateResponse {
 		$params = [];
 		$file = $this->request->getParam('file');

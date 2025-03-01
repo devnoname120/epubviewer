@@ -4,6 +4,8 @@ namespace OCA\Epubviewer\Controller;
 
 use OCA\Epubviewer\Service\BookmarkService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\JSONResponse;
 
 
@@ -34,7 +36,9 @@ class BookmarkController extends Controller {
 	 *
 	 * @return array|JSONResponse
 	 */
-	public function get($fileId, $name, $type = null) {
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	public function get(int $fileId, string $name, ?string $type = null): array|JSONResponse {
 		return $this->bookmarkService->get($fileId, $name, $type);
 	}
 
@@ -49,34 +53,21 @@ class BookmarkController extends Controller {
 	 * @param string $name
 	 * @param string $value
 	 */
-	public function set($fileId, $name, $value, $type = null, $content = null): \OCA\Epubviewer\Db\Bookmark {
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	public function set(int $fileId, string $name, string $value, ?string $type = null, ?string $content = null): \OCA\Epubviewer\Db\Bookmark {
 		return $this->bookmarkService->set($fileId, $name, $value, $type, $content);
 	}
 
 
-	/**
-	 * @brief return cursor for $fileId
-	 *
-	 * @NoAdminRequired
-	 *
-	 * @NoCSRFRequired
-	 *
-	 * @param int $fileId
-	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function getCursor($fileId): array|null {
 		return $this->bookmarkService->getCursor($fileId);
 	}
 
-	/**
-	 * @brief write cursor for $fileId
-	 *
-	 * @NoAdminRequired
-	 *
-	 * @NoCSRFRequired
-	 *
-	 * @param int $fileId
-	 * @param string $value
-	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function setCursor($fileId, $value): \OCA\Epubviewer\Db\Bookmark {
 		return $this->bookmarkService->setCursor($fileId, $value);
 	}
@@ -91,19 +82,14 @@ class BookmarkController extends Controller {
 	 * @param int $fileId
 	 * @param string name
 	 */
-	public function delete($fileId, $name): void {
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	public function delete(int $fileId, string $name): void {
 		$this->bookmarkService->delete($fileId, $name);
 	}
 
-	/**
-	 * @brief delete cursor
-	 *
-	 * @NoAdminRequired
-	 *
-	 * @NoCSRFRequired
-	 *
-	 * @param int $fileId
-	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function deleteCursor($fileId): void {
 		$this->bookmarkService->deleteCursor($fileId);
 	}
