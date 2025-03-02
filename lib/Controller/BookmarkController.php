@@ -16,11 +16,11 @@ class BookmarkController extends Controller {
 	/**
 	 * @param string $appName
 	 * @param IRequest $request
-	 * @param BookmarkService $bookmarkService
+	 * @param ?BookmarkService $bookmarkService
 	 */
 	public function __construct($appName,
 		IRequest $request,
-		private BookmarkService $bookmarkService) {
+		private ?BookmarkService $bookmarkService) {
 
 		parent::__construct($appName, $request);
 	}

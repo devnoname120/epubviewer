@@ -71,7 +71,19 @@ class PageController extends Controller {
 		];
 
 		$scope = $template = $templates[$type];
-		$cursor = $this->bookmarkService->getCursor($fileInfo['fileId']);
+
+
+		$cursor = null;
+		$defaults = null;
+		$preferences = null;
+		$annotations = null;
+
+		if ($this->userId !== null) {
+			$cursor = $this->bookmarkService->getCursor($fileInfo['fileId']);
+			$defaults  = $this->preferenceService->getDefault($scope);
+			$preferences = $this->preferenceService->get($scope, (int)$fileInfo['fileId']);
+			$annotations = $this->bookmarkService->get((int)$fileInfo['fileId']);
+		}
 		
 		$params = [
 			'urlGenerator' => $this->urlGenerator,
@@ -81,9 +93,9 @@ class PageController extends Controller {
 			'fileName' => $fileInfo['fileName'],
 			'fileType' => $fileInfo['fileType'],
 			'cursor' => $cursor ? $this->toJson($cursor) : null,
-			'defaults' => $this->toJson($this->preferenceService->getDefault($scope)),
-			'preferences' => $this->toJson($this->preferenceService->get($scope, (int)$fileInfo['fileId'])),
-			'annotations' => $this->toJson($this->bookmarkService->get((int)$fileInfo['fileId']))
+			'defaults' => $defaults ? $this->toJson($defaults) : null,
+			'preferences' => $preferences ? $this->toJson($preferences) : null,
+			'annotations' => $annotations ? $this->toJson($annotations) : null
 		];
 
 		$policy = new ContentSecurityPolicy();

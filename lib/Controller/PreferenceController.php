@@ -14,11 +14,12 @@ class PreferenceController extends Controller {
 	/**
 	 * @param string $appName
 	 * @param IRequest $request
-	 * @param PreferenceService $preferenceService
+	 * @param ?PreferenceService $preferenceService
 	 */
 	public function __construct($appName,
 		IRequest $request,
-		private PreferenceService $preferenceService) {
+		private ?PreferenceService $preferenceService,
+		private ?string $userId) {
 
 		parent::__construct($appName, $request);
 	}
@@ -31,6 +32,9 @@ class PreferenceController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function get($scope, $fileId, $name): array|JSONResponse {
+		if ($this->userId === null) {
+			return new JSONResponse([]);
+		}
 		return $this->preferenceService->get($scope, $fileId, $name);
 	}
 
@@ -44,8 +48,11 @@ class PreferenceController extends Controller {
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function set($scope, $fileId, $name, $value): \OCA\Epubviewer\Db\Preference {
-		return $this->preferenceService->set($scope, $fileId, $name, $value);
+	public function set($scope, $fileId, $name, $value): void {
+		if ($this->userId === null) {
+			return;
+		}
+		$this->preferenceService->set($scope, $fileId, $name, $value);
 	}
 
 
@@ -58,6 +65,9 @@ class PreferenceController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function getDefault($scope, $name): array|JSONResponse {
+		if ($this->userId === null) {
+			return new JSONResponse([]);
+		}
 		return $this->preferenceService->getDefault($scope, $name);
 	}
 
@@ -70,8 +80,12 @@ class PreferenceController extends Controller {
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function setDefault($scope, $name, $value): \OCA\Epubviewer\Db\Preference {
-		return $this->preferenceService->setDefault($scope, $name, $value);
+	public function setDefault($scope, $name, $value): void {
+		if ($this->userId === null) {
+			return;
+		}
+
+		$this->preferenceService->setDefault($scope, $name, $value);
 	}
 
 	/**
@@ -82,6 +96,9 @@ class PreferenceController extends Controller {
 	 * @param string $name
 	 */
 	public function delete($scope, $fileId, $name): void {
+		if ($this->userId === null) {
+			return;
+		}
 		$this->preferenceService->delete($scope, $fileId, $name);
 	}
 
@@ -92,6 +109,9 @@ class PreferenceController extends Controller {
 	 * @param $name
 	 */
 	public function deleteDefault($scope, $name): void {
+		if ($this->userId === null) {
+			return;
+		}
 		$this->preferenceService->deleteDefault($scope, $name);
 	}
 }
