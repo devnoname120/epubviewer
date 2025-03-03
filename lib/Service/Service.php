@@ -14,9 +14,6 @@ abstract class Service {
 	 * @param QBMapper<T> $mapper
 	 */
 	public function __construct(
-		/**
-		 * @var QBMapper<T>
-		 */
 		protected QBMapper $mapper
 	) {
 	}
