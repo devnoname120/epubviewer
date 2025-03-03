@@ -145,7 +145,7 @@ class PageController extends Controller {
 			$fileId = $node->getId();
 		} else {
 			// For user files, we need a logged in user
-			if (!$this->userId) {
+			if ($this->userId === null || empty($this->userId)) {
 				throw new NotFoundException('User not found');
 			}
 			
@@ -172,7 +172,7 @@ class PageController extends Controller {
 	}
 
 	public function load(): JSONResponse {
-		if (!$this->userId) {
+		if ($this->userId === null || empty($this->userId)) {
 			return new JSONResponse(['success' => false, 'error' => 'User not found']);
 		}
 

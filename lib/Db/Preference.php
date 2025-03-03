@@ -38,7 +38,7 @@ class Preference extends Entity implements JsonSerializable {
 		$this->addType('lastModified', Types::STRING);
 	}
 
-	public static function conditional_json_decode(string $el) {
+	public static function conditional_json_decode(string $el): mixed {
 		if (empty($el)) {
 			return $el;
 		}

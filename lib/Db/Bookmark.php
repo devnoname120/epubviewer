@@ -69,7 +69,7 @@ class Bookmark extends Entity implements JsonSerializable {
 	/**
 	 * @param null|string $el
 	 */
-	public static function conditional_json_decode(string|null $el) {
+	public static function conditional_json_decode(string|null $el): mixed {
 		if (empty($el)) {
 			return $el;
 		}

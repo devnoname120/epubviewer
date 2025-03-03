@@ -59,7 +59,7 @@ class BookmarkController extends Controller {
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function getCursor($fileId): array|null {
+	public function getCursor(int $fileId): array|null {
 		return $this->bookmarkService->getCursor($fileId);
 	}
 
@@ -73,7 +73,7 @@ class BookmarkController extends Controller {
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function setCursor($fileId, $value): void {
+	public function setCursor(int $fileId, string $value): void {
 		$this->bookmarkService->setCursor($fileId, $value);
 	}
 
@@ -91,7 +91,7 @@ class BookmarkController extends Controller {
 
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function deleteCursor($fileId): void {
+	public function deleteCursor(int $fileId): void {
 		$this->bookmarkService->deleteCursor($fileId);
 	}
 }

@@ -31,7 +31,7 @@ class PreferenceController extends Controller {
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function get($scope, $fileId, $name): array|JSONResponse {
+	public function get(string $scope, int $fileId, string $name): array|JSONResponse {
 		if ($this->userId === null) {
 			return new JSONResponse([]);
 		}
@@ -48,7 +48,7 @@ class PreferenceController extends Controller {
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function set($scope, $fileId, $name, $value): void {
+	public function set(string $scope, int $fileId, string $name, string $value): void {
 		if ($this->userId === null) {
 			return;
 		}
@@ -64,7 +64,7 @@ class PreferenceController extends Controller {
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function getDefault($scope, $name): array|JSONResponse {
+	public function getDefault(string $scope, string $name): array|JSONResponse {
 		if ($this->userId === null) {
 			return new JSONResponse([]);
 		}
@@ -80,7 +80,7 @@ class PreferenceController extends Controller {
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function setDefault($scope, $name, $value): void {
+	public function setDefault(string $scope, string $name, string $value): void {
 		if ($this->userId === null) {
 			return;
 		}
@@ -95,7 +95,7 @@ class PreferenceController extends Controller {
 	 * @param int $fileId
 	 * @param string $name
 	 */
-	public function delete($scope, $fileId, $name): void {
+	public function delete(string $scope, int $fileId, string $name): void {
 		if ($this->userId === null) {
 			return;
 		}
@@ -108,7 +108,7 @@ class PreferenceController extends Controller {
 	 * @param $scope
 	 * @param $name
 	 */
-	public function deleteDefault($scope, $name): void {
+	public function deleteDefault(string $scope, string $name): void {
 		if ($this->userId === null) {
 			return;
 		}
