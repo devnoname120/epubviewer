@@ -4,7 +4,7 @@ namespace OCA\Epubviewer\Db;
 
 use JsonSerializable;
 use OCP\AppFramework\Db\Entity;
-
+use OCP\DB\Types;
 /**
  * @method string getUserId()
  * @method void setUserId(string $userId)
@@ -32,13 +32,13 @@ class Bookmark extends Entity implements JsonSerializable {
 	protected $lastModified;
 
 	public function __construct() {
-		$this->addType('userId', 'string');
-		$this->addType('fileId', 'integer');
-		$this->addType('type', 'string');
-		$this->addType('name', 'string');
-		$this->addType('value', 'string');
-		$this->addType('content', 'string');
-		$this->addType('lastModified', 'string');
+		$this->addType('userId', Types::STRING);
+		$this->addType('fileId', Types::INTEGER);
+		$this->addType('type', Types::STRING);
+		$this->addType('name', Types::STRING);
+		$this->addType('value', Types::STRING);
+		$this->addType('content', Types::STRING);
+		$this->addType('lastModified', Types::STRING);
 	}
 
 	public function jsonSerialize(): array {

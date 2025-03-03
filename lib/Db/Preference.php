@@ -4,6 +4,7 @@ namespace OCA\Epubviewer\Db;
 
 use JsonSerializable;
 use OCP\AppFramework\Db\Entity;
+use OCP\DB\Types;
 
 /**
  * @method string getUserId()
@@ -29,12 +30,12 @@ class Preference extends Entity implements JsonSerializable {
 	protected $lastModified;
 
 	public function __construct() {
-		$this->addType('userId', 'string');
-		$this->addType('scope', 'string');
-		$this->addType('fileId', 'integer');
-		$this->addType('name', 'string');
-		$this->addType('value', 'string');
-		$this->addType('lastModified', 'string');
+		$this->addType('userId', Types::STRING);
+		$this->addType('scope', Types::STRING);
+		$this->addType('fileId', Types::INTEGER);
+		$this->addType('name', Types::STRING);
+		$this->addType('value', Types::STRING);
+		$this->addType('lastModified', Types::STRING);
 	}
 
 	public static function conditional_json_decode(string $el) {
