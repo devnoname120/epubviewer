@@ -64,6 +64,6 @@
     "sabre/dav": "^4.7.0",
     "sabre/xml": "^2.2.11",
     "symfony/event-dispatcher": "^5.4.45",
-	"mikespub/php-epub-meta": "^1.5.3"
+    "mikespub/php-epub-meta": "^1.5.3"
   }
 }

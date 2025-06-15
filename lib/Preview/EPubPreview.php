@@ -36,7 +36,7 @@ class EPubPreview implements IProviderV2 {
 	 * {@inheritDoc}
 	 */
 	public function getMimeType(): string {
-		return '/application\/epub\+zip/';
+		return '/^application\/epub\+zip$/';
 	}
 
 	/**
@@ -51,7 +51,7 @@ class EPubPreview implements IProviderV2 {
 	 */
 	public function getThumbnail(File $file, int $maxX, int $maxY): ?IImage {
 		try {
-			$epub = new EPub($file->getPath());
+			$epub = new EPub($file->getStorage()->getLocalFile($file->getInternalPath()));
 			$coverInfo = $epub->getCoverInfo();
 			if (!$coverInfo["found"]) {
 				return null; // Successfully parsed, but no cover image.
