@@ -24,6 +24,7 @@ namespace OCA\Epubviewer\Preview;
 use OCP\Files\File;
 use OCP\Files\FileInfo;
 use OCP\IImage;
+use OCP\Image;
 use OCP\Preview\IProviderV2;
 use SebLucas\EPubMeta\EPub;
 
@@ -61,7 +62,7 @@ class EPubPreview implements IProviderV2 {
 		}
 
 		// Found a cover, so attempt to convert it to an OC_Image.
-		$image = new \OC_Image();
+		$image = new Image();
 		$image->loadFromData($coverInfo["data"]);
 		if (!$image->valid()) {
 			return null; // Invalid image, so don't provide a cover image.
