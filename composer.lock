@@ -4,8 +4,78 @@
     "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
     "This file is @generated automatically"
   ],
-  "content-hash": "02b7a098f52dd90d6096b1d53f82582c",
+  "content-hash": "78104b3d77ada29aba6596beeff5d879",
   "packages": [
+    {
+      "name": "mikespub/php-epub-meta",
+      "version": "1.5.3",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/mikespub-org/php-epub-meta.git",
+        "reference": "37170e25d86f8f499f1a60f079ded406b54cbe15"
+      },
+      "dist": {
+        "type": "zip",
+        "url": "https://api.github.com/repos/mikespub-org/php-epub-meta/zipball/37170e25d86f8f499f1a60f079ded406b54cbe15",
+        "reference": "37170e25d86f8f499f1a60f079ded406b54cbe15",
+        "shasum": ""
+      },
+      "require": {
+        "ext-dom": "*",
+        "ext-xml": "*",
+        "ext-zip": "*",
+        "php": ">=7.4"
+      },
+      "require-dev": {
+        "phpunit/phpunit": "9.*"
+      },
+      "suggest": {
+        "mikespub/epub-loader": "epub-loader is a utility resource for ebooks",
+        "mikespub/seblucas-cops": "COPS - Calibre OPDS (and HTML) PHP Server"
+      },
+      "type": "library",
+      "autoload": {
+        "classmap": [
+          "src/",
+          "resources/tbszip/src/"
+        ]
+      },
+      "notification-url": "https://packagist.org/downloads/",
+      "license": [
+        "MIT"
+      ],
+      "authors": [
+        {
+          "name": "Andreas Gohr",
+          "email": "andi@splitbrain.org",
+          "homepage": "https://www.splitbrain.org/",
+          "role": "Developer"
+        },
+        {
+          "name": "Sébastien Lucas",
+          "email": "sebastien@slucas.fr",
+          "homepage": "http://www.slucas.fr/",
+          "role": "Developer"
+        },
+        {
+          "name": "mikespub",
+          "homepage": "https://github.com/mikespub-org/php-epub-meta",
+          "role": "Developer"
+        }
+      ],
+      "description": "Reading and writing metadata included in the EPub ebook format",
+      "homepage": "https://github.com/mikespub-org/php-epub-meta",
+      "keywords": [
+        "ebook",
+        "epub",
+        "metadata"
+      ],
+      "support": {
+        "issues": "https://github.com/mikespub-org/php-epub-meta/issues",
+        "source": "https://github.com/mikespub-org/php-epub-meta/tree/1.5.3"
+      },
+      "time": "2023-09-10T15:05:48+00:00"
+    },
     {
       "name": "psr/event-dispatcher",
       "version": "1.0.0",
@@ -330,16 +400,16 @@
     },
     {
       "name": "sabre/vobject",
-      "version": "4.5.6",
+      "version": "4.5.7",
       "source": {
         "type": "git",
         "url": "https://github.com/sabre-io/vobject.git",
-        "reference": "900266bb3bd448a9f7f41f82344ad0aba237cb27"
+        "reference": "ff22611a53782e90c97be0d0bc4a5f98a5c0a12c"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/sabre-io/vobject/zipball/900266bb3bd448a9f7f41f82344ad0aba237cb27",
-        "reference": "900266bb3bd448a9f7f41f82344ad0aba237cb27",
+        "url": "https://api.github.com/repos/sabre-io/vobject/zipball/ff22611a53782e90c97be0d0bc4a5f98a5c0a12c",
+        "reference": "ff22611a53782e90c97be0d0bc4a5f98a5c0a12c",
         "shasum": ""
       },
       "require": {
@@ -349,7 +419,7 @@
       },
       "require-dev": {
         "friendsofphp/php-cs-fixer": "~2.17.1",
-        "phpstan/phpstan": "^0.12 || ^1.11",
+        "phpstan/phpstan": "^0.12 || ^1.12 || ^2.0",
         "phpunit/php-invoker": "^2.0 || ^3.1",
         "phpunit/phpunit": "^7.5 || ^8.5 || ^9.6"
       },
@@ -430,7 +500,7 @@
         "issues": "https://github.com/sabre-io/vobject/issues",
         "source": "https://github.com/fruux/sabre-vobject"
       },
-      "time": "2024-10-14T11:53:54+00:00"
+      "time": "2025-04-17T09:22:48+00:00"
     },
     {
       "name": "sabre/xml",
@@ -503,16 +573,16 @@
     },
     {
       "name": "symfony/deprecation-contracts",
-      "version": "v3.5.1",
+      "version": "v3.6.0",
       "source": {
         "type": "git",
         "url": "https://github.com/symfony/deprecation-contracts.git",
-        "reference": "74c71c939a79f7d5bf3c1ce9f5ea37ba0114c6f6"
+        "reference": "63afe740e99a13ba87ec199bb07bbdee937a5b62"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/74c71c939a79f7d5bf3c1ce9f5ea37ba0114c6f6",
-        "reference": "74c71c939a79f7d5bf3c1ce9f5ea37ba0114c6f6",
+        "url": "https://api.github.com/repos/symfony/deprecation-contracts/zipball/63afe740e99a13ba87ec199bb07bbdee937a5b62",
+        "reference": "63afe740e99a13ba87ec199bb07bbdee937a5b62",
         "shasum": ""
       },
       "require": {
@@ -525,7 +595,7 @@
           "name": "symfony/contracts"
         },
         "branch-alias": {
-          "dev-main": "3.5-dev"
+          "dev-main": "3.6-dev"
         }
       },
       "autoload": {
@@ -550,7 +620,7 @@
       "description": "A generic function and convention to trigger deprecation notices",
       "homepage": "https://symfony.com",
       "support": {
-        "source": "https://github.com/symfony/deprecation-contracts/tree/v3.5.1"
+        "source": "https://github.com/symfony/deprecation-contracts/tree/v3.6.0"
       },
       "funding": [
         {
@@ -566,7 +636,7 @@
           "type": "tidelift"
         }
       ],
-      "time": "2024-09-25T14:20:29+00:00"
+      "time": "2024-09-25T14:21:43+00:00"
     },
     {
       "name": "symfony/event-dispatcher",
@@ -655,16 +725,16 @@
     },
     {
       "name": "symfony/event-dispatcher-contracts",
-      "version": "v3.5.1",
+      "version": "v3.6.0",
       "source": {
         "type": "git",
         "url": "https://github.com/symfony/event-dispatcher-contracts.git",
-        "reference": "7642f5e970b672283b7823222ae8ef8bbc160b9f"
+        "reference": "59eb412e93815df44f05f342958efa9f46b1e586"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/symfony/event-dispatcher-contracts/zipball/7642f5e970b672283b7823222ae8ef8bbc160b9f",
-        "reference": "7642f5e970b672283b7823222ae8ef8bbc160b9f",
+        "url": "https://api.github.com/repos/symfony/event-dispatcher-contracts/zipball/59eb412e93815df44f05f342958efa9f46b1e586",
+        "reference": "59eb412e93815df44f05f342958efa9f46b1e586",
         "shasum": ""
       },
       "require": {
@@ -678,7 +748,7 @@
           "name": "symfony/contracts"
         },
         "branch-alias": {
-          "dev-main": "3.5-dev"
+          "dev-main": "3.6-dev"
         }
       },
       "autoload": {
@@ -711,7 +781,7 @@
         "standards"
       ],
       "support": {
-        "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v3.5.1"
+        "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v3.6.0"
       },
       "funding": [
         {
@@ -727,20 +797,20 @@
           "type": "tidelift"
         }
       ],
-      "time": "2024-09-25T14:20:29+00:00"
+      "time": "2024-09-25T14:21:43+00:00"
     },
     {
       "name": "symfony/polyfill-php80",
-      "version": "v1.31.0",
+      "version": "v1.32.0",
       "source": {
         "type": "git",
         "url": "https://github.com/symfony/polyfill-php80.git",
-        "reference": "60328e362d4c2c802a54fcbf04f9d3fb892b4cf8"
+        "reference": "0cc9dd0f17f61d8131e7df6b84bd344899fe2608"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/60328e362d4c2c802a54fcbf04f9d3fb892b4cf8",
-        "reference": "60328e362d4c2c802a54fcbf04f9d3fb892b4cf8",
+        "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/0cc9dd0f17f61d8131e7df6b84bd344899fe2608",
+        "reference": "0cc9dd0f17f61d8131e7df6b84bd344899fe2608",
         "shasum": ""
       },
       "require": {
@@ -791,7 +861,7 @@
         "shim"
       ],
       "support": {
-        "source": "https://github.com/symfony/polyfill-php80/tree/v1.31.0"
+        "source": "https://github.com/symfony/polyfill-php80/tree/v1.32.0"
       },
       "funding": [
         {
@@ -807,7 +877,7 @@
           "type": "tidelift"
         }
       ],
-      "time": "2024-09-09T11:45:10+00:00"
+      "time": "2025-01-02T08:10:11+00:00"
     }
   ],
   "packages-dev": [
@@ -883,16 +953,16 @@
     },
     {
       "name": "kubawerlos/php-cs-fixer-custom-fixers",
-      "version": "v3.23.0",
+      "version": "v3.27.0",
       "source": {
         "type": "git",
         "url": "https://github.com/kubawerlos/php-cs-fixer-custom-fixers.git",
-        "reference": "b3210c6e546bdfc95664297a8971ae3b6b1f4a5a"
+        "reference": "d860473d16b906c7945206177edc7d112357a706"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/kubawerlos/php-cs-fixer-custom-fixers/zipball/b3210c6e546bdfc95664297a8971ae3b6b1f4a5a",
-        "reference": "b3210c6e546bdfc95664297a8971ae3b6b1f4a5a",
+        "url": "https://api.github.com/repos/kubawerlos/php-cs-fixer-custom-fixers/zipball/d860473d16b906c7945206177edc7d112357a706",
+        "reference": "d860473d16b906c7945206177edc7d112357a706",
         "shasum": ""
       },
       "require": {
@@ -902,7 +972,7 @@
         "php": "^7.4 || ^8.0"
       },
       "require-dev": {
-        "phpunit/phpunit": "^9.6.4 || ^10.5.29"
+        "phpunit/phpunit": "^9.6.22 || 10.5.45 || ^11.5.7"
       },
       "type": "library",
       "autoload": {
@@ -923,22 +993,28 @@
       "description": "A set of custom fixers for PHP CS Fixer",
       "support": {
         "issues": "https://github.com/kubawerlos/php-cs-fixer-custom-fixers/issues",
-        "source": "https://github.com/kubawerlos/php-cs-fixer-custom-fixers/tree/v3.23.0"
+        "source": "https://github.com/kubawerlos/php-cs-fixer-custom-fixers/tree/v3.27.0"
       },
-      "time": "2025-02-15T09:15:56+00:00"
+      "funding": [
+        {
+          "url": "https://github.com/kubawerlos",
+          "type": "github"
+        }
+      ],
+      "time": "2025-06-10T20:53:07+00:00"
     },
     {
       "name": "myclabs/deep-copy",
-      "version": "1.13.0",
+      "version": "1.13.1",
       "source": {
         "type": "git",
         "url": "https://github.com/myclabs/DeepCopy.git",
-        "reference": "024473a478be9df5fdaca2c793f2232fe788e414"
+        "reference": "1720ddd719e16cf0db4eb1c6eca108031636d46c"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/024473a478be9df5fdaca2c793f2232fe788e414",
-        "reference": "024473a478be9df5fdaca2c793f2232fe788e414",
+        "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/1720ddd719e16cf0db4eb1c6eca108031636d46c",
+        "reference": "1720ddd719e16cf0db4eb1c6eca108031636d46c",
         "shasum": ""
       },
       "require": {
@@ -977,7 +1053,7 @@
       ],
       "support": {
         "issues": "https://github.com/myclabs/DeepCopy/issues",
-        "source": "https://github.com/myclabs/DeepCopy/tree/1.13.0"
+        "source": "https://github.com/myclabs/DeepCopy/tree/1.13.1"
       },
       "funding": [
         {
@@ -985,7 +1061,7 @@
           "type": "tidelift"
         }
       ],
-      "time": "2025-02-12T12:17:51+00:00"
+      "time": "2025-04-29T12:36:36+00:00"
     },
     {
       "name": "nextcloud/coding-standard",
@@ -1031,16 +1107,16 @@
     },
     {
       "name": "nikic/php-parser",
-      "version": "v5.4.0",
+      "version": "v5.5.0",
       "source": {
         "type": "git",
         "url": "https://github.com/nikic/PHP-Parser.git",
-        "reference": "447a020a1f875a434d62f2a401f53b82a396e494"
+        "reference": "ae59794362fe85e051a58ad36b289443f57be7a9"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/447a020a1f875a434d62f2a401f53b82a396e494",
-        "reference": "447a020a1f875a434d62f2a401f53b82a396e494",
+        "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/ae59794362fe85e051a58ad36b289443f57be7a9",
+        "reference": "ae59794362fe85e051a58ad36b289443f57be7a9",
         "shasum": ""
       },
       "require": {
@@ -1083,9 +1159,9 @@
       ],
       "support": {
         "issues": "https://github.com/nikic/PHP-Parser/issues",
-        "source": "https://github.com/nikic/PHP-Parser/tree/v5.4.0"
+        "source": "https://github.com/nikic/PHP-Parser/tree/v5.5.0"
       },
-      "time": "2024-12-30T11:07:19+00:00"
+      "time": "2025-05-31T08:24:38+00:00"
     },
     {
       "name": "phar-io/manifest",
@@ -1207,16 +1283,16 @@
     },
     {
       "name": "php-cs-fixer/shim",
-      "version": "v3.70.0",
+      "version": "v3.75.0",
       "source": {
         "type": "git",
         "url": "https://github.com/PHP-CS-Fixer/shim.git",
-        "reference": "9302388f32d5181cd7238717860391396c592f36"
+        "reference": "eea219a577085bd13ff0cb644a422c20798316c7"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/PHP-CS-Fixer/shim/zipball/9302388f32d5181cd7238717860391396c592f36",
-        "reference": "9302388f32d5181cd7238717860391396c592f36",
+        "url": "https://api.github.com/repos/PHP-CS-Fixer/shim/zipball/eea219a577085bd13ff0cb644a422c20798316c7",
+        "reference": "eea219a577085bd13ff0cb644a422c20798316c7",
         "shasum": ""
       },
       "require": {
@@ -1253,9 +1329,9 @@
       "description": "A tool to automatically fix PHP code style",
       "support": {
         "issues": "https://github.com/PHP-CS-Fixer/shim/issues",
-        "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.70.0"
+        "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.75.0"
       },
-      "time": "2025-02-22T23:31:12+00:00"
+      "time": "2025-03-31T18:45:02+00:00"
     },
     {
       "name": "phpunit/php-code-coverage",
@@ -1578,16 +1654,16 @@
     },
     {
       "name": "phpunit/phpunit",
-      "version": "9.6.22",
+      "version": "9.6.23",
       "source": {
         "type": "git",
         "url": "https://github.com/sebastianbergmann/phpunit.git",
-        "reference": "f80235cb4d3caa59ae09be3adf1ded27521d1a9c"
+        "reference": "43d2cb18d0675c38bd44982a5d1d88f6d53d8d95"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/f80235cb4d3caa59ae09be3adf1ded27521d1a9c",
-        "reference": "f80235cb4d3caa59ae09be3adf1ded27521d1a9c",
+        "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/43d2cb18d0675c38bd44982a5d1d88f6d53d8d95",
+        "reference": "43d2cb18d0675c38bd44982a5d1d88f6d53d8d95",
         "shasum": ""
       },
       "require": {
@@ -1598,7 +1674,7 @@
         "ext-mbstring": "*",
         "ext-xml": "*",
         "ext-xmlwriter": "*",
-        "myclabs/deep-copy": "^1.12.1",
+        "myclabs/deep-copy": "^1.13.1",
         "phar-io/manifest": "^2.0.4",
         "phar-io/version": "^3.2.1",
         "php": ">=7.3",
@@ -1661,7 +1737,7 @@
       "support": {
         "issues": "https://github.com/sebastianbergmann/phpunit/issues",
         "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-        "source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.22"
+        "source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.23"
       },
       "funding": [
         {
@@ -1673,11 +1749,19 @@
           "type": "github"
         },
         {
+          "url": "https://liberapay.com/sebastianbergmann",
+          "type": "liberapay"
+        },
+        {
+          "url": "https://thanks.dev/u/gh/sebastianbergmann",
+          "type": "thanks_dev"
+        },
+        {
           "url": "https://tidelift.com/funding/github/packagist/phpunit/phpunit",
           "type": "tidelift"
         }
       ],
-      "time": "2024-12-05T13:48:26+00:00"
+      "time": "2025-05-02T06:40:34+00:00"
     },
     {
       "name": "psalm/phar",
