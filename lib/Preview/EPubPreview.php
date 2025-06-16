@@ -21,8 +21,9 @@
 
 namespace OCA\Epubviewer\Preview;
 
-use OC\Preview\ProviderV2;
+use OCA\Preview\ProviderV2;
 use OCP\Files\File;
+use OCP\Files\FileInfo;
 use OCP\IImage;
 use OCP\Image;
 use Psr\Log\LoggerInterface;
@@ -51,10 +52,19 @@ class EPubPreview extends ProviderV2 {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public function isAvailable(FileInfo $file): bool {
+		return $file->getSize() > 0;
+	}
+
+	/**
 	 * @inheritDoc
 	 */
 	public function getThumbnail(File $file, int $maxX, int $maxY): ?IImage {
 		$internalPath = $file->getInternalPath();
+		$image = new Image();
+
 		try {
 			$localFile = $this->getLocalFile($file);
 			if ($localFile === false) {
@@ -63,14 +73,20 @@ class EPubPreview extends ProviderV2 {
 			}
 
 			$epub = new EPub($localFile);
-
-			// CoverInfo is an associative array with the following keys:
-			// - mime: the mime type of the cover image in the data key, or image/gif if none found
-			// - data: the data of the cover image, or a transparent GIF pixel if none found
-			// - found: a string containing the cover archive file path, or false if none found
 			$coverInfo = $epub->getCoverInfo();
 			if (!$coverInfo['found']) {
 				$this->logger->debug('EPUB file {file} parsed successfully, but no cover image was found to generate a thumbnail.', ['file' => $internalPath]);
+				return null;
+			}
+
+			// Found a cover, so attempt to convert it to an OC_Image.
+			$image->loadFromData($coverInfo['data']);
+			if (!$image->valid()) {
+				$this->logger->warning('EPUB file {file} contains cover \'{coverPath}\' (MIME: \'{coverMime}\') but it could not be loaded a valid image, so no thumbnail is generated.', [
+					'file' => $internalPath,
+					'coverPath' => $coverInfo['found'],
+					'coverMime' => $coverInfo['mime']
+				]);
 				return null;
 			}
 		} catch (\Exception $e) {
@@ -83,18 +99,6 @@ class EPubPreview extends ProviderV2 {
 		} finally {
 			// Clean up any potential temporary files created by getLocalFile()
 			$this->cleanTmpFiles();
-		}
-
-		// Found a cover, so attempt to convert it to an OC_Image.
-		$image = new Image();
-		$image->loadFromData($coverInfo['data']);
-		if (!$image->valid()) {
-			$this->logger->warning('EPUB file {file} contains cover \'{cover}\' (MIME: \'{mime}\') but it could not be loaded a valid image, so no thumbnail is generated.', [
-				'file' => $internalPath,
-				'cover' => $coverInfo['found'],
-				'mime' => $coverInfo['mime']
-			]);
-			return null;
 		}
 
 		// Scale image to fit to the maximum dimensions if necessary.
