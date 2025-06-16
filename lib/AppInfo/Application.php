@@ -49,6 +49,8 @@ class Application extends App implements IBootstrap {
 			);
 		});
 
+		$this->registerPreviewProviders($context);
+
 		// "Emitted before the rendering step of each TemplateResponse. The event holds a flag that specifies if a user is logged in."
 		// See: https://docs.nextcloud.com/server/latest/developer_manual/basics/events.html#oca-settings-events-beforetemplaterenderedevent
 		$context->registerEventListener(\OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent::class, BeforeTemplateRenderedListener::class);
@@ -63,6 +65,10 @@ class Application extends App implements IBootstrap {
 
 		$context->registerEventListener(\OCP\Files\Events\Node\NodeDeletedEvent::class, FileNodeDeletedListener::class);
 		$context->registerEventListener(\OCP\User\Events\UserDeletedEvent::class, UserDeletedListener::class);
+	}
+
+	private function registerPreviewProviders(IRegistrationContext $context): void {
+		$context->registerPreviewProvider(\OCA\Epubviewer\Preview\EPubPreview::class, '/^application\/epub\+zip$/');
 	}
 
 	public function boot(IBootContext $context): void {
