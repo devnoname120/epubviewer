@@ -82,7 +82,7 @@ class EPubPreview extends ProviderV2 {
 			// Found a cover, so attempt to convert it to an OC_Image.
 			$image->loadFromData($coverInfo['data']);
 			if (!$image->valid()) {
-				$this->logger->warning('EPUB file {file} contains cover \'{coverPath}\' (MIME: \'{coverMime}\') but it could not be loaded a valid image, so no thumbnail is generated.', [
+				$this->logger->warning('EPUB file {file} contains cover \'{coverPath}\' (MIME: \'{coverMime}\') but it could not be loaded as a valid image, so no thumbnail is generated.', [
 					'file' => $internalPath,
 					'coverPath' => $coverInfo['found'],
 					'coverMime' => $coverInfo['mime']
