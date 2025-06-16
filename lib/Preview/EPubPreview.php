@@ -21,9 +21,7 @@
 
 namespace OCA\Epubviewer\Preview;
 
-use OCA\Preview\ProviderV2;
 use OCP\Files\File;
-use OCP\Files\FileInfo;
 use OCP\IImage;
 use OCP\Image;
 use Psr\Log\LoggerInterface;
