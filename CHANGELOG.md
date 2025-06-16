@@ -1,3 +1,18 @@
+## 1.8.0 - 2025-06-16
+
+### Added
+
+- (#33) Added EPUB cover preview generation. Huge thank you to @JochemKuijpers for the implementation!
+
+### Fixed
+
+- Don't attempt to save the cursor and preferences when a file is previewed by an anonymous user
+
+### Changed
+
+- Added back support for Nextcloud 30
+- Removed the use of deprecated APIs and switched to modern alternatives
+
 ## 1.7.3 - 2025-02-26
 
 ### Fixed
