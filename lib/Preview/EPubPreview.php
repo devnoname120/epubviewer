@@ -39,6 +39,7 @@ class EPubPreview extends ProviderV2 {
 	 * @param LoggerInterface $logger dependency-injected logger
 	 */
 	public function __construct(LoggerInterface $logger) {
+		parent::__construct();
 		$this->logger = $logger;
 	}
 
