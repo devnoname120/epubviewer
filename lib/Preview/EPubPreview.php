@@ -23,7 +23,6 @@ namespace OCA\Epubviewer\Preview;
 
 use OC\Preview\ProviderV2;
 use OCP\Files\File;
-use OCP\Files\FileInfo;
 use OCP\IImage;
 use OCP\Image;
 use Psr\Log\LoggerInterface;
@@ -64,6 +63,11 @@ class EPubPreview extends ProviderV2 {
 			}
 
 			$epub = new EPub($localFile);
+
+			// CoverInfo is an associative array with the following keys:
+			// - mime: the mime type of the cover image in the data key, or image/gif if none found
+			// - data: the data of the cover image, or a transparent GIF pixel if none found
+			// - found: a string containing the cover archive file path, or false if none found
 			$coverInfo = $epub->getCoverInfo();
 			if (!$coverInfo['found']) {
 				$this->logger->debug('EPUB file {file} parsed successfully, but no cover image was found to generate a thumbnail.', ['file' => $internalPath]);
