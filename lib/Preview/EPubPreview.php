@@ -32,15 +32,11 @@ use SebLucas\EPubMeta\EPub;
  */
 class EPubPreview extends ProviderV2 {
 
-	/** @var LoggerInterface dependency-injected logger */
-	private LoggerInterface $logger;
-
 	/**
 	 * @param LoggerInterface $logger dependency-injected logger
 	 */
-	public function __construct(LoggerInterface $logger) {
+	public function __construct(private LoggerInterface $logger) {
 		parent::__construct();
-		$this->logger = $logger;
 	}
 
 	/**
