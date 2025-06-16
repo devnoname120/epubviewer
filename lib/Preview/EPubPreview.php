@@ -52,13 +52,6 @@ class EPubPreview extends ProviderV2 {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	public function isAvailable(FileInfo $file): bool {
-		return $file->getSize() > 0;
-	}
-
-	/**
 	 * @inheritDoc
 	 */
 	public function getThumbnail(File $file, int $maxX, int $maxY): ?IImage {
