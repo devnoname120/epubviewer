@@ -21,18 +21,18 @@
 
 namespace OCA\Epubviewer\Preview;
 
+use OC\Preview\ProviderV2;
 use OCP\Files\File;
 use OCP\Files\FileInfo;
 use OCP\IImage;
 use OCP\Image;
-use OCP\Preview\IProviderV2;
 use Psr\Log\LoggerInterface;
 use SebLucas\EPubMeta\EPub;
 
 /**
  * Preview generator for .epub e-book files.
  */
-class EPubPreview implements IProviderV2 {
+class EPubPreview extends ProviderV2 {
 
 	/** @var LoggerInterface dependency-injected logger */
 	private LoggerInterface $logger;
@@ -52,21 +52,12 @@ class EPubPreview implements IProviderV2 {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	public function isAvailable(FileInfo $file): bool {
-		return $file->getSize() > 0;
-	}
-
-	/**
 	 * @inheritDoc
 	 */
 	public function getThumbnail(File $file, int $maxX, int $maxY): ?IImage {
 		$internalPath = $file->getInternalPath();
 		try {
-			$fileStorage = $file->getStorage(); // may throw if storage is unavailable, caught below.
-
-			$localFile = $fileStorage->getLocalFile($internalPath);
+			$localFile = $this->getLocalFile($file);
 			if ($localFile === false) {
 				$this->logger->warning('Could not generate EPUB file thumbnail for {file} because the local file is unavailable.', ['file' => $internalPath]);
 				return null;
@@ -85,6 +76,9 @@ class EPubPreview implements IProviderV2 {
 				'exception' => $e
 			]);
 			return null;
+		} finally {
+			// Clean up any potential temporary files created by getLocalFile()
+			$this->cleanTmpFiles();
 		}
 
 		// Found a cover, so attempt to convert it to an OC_Image.
