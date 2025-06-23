@@ -1,0 +1,5 @@
+- Add IDs to highlights so they can be marked when hovered - or when related list item is hovered
+- Use this GitHub Action for releasing: [`R0Wi/nextcloud-appstore-push-action`](https://github.com/R0Wi/nextcloud-appstore-push-action)
+- Investigate using [`kiwilan/php-ebook`](https://github.com/kiwilan/php-ebook) to fetch covers for CBR/CBZ
+  - It supports [additional formats](https://github.com/kiwilan/php-ebook#supported-formats) such as AZW/AZW3, MOBI, and even M4B (if [`kiwilan/php-audio`](https://github.com/kiwilan/php-audio) is installed along)
+  - It supports EPUB covers too so if it's good it could even entirely replace [`mikespub-org/php-epub-meta`](https://github.com/mikespub-org/php-epub-meta) (that was implemented in [#33](mikespub/php-epub-meta))
