@@ -63,6 +63,7 @@ class Preference extends Entity implements JsonSerializable {
 		return [
 			'name' => $this->getName(),
 			'value' => self::conditional_json_decode($this->getValue()),
+			'lastModified' => $this->getLastModified(),
 		];
 	}
 }
