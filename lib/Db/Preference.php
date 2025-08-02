@@ -57,7 +57,7 @@ class Preference extends Entity implements JsonSerializable {
 	}
 
 	/**
-	 * @psalm-return array{name: mixed, value: mixed}
+	 * @psalm-return array{name: mixed, value: mixed, lastModified: mixed}
 	 */
 	public function toService(): array {
 		return [
