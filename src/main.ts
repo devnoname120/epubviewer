@@ -1,3 +1,4 @@
+import { getSharingToken, isPublicShare } from '@nextcloud/sharing/public';
 import { generateUrl } from '@nextcloud/router';
 import { DefaultType, FileAction, type Node, Permission, registerFileAction } from '@nextcloud/files';
 import { loadState } from '@nextcloud/initial-state';
@@ -21,7 +22,7 @@ function hide() {
   $('#app-content #controls').removeClass('hidden');
   // NC12...
   $('#app-navigation').css('display', '');
-  if ($('#isPublic').val()) {
+  if (isPublicShare()) {
     $('#imgframe').show();
     $('footer').show();
     $('.directLink').show();
@@ -40,10 +41,9 @@ function show(downloadUrl: string, mimeType: string, isFileList: boolean) {
 
 function actionHandler(file: Node, dir: string) {
   let downloadUrl = '';
-  if ($('#isPublic').val()) {
-    const sharingToken = $('#sharingToken').val();
+  if (isPublicShare()) {
     downloadUrl = generateUrl('/s/{token}/download?files={files}&path={path}', {
-      token: sharingToken,
+      token: getSharingToken(),
       files: file.basename,
       path: dir,
     });

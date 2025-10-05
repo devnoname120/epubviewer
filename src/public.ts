@@ -1,4 +1,5 @@
 import { generateUrl } from '@nextcloud/router';
+import { isPublicShare, getSharingToken } from '@nextcloud/sharing/public';
 
 // FIXME: Hack for single public file view since it is not attached to the fileslist
 window.addEventListener('DOMContentLoaded', function () {
@@ -16,12 +17,11 @@ window.addEventListener('DOMContentLoaded', function () {
     'application/comicbook+zip',
   ];
 
-  if ($('#isPublic').val() === undefined || !supportedMimetypes.includes(mime)) {
+  if (!isPublicShare() || !supportedMimetypes.includes(mime)) {
     return;
   }
 
-  const sharingToken = $('#sharingToken').val();
-  const downloadUrl = generateUrl('/s/{token}/download', { token: sharingToken });
+  const downloadUrl = generateUrl('/s/{token}/download', { token: getSharingToken() });
 
   const content = $('#files-public-content');
   const footerElmt = document.querySelector('body > footer') ?? document.querySelector('#app-content > footer');
