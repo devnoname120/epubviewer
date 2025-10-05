@@ -1,3 +1,14 @@
+## 1.8.1 - 2025-10-05
+
+### Added
+
+- (#34) `lastModified` on preferences to improve performance of [nextcloud\_books](https://git.crystalyx.net/Xefir/nextcloud_books)
+
+### Changed
+
+- Dropped support for Nextcloud 30
+- Added support for Nextcloud 32
+
 ## 1.8.0 - 2025-06-16
 
 ### Added
