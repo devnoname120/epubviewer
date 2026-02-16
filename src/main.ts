@@ -1,131 +1,99 @@
-import { getSharingToken, isPublicShare } from '@nextcloud/sharing/public';
 import { generateUrl } from '@nextcloud/router';
-import { DefaultType, FileAction, type Node, Permission, registerFileAction } from '@nextcloud/files';
+import { registerHandler } from '@nextcloud/viewer';
 import { loadState } from '@nextcloud/initial-state';
-
-// TODO: use i10n for strings:
-// import { translate as t, translatePlural as n } from '@nextcloud/l10n'
+import type { AsyncComponent } from 'vue';
 
 const APP_ID = 'epubviewer';
 
-function hideControls() {
-  $('#app-content #controls').hide();
-  // and, for NC12...
-  $('#app-navigation').css('display', 'none');
-}
+const cbxMimes = [
+  'application/x-cbr',
+  'application/x-cbz',
+  // 'application/comicbook+7z',
+  // 'application/comicbook+ace',
+  'application/comicbook+rar',
+  'application/comicbook+tar',
+  // 'application/comicbook+truecrypt',
+  'application/comicbook+zip',
+];
 
-function hide() {
-  if ($('#fileList').length > 0) {
-    // FileList.setViewerMode(false);
-  }
-  $('#controls').show();
-  $('#app-content #controls').removeClass('hidden');
-  // NC12...
-  $('#app-navigation').css('display', '');
-  if (isPublicShare()) {
-    $('#imgframe').show();
-    $('footer').show();
-    $('.directLink').show();
-    $('.directDownload').show();
-  }
-  $('iframe').remove();
-  $('body').off('focus.filesreader');
-  $(window).off('popstate.filesreader');
-}
+const viewerMimes = [
+  'application/epub+zip',
+  'application/pdf',
+  ...cbxMimes,
+];
 
-function show(downloadUrl: string, mimeType: string, isFileList: boolean) {
-  const viewer = generateUrl('/apps/{APP_ID}/?file={file}&type={type}', { APP_ID, file: downloadUrl, type: mimeType });
-  // launch in new window on all devices
-  window.open(viewer, downloadUrl);
-}
-
-function actionHandler(file: Node, dir: string) {
-  let downloadUrl = '';
-  if (isPublicShare()) {
-    downloadUrl = generateUrl('/s/{token}/download?files={files}&path={path}', {
-      token: getSharingToken(),
-      files: file.basename,
-      path: dir,
+const EpubViewerComponent: AsyncComponent = {
+  name: 'EpubViewerComponent',
+  props: {
+    path: {
+      type: String,
+      default: '',
+    },
+    source: {
+      type: String,
+      default: '',
+    },
+    mime: {
+      type: String,
+      default: '',
+    },
+  },
+  computed: {
+    filePath(): string {
+      return this.path || this.source;
+    },
+    viewerUrl(): string {
+      return generateUrl('/apps/{APP_ID}/?file={file}&type={type}', {
+        APP_ID,
+        file: this.filePath,
+        type: this.mime,
+      });
+    },
+  },
+  methods: {
+    onLoad() {
+      this.$emit('update:loaded', true);
+    },
+  },
+  render(h) {
+    return h('iframe', {
+      attrs: {
+        src: this.viewerUrl,
+        title: 'EPUB viewer',
+      },
+      style: {
+        width: '100%',
+        height: '100%',
+        border: 'none',
+      },
+      on: {
+        load: this.onLoad,
+      },
     });
-  } else {
-    downloadUrl = getAbsolutePath(file.encodedSource);
-  }
-  show(downloadUrl, file.mime || '', true);
-}
-
-function getAbsolutePath(url: string): string {
-  const urlObj = new URL(url);
-  return urlObj.pathname + urlObj.search + urlObj.hash;
-}
+  },
+};
 
 const isEpubEnabled = loadState<boolean>(APP_ID, 'enableEpub');
 const isPdfEnabled = loadState<boolean>(APP_ID, 'enablePdf');
 const isCbxEnabled = loadState<boolean>(APP_ID, 'enableCbx');
 
-registerFileAction(
-  new FileAction({
-    id: 'view-epub',
-    iconSvgInline: () => '<svg></svg>',
-    displayName: () => 'View',
-    default: DefaultType.DEFAULT,
-    enabled(nodes) {
-      const isEpub = nodes.some((node) => node.mime === 'application/epub+zip');
-      const isReadable = nodes.some((node) => node.permissions & Permission.READ);
+const enabledMimes = viewerMimes.filter((mime) => {
+  if (mime === 'application/epub+zip') {
+    return isEpubEnabled;
+  }
 
-      return isEpubEnabled && isEpub && isReadable;
-    },
-    exec: async function (file, view, dir) {
-      actionHandler(file, dir);
-      return true;
-    },
-  }),
-);
+  if (mime === 'application/pdf') {
+    return isPdfEnabled;
+  }
 
-registerFileAction(
-  new FileAction({
-    id: 'view-cbr',
-    iconSvgInline: () => '<svg></svg>',
-    displayName: () => 'View',
-    default: DefaultType.DEFAULT,
-    enabled(nodes) {
-      const cbxMimes = [
-        'application/x-cbr',
-        'application/x-cbz',
-        // 'application/comicbook+7z',
-        // 'application/comicbook+ace',
-        'application/comicbook+rar',
-        'application/comicbook+tar',
-        // 'application/comicbook+truecrypt',
-        'application/comicbook+zip',
-      ];
+  return isCbxEnabled;
+});
 
-      const isCbx = nodes.some((node) => cbxMimes.includes(node.mime || ''));
-      const isReadable = nodes.some((node) => node.permissions & Permission.READ);
-
-      return isCbxEnabled && isCbx && isReadable;
-    },
-    exec: async function (file, view, dir) {
-      actionHandler(file, dir);
-      return true;
-    },
-  }),
-);
-
-registerFileAction(
-  new FileAction({
-    id: 'view-pdf',
-    iconSvgInline: () => '<svg></svg>',
-    displayName: () => 'View',
-    default: DefaultType.DEFAULT,
-    enabled(nodes) {
-      const isPdf = nodes.some((node) => node.mime === 'application/pdf');
-      const isReadable = nodes.some((node) => node.permissions & Permission.READ);
-
-      return isPdfEnabled && isPdf && isReadable;
-    },
-    exec: async function (file, view, dir) {
-      actionHandler(file, dir);
-      return true;
-    },
-  }),
-);
+if (enabledMimes.length > 0) {
+  registerHandler({
+    id: APP_ID,
+    mimes: enabledMimes,
+    component: EpubViewerComponent,
+    theme: 'default',
+  });
+}
