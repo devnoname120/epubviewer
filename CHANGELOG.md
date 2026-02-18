@@ -1,3 +1,9 @@
+## 1.9.0 - 2026-02-18
+
+### Changed
+
+- Register a proper [`@nextcloud/viewer`](https://github.com/nextcloud/viewer) handler instead of doing a dirty DOM injection
+
 ## 1.8.1 - 2025-10-05
 
 ### Added
