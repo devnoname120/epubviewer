@@ -84,6 +84,14 @@ This requires the following things to be present:
 
 ## Publish to App Store
 
+Before creating a release, bump the app version in metadata files:
+
+```shell
+make bump-version VERSION=1.9.2
+```
+
+This updates `CHANGELOG.md`, `appinfo/info.xml`, `composer.json`, `composer.lock`, `package.json`, and `package-lock.json`, then runs `npm install` and `composer install`. It also adds a new changelog section boilerplate that you should fill before committing.
+
 Run the following in order to prepare a tarball that can be uploaded
 to [Nextcloud's App Store](http://apps.nextcloud.com/):
 
