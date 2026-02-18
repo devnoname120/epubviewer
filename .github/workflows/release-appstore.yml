@@ -1,0 +1,58 @@
+# SPDX-FileCopyrightText: 2026 Nextcloud contributors
+# SPDX-License-Identifier: MIT
+
+name: Release appstore
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  release-appstore:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          persist-credentials: false
+
+      - name: Build release artifacts
+        run: make dist
+
+      - name: Resolve tarball metadata
+        id: tarball
+        run: |
+          set -eu
+          set -- build/artifacts/epubviewer-*.tar.gz
+          if [ "$1" = "build/artifacts/epubviewer-*.tar.gz" ] || [ "$#" -ne 1 ]; then
+            echo "Expected exactly one built tarball for epubviewer, got $#"
+            exit 1
+          fi
+          tarball="$1"
+          asset_name="$(basename "$tarball")"
+          download_url="https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/${asset_name}"
+
+          {
+            echo "path=${tarball}"
+            echo "asset_name=${asset_name}"
+            echo "download_url=${download_url}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Upload tarball to GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" "${{ steps.tarball.outputs.path }}" --clobber
+
+      - name: Push to Nextcloud appstore
+        uses: R0Wi/nextcloud-appstore-push-action@9244bb5445776688cfe90fa1903ea8dff95b0c28 # v1
+        with:
+          app_name: epubviewer
+          appstore_token: ${{ secrets.NC_APPSTORE_TOKEN }}
+          download_url: ${{ steps.tarball.outputs.download_url }}
+          app_private_key: ${{ secrets.NC_APP_PRIVATE_KEY }}
+          nightly: ${{ github.event.release.prerelease }}

@@ -216,10 +216,15 @@ appstore:
 	$(app_name)
 	@echo
 	@echo "You can now create a GitHub release and upload the build here: https://apps.nextcloud.com/developer/apps/releases/new"
-	@echo
-	@echo "Signature of $(appstore_package_name).tar.gz:"
-	@echo
-	@openssl dgst -sha512 -sign ~/.nextcloud/certificates/epubviewer.key "$(appstore_package_name).tar.gz" | openssl base64
+	@if [ -f ~/.nextcloud/certificates/epubviewer.key ]; then \
+		echo; \
+		echo "Signature of $(appstore_package_name).tar.gz:"; \
+		echo; \
+		openssl dgst -sha512 -sign ~/.nextcloud/certificates/epubviewer.key "$(appstore_package_name).tar.gz" | openssl base64; \
+	else \
+		echo; \
+		echo "Skipping signature output: ~/.nextcloud/certificates/epubviewer.key was not found."; \
+	fi
 
 
 .PHONY: test

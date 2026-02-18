@@ -102,6 +102,25 @@ openssl dgst -sha512 -sign ~/.nextcloud/certificates/epubviewer.key build/artifa
 You can then create a [new app release](https://apps.nextcloud.com/developer/apps/releases/new) specifying the direct
 link to the `.tar.gz` file from the GitHub release as well as the signature that was computed above.
 
+### Automated release workflow
+
+Publishing to the Nextcloud App Store is automated through
+`.github/workflows/release-appstore.yml` using
+[`R0Wi/nextcloud-appstore-push-action`](https://github.com/R0Wi/nextcloud-appstore-push-action).
+
+Required GitHub repository secrets:
+
+- `NC_APPSTORE_TOKEN`: API token from [Account -> API token](https://apps.nextcloud.com/account/token)
+- `NC_APP_PRIVATE_KEY`: the app private key used to sign releases
+
+After these secrets are configured, publishing a GitHub release triggers the upload automatically.
+
+Release flow:
+
+1. Create a new tag/release on GitHub (no manual attachment needed).
+2. Publish the release (drafts do not run the workflow until published).
+3. The workflow builds the tarball, uploads it to that GitHub release, and pushes the version to the Nextcloud App Store.
+
 # Features
 
 Reader remembers the last-visited page in a book and returns to that page when the book is re-opened. As all settings
