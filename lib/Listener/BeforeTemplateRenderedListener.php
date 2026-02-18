@@ -23,33 +23,36 @@ class BeforeTemplateRenderedListener implements IEventListener {
 
 	public function handle(Event $event): void {
 		/** @var \OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent $event */
-		if ($event->getResponse()->getRenderAs() === TemplateResponse::RENDER_AS_USER) {
-			$this->initialState->provideLazyInitialState('enableEpub', function () {
-				$user = $this->userSession->getUser();
-				if ($user !== null) {
-					$uid = $user->getUID();
-					return $this->config->getUserValue($uid, Application::APP_ID, 'epub_enable', 'true') === 'true';
-				}
-				return true;
-			});
-
-			$this->initialState->provideLazyInitialState('enablePdf', function () {
-				$user = $this->userSession->getUser();
-				if ($user !== null) {
-					$uid = $user->getUID();
-					return $this->config->getUserValue($uid, Application::APP_ID, 'pdf_enable', 'false') === 'true';
-				}
-				return false;
-			});
-
-			$this->initialState->provideLazyInitialState('enableCbx', function () {
-				$user = $this->userSession->getUser();
-				if ($user !== null) {
-					$uid = $user->getUID();
-					return $this->config->getUserValue($uid, Application::APP_ID, 'cbx_enable', 'true') === 'true';
-				}
-				return true;
-			});
+		$renderAs = $event->getResponse()->getRenderAs();
+		if ($renderAs !== TemplateResponse::RENDER_AS_USER && $renderAs !== TemplateResponse::RENDER_AS_GUEST) {
+			return;
 		}
+
+		$this->initialState->provideLazyInitialState('enableEpub', function () {
+			$user = $this->userSession->getUser();
+			if ($user !== null) {
+				$uid = $user->getUID();
+				return $this->config->getUserValue($uid, Application::APP_ID, 'epub_enable', 'true') === 'true';
+			}
+			return true;
+		});
+
+		$this->initialState->provideLazyInitialState('enablePdf', function () {
+			$user = $this->userSession->getUser();
+			if ($user !== null) {
+				$uid = $user->getUID();
+				return $this->config->getUserValue($uid, Application::APP_ID, 'pdf_enable', 'false') === 'true';
+			}
+			return false;
+		});
+
+		$this->initialState->provideLazyInitialState('enableCbx', function () {
+			$user = $this->userSession->getUser();
+			if ($user !== null) {
+				$uid = $user->getUID();
+				return $this->config->getUserValue($uid, Application::APP_ID, 'cbx_enable', 'true') === 'true';
+			}
+			return true;
+		});
 	}
 }

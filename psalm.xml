@@ -60,6 +60,7 @@
         <directory name="nextcloud-server/apps/updatenotification"/>
         <directory name="nextcloud-server/apps/user_ldap"/>
         <directory name="nextcloud-server/apps/user_status"/>
+        <directory name="nextcloud-server/apps/viewer"/>
         <directory name="nextcloud-server/apps/weather_status"/>
         <directory name="nextcloud-server/apps/webhook_listeners"/>
         <directory name="nextcloud-server/apps/workflowengine"/>

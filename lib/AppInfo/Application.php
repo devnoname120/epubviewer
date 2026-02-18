@@ -6,8 +6,7 @@ namespace OCA\Epubviewer\AppInfo;
 
 use OCA\Epubviewer\Listener\BeforeTemplateRenderedListener;
 use OCA\Epubviewer\Listener\FileNodeDeletedListener;
-use OCA\Epubviewer\Listener\FilesLoadAdditionalScriptsListener;
-use OCA\Epubviewer\Listener\PublicShareBeforeTemplateRenderedListener;
+use OCA\Epubviewer\Listener\LoadViewerAndAdditionalScriptsListener;
 use OCA\Epubviewer\Listener\UserDeletedListener;
 
 use OCP\AppFramework\App;
@@ -57,11 +56,10 @@ class Application extends App implements IBootstrap {
 
 		// "This event is triggered when the files app is rendered. It can be used to add additional scripts to the files app."
 		// See: https://docs.nextcloud.com/server/latest/developer_manual/basics/events.html#oca-files-event-loadadditionalscriptsevent
-		$context->registerEventListener(\OCA\Files\Event\LoadAdditionalScriptsEvent::class, FilesLoadAdditionalScriptsListener::class);
+		$context->registerEventListener(\OCA\Files\Event\LoadAdditionalScriptsEvent::class, LoadViewerAndAdditionalScriptsListener::class);
 
-		// "Emitted before the rendering step of the public share page happens. The event holds a flag that specifies if it is the authentication page of a public share."
-		// See: https://docs.nextcloud.com/server/latest/developer_manual/basics/events.html#oca-files-sharing-event-beforetemplaterenderedevent
-		$context->registerEventListener(\OCA\Files_Sharing\Event\BeforeTemplateRenderedEvent::class, PublicShareBeforeTemplateRenderedListener::class);
+		// Viewer pages (including public shares) dispatch this event before rendering the viewer app.
+		$context->registerEventListener(\OCA\Viewer\Event\LoadViewer::class, LoadViewerAndAdditionalScriptsListener::class);
 
 		$context->registerEventListener(\OCP\Files\Events\Node\NodeDeletedEvent::class, FileNodeDeletedListener::class);
 		$context->registerEventListener(\OCP\User\Events\UserDeletedEvent::class, UserDeletedListener::class);
