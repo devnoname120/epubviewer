@@ -1,3 +1,17 @@
+## 1.9.1 - 2026-02-18
+
+### Added
+
+- Automated Nextcloud App Store publishing via GitHub Actions
+
+### Fixed
+
+- Removed unused `sabre/dav` and `sabre/xml` to fix spammy download warnings (see [GitHub discussion #40](https://github.com/devnoname120/epubviewer/discussions/40) and [Nextcloud forum report](https://help.nextcloud.com/t/php-warning-during-the-download-of-multiple-files/236252))
+
+### Changed
+
+- Removed unused dependencies: `symfony/event-dispatcher`, `@nextcloud/auth`, `@nextcloud/axios`, `@nextcloud/event-bus`, `@nextcloud/files`, `@nextcloud/l10n`, `@nextcloud/paths`, `@nextcloud/sharing`, `@nextcloud/vue`
+
 ## 1.9.0 - 2026-02-18
 
 ### Changed
