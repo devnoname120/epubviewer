@@ -1,6 +1,8 @@
 {
-  "extends": "@vue/tsconfig",
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "allowSyntheticDefaultImports": true,
     "declaration": true,
     "esModuleInterop": true,
@@ -10,8 +12,5 @@
     "plugins": [{ "name": "typescript-plugin-css-modules" }],
     "sourceMap": true
   },
-  "exclude": ["js", "lib", "node_modules", "vendor", "nextcloud-server", "nextcloud-docker-dev"],
-  "vueCompilerOptions": {
-    "target": 2.7
-  }
+  "exclude": ["js", "lib", "node_modules", "vendor", "nextcloud-server", "nextcloud-docker-dev"]
 }

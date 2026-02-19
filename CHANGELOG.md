@@ -11,10 +11,19 @@
 - Widened supported PHP range to 8.1-8.5.
 - Switched viewer script loading to `OCA\Viewer\Event\LoadViewer` only (removed `LoadAdditionalScriptsEvent` compatibility wiring).
 - Updated static analysis CI to validate both `stable32` and `stable33` with matching PHP versions.
+- Updated Composer dependencies:
+  - `mikespub/php-epub-meta` to `2.3.1` (latest PHP-8.1-compatible release)
+  - `phpunit/phpunit` to `10.5.63`
+  - `psalm/phar` kept on `5.26.1` (latest PHP-8.1-compatible major)
+- Modernized JS/tooling dependencies (Vite 7, ESLint 10, TypeScript 5.9, stylelint stack updates).
+- Switched to flat ESLint config (`eslint.config.js`) and removed legacy `.eslintrc.cjs` / `.eslintignore`.
+- Replaced vendored runtime jQuery with `3.7.1` and added a small legacy compatibility shim for old plugins.
 
 ### Fixed
 
 - Fixed Psalm CI path resolution by removing stale `nextcloud-server/apps/files_external/3rdparty` from `psalm.xml`.
+- Fixed `npm ci` / `make build` lockfile drift after tooling upgrades.
+- Fixed GitHub Actions lint warning in `lint-php-cs.yml` (shellcheck quoting issue).
 
 ## 1.9.1 - 2026-02-18
 

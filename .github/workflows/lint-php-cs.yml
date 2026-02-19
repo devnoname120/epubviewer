@@ -64,7 +64,7 @@ jobs:
         run: composer i
 
       - name: Lint
-        run: composer run cs:check || ( echo 'Please run `composer run cs:fix` to format your code' && exit 1 )
+        run: composer run cs:check || ( echo "Please run composer run cs:fix to format your code" && exit 1 )
 
   summary:
     permissions:

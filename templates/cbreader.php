@@ -48,6 +48,8 @@ $nonce = \OC::$server->getContentSecurityPolicyNonceManager()->getNonce();
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/epubjs/libs/jquery.min.js')) ?>?v=<?php p($version) ?>"></script>
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
+          src="<?php p($urlGenerator->linkTo('epubviewer', 'js/jquery/jquery-legacy-compat.js')) ?>?v=<?php p($version) ?>"></script>
+  <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/sindresorhus/screenfull.js')) ?>?v=<?php p($version) ?>"></script>
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/pixastic/pixastic_combined.js')) ?>?v=<?php p($version) ?>"></script>
