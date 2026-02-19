@@ -2,7 +2,9 @@
 
 ### Changed
 
-- Dropped support for Nextcloud 31 (Nextcloud 32 is now the only supported version).
+- Dropped support for Nextcloud 31.
+- Added support for Nextcloud 33 (supported Nextcloud versions are now 32 and 33).
+- Widened supported PHP range to 8.1-8.5.
 - Switched viewer script loading to `OCA\Viewer\Event\LoadViewer` only (removed `LoadAdditionalScriptsEvent` compatibility wiring).
 
 ## 1.9.1 - 2026-02-18

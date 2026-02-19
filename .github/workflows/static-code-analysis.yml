@@ -19,6 +19,10 @@ permissions:
 jobs:
   static-code-analysis:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        nc_ref: [stable32, stable33]
     steps:
       - name: Checkout epubviewer app
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -31,7 +35,7 @@ jobs:
         with:
           path: nextcloud-server
           repository: nextcloud/server
-          ref: stable32
+          ref: ${{ matrix.nc_ref }}
           submodules: true
           persist-credentials: false
 
@@ -40,7 +44,7 @@ jobs:
         with:
           path: nextcloud-server/apps/viewer
           repository: nextcloud/viewer
-          ref: stable32
+          ref: ${{ matrix.nc_ref }}
           submodules: true
           persist-credentials: false
 
@@ -70,6 +74,14 @@ jobs:
 
   static-code-analysis-security:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nc_ref: stable32
+            php_version: '8.1'
+          - nc_ref: stable33
+            php_version: '8.2'
 
     steps:
       - name: Checkout epubviewer app
@@ -83,7 +95,7 @@ jobs:
         with:
           path: nextcloud-server
           repository: nextcloud/server
-          ref: stable32
+          ref: ${{ matrix.nc_ref }}
           submodules: true
           persist-credentials: false
 
@@ -92,14 +104,14 @@ jobs:
         with:
           path: nextcloud-server/apps/viewer
           repository: nextcloud/viewer
-          ref: stable32
+          ref: ${{ matrix.nc_ref }}
           submodules: true
           persist-credentials: false
 
       - name: Set up php
         uses: shivammathur/setup-php@3209251719395a11279642c89c6fd159cdf5dc82 # main (21 commits after latest release (v2.32.0) at time of writing)
         with:
-          php-version: '8.1'
+          php-version: ${{ matrix.php_version }}
           extensions: ctype,curl,dom,fileinfo,ftp,gd,intl,json,ldap,mbstring,openssl,pdo_sqlite,posix,sqlite,xml,zip
           coverage: none
 
