@@ -71,8 +71,28 @@ const EpubViewerComponent: AsyncComponent = {
     },
   },
   methods: {
-    onLoad() {
+    focusFrame(frame: HTMLIFrameElement) {
+      if (!frame.isConnected) {
+        return;
+      }
+
+      if (!frame.hasAttribute('tabindex')) {
+        frame.setAttribute('tabindex', '-1');
+      }
+
+      // Keep keyboard navigation working immediately after opening the file.
+      // Without explicit focus, arrow keys are handled by the outer Viewer page.
+      frame.focus();
+      frame.contentWindow?.focus();
+    },
+    onLoad(event: Event) {
+      const frame = event.target instanceof HTMLIFrameElement ? event.target : null;
       this.$emit('update:loaded', true);
+
+      if (frame) {
+        // Defer once so Viewer post-load updates settle first.
+        window.setTimeout(() => this.focusFrame(frame), 0);
+      }
     },
   },
   render(h) {
@@ -80,6 +100,7 @@ const EpubViewerComponent: AsyncComponent = {
       attrs: {
         src: this.viewerUrl,
         title: 'EPUB viewer',
+        tabindex: '-1',
       },
       style: {
         width: '100%',
