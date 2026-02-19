@@ -1,4 +1,8 @@
-## Unreleased
+## 1.9.2 - 2026-02-19
+
+### Added
+
+- Added `make bump-version version=<X.Y.Z>` and `scripts/bump-version.sh` to automate version bumps and changelog boilerplate updates.
 
 ### Changed
 
@@ -6,6 +10,11 @@
 - Added support for Nextcloud 33 (supported Nextcloud versions are now 32 and 33).
 - Widened supported PHP range to 8.1-8.5.
 - Switched viewer script loading to `OCA\Viewer\Event\LoadViewer` only (removed `LoadAdditionalScriptsEvent` compatibility wiring).
+- Updated static analysis CI to validate both `stable32` and `stable33` with matching PHP versions.
+
+### Fixed
+
+- Fixed Psalm CI path resolution by removing stale `nextcloud-server/apps/files_external/3rdparty` from `psalm.xml`.
 
 ## 1.9.1 - 2026-02-18
 
