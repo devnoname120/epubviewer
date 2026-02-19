@@ -4,7 +4,7 @@
     "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
     "This file is @generated automatically"
   ],
-  "content-hash": "e777c6ab19d008c87949dc128beecdd8",
+  "content-hash": "526d6c7fe7700172b8b544c059e4b801",
   "packages": [
     {
       "name": "mikespub/php-epub-meta",
