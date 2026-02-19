@@ -1,3 +1,10 @@
+## Unreleased
+
+### Changed
+
+- Dropped support for Nextcloud 31 (Nextcloud 32 is now the only supported version).
+- Switched viewer script loading to `OCA\Viewer\Event\LoadViewer` only (removed `LoadAdditionalScriptsEvent` compatibility wiring).
+
 ## 1.9.1 - 2026-02-18
 
 ### Added

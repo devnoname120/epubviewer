@@ -29,7 +29,7 @@
 
         For example here is an error if you remove those:
 
-        ERROR: UndefinedClass - lib/Listener/FilesLoadAdditionalScriptsListener.php:26:27 - Class, interface or enum named OCA\Files\Event\LoadAdditionalScriptsEvent does not exist (see https://psalm.dev/019)
+        ERROR: UndefinedClass - lib/Listener/LoadViewerListener.php:22:13 - Class, interface or enum named OCA\Viewer\Event\LoadViewer does not exist (see https://psalm.dev/019)
         -->
         <directory name="nextcloud-server/3rdparty"/>
         <directory name="nextcloud-server/apps/files_external/3rdparty"/>

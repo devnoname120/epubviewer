@@ -4,23 +4,21 @@ declare(strict_types=1);
 
 namespace OCA\Epubviewer\Listener;
 
-use OCA\Files\Event\LoadAdditionalScriptsEvent;
 use OCA\Epubviewer\AppInfo\Application;
-use OCA\Viewer\Event\LoadViewer;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Util;
 
 /**
- * @template-implements IEventListener<Event>
+ * @template-implements IEventListener<\OCA\Viewer\Event\LoadViewer>
  */
-class LoadViewerAndAdditionalScriptsListener implements IEventListener {
+class LoadViewerListener implements IEventListener {
 
 	public function __construct() {
 	}
 
 	public function handle(Event $event): void {
-		/** @var LoadAdditionalScriptsEvent|LoadViewer $event */
+		/** @var \OCA\Viewer\Event\LoadViewer $event */
 
 		Util::addInitScript(Application::APP_ID, 'epubviewer-main');
 

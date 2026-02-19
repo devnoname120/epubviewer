@@ -6,7 +6,7 @@ namespace OCA\Epubviewer\AppInfo;
 
 use OCA\Epubviewer\Listener\BeforeTemplateRenderedListener;
 use OCA\Epubviewer\Listener\FileNodeDeletedListener;
-use OCA\Epubviewer\Listener\LoadViewerAndAdditionalScriptsListener;
+use OCA\Epubviewer\Listener\LoadViewerListener;
 use OCA\Epubviewer\Listener\UserDeletedListener;
 
 use OCP\AppFramework\App;
@@ -54,12 +54,8 @@ class Application extends App implements IBootstrap {
 		// See: https://docs.nextcloud.com/server/latest/developer_manual/basics/events.html#oca-settings-events-beforetemplaterenderedevent
 		$context->registerEventListener(\OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent::class, BeforeTemplateRenderedListener::class);
 
-		// "This event is triggered when the files app is rendered. It can be used to add additional scripts to the files app."
-		// See: https://docs.nextcloud.com/server/latest/developer_manual/basics/events.html#oca-files-event-loadadditionalscriptsevent
-		$context->registerEventListener(\OCA\Files\Event\LoadAdditionalScriptsEvent::class, LoadViewerAndAdditionalScriptsListener::class);
-
 		// Viewer pages (including public shares) dispatch this event before rendering the viewer app.
-		$context->registerEventListener(\OCA\Viewer\Event\LoadViewer::class, LoadViewerAndAdditionalScriptsListener::class);
+		$context->registerEventListener(\OCA\Viewer\Event\LoadViewer::class, LoadViewerListener::class);
 
 		$context->registerEventListener(\OCP\Files\Events\Node\NodeDeletedEvent::class, FileNodeDeletedListener::class);
 		$context->registerEventListener(\OCP\User\Events\UserDeletedEvent::class, UserDeletedListener::class);
