@@ -167,7 +167,10 @@ PDFJS.reader.TocController = function() {
         page_rotation = page.rotate;
         rotation = (page_rotation + reader.settings.rotation) % 360;
 
-        viewport = page.getViewport(1, rotation);
+        viewport = page.getViewport({
+            scale: 1,
+            rotation: rotation
+        });
 
         width = viewport.width;
         height = viewport.height;

@@ -56,8 +56,6 @@ $nonce = \OC::$server->getContentSecurityPolicyNonceManager()->getNonce();
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/jquery/jquery-legacy-compat.js')) ?>?v=<?php p($version) ?>"></script>
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
-          src="<?php p($urlGenerator->linkTo('epubviewer', 'js/pdfjs/lib/pdf.worker.js')) ?>?v=<?php p($version) ?>"></script>
-  <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/bartaz/jquery.highlight.js')) ?>?v=<?php p($version) ?>"></script>
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/jquery/put-delete.js')) ?>?v=<?php p($version) ?>"></script>
@@ -65,6 +63,8 @@ $nonce = \OC::$server->getContentSecurityPolicyNonceManager()->getNonce();
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/sindresorhus/screenfull.js')) ?>?v=<?php p($version) ?>"></script>
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/pdfjs/lib/pdf.js')) ?>?v=<?php p($version) ?>"></script>
+  <script type="text/javascript" nonce="<?php p($nonce) ?>"
+          src="<?php p($urlGenerator->linkTo('epubviewer', 'js/pdfjs/lib/pdf-compat.js')) ?>?v=<?php p($version) ?>"></script>
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/pdfjs/pdf.reader.js')) ?>?v=<?php p($version) ?>"></script>
   <script type="text/javascript" nonce="<?php p($nonce) ?>"

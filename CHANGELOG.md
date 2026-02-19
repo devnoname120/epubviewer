@@ -18,6 +18,7 @@
 - Modernized JS/tooling dependencies (Vite 7, ESLint 10, TypeScript 5.9, stylelint stack updates).
 - Switched to flat ESLint config (`eslint.config.js`) and removed legacy `.eslintrc.cjs` / `.eslintignore`.
 - Replaced vendored runtime jQuery with `3.7.1` and added a small legacy compatibility shim for old plugins.
+- Upgraded vendored PDF.js runtime/worker to `4.10.38` and adapted the legacy reader integration layer (worker wiring + compatibility shims) to keep existing PDF UX.
 
 ### Fixed
 

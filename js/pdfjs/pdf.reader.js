@@ -219,7 +219,7 @@ PDFJS.Reader = function(bookPath, _options) {
         reader.ProgressController.setProgress(progress);
     };
 
-	loadingTask.then(
+	loadingTask.promise.then(
 
 		function(_book) {
 			reader.book = book = _book;
@@ -468,7 +468,10 @@ PDFJS.Reader.prototype.getThumb = function (pageNum, insert) {
         reader.book.getPage(parseInt(pageNum)).then(function(page) {
             page_rotation = page.rotate;
             rotation = (page_rotation + reader.settings.rotation) % 360;
-            initial_viewport = page.getViewport(1, rotation);
+            initial_viewport = page.getViewport({
+                scale: 1,
+                rotation: rotation
+            });
             canvas = document.createElement("canvas");
             ctx = canvas.getContext("2d");
             outputscale = reader.getOutputScale(ctx);
@@ -693,7 +696,10 @@ PDFJS.Reader.prototype.renderPage = function(pageNum) {
             });
             page_rotation = page.rotate;
             rotation = (page_rotation + reader.settings.rotation) % 360;
-            initial_viewport = page.getViewport(1, rotation);
+            initial_viewport = page.getViewport({
+                scale: 1,
+                rotation: rotation
+            });
             page_width = initial_viewport.width;
             page_height = initial_viewport.height;
 
@@ -1293,5 +1299,3 @@ PDFJS.Reader.prototype.refreshStyles = function (callback) {
 
     if (callback) callback();
 };
-
-

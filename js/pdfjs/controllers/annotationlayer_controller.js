@@ -6,6 +6,7 @@ PDFJS.Reader.AnnotationLayerController = function (options, reader) {
     this.renderInteractiveForms = options.renderInteractiveForms;
     this.linkService = options.linkService;
     this.downloadManager = options.downloadManager;
+    this.annotationLayer = null;
 
     this.div = null;
 
@@ -20,32 +21,29 @@ PDFJS.Reader.AnnotationLayerController.prototype.render = function (viewport, in
 
 	this.pdfPage.getAnnotations(parameters).then(function (annotations) {
 		viewport = viewport.clone({ dontFlip: true });
-		parameters = {
-			viewport: viewport,
+		if (self.annotationLayer) {
+			self.annotationLayer.update({ viewport: viewport });
+			return;
+		}
+
+		// Create an annotation layer div and render only when there is content.
+		if (annotations.length === 0) {
+			return;
+		}
+
+		self.div = self.annotationDiv;
+		self.annotationLayer = new PDFJS.AnnotationLayer({
 			div: self.div,
-			annotations: annotations,
 			page: self.pdfPage,
-			renderInteractiveForms: self.renderInteractiveForms,
+			viewport: viewport,
+		});
+
+		self.annotationLayer.render({
+			annotations: annotations,
 			linkService: self.linkService,
 			downloadManager: self.downloadManager,
-		};
-
-		if (self.div) {
-			// If an annotationLayer already exists, refresh its children's
-			// transformation matrices.
-			PDFJS.AnnotationLayer.update(parameters);
-		} else {
-			// Create an annotation layer div and render the annotations
-			// if there is at least one annotation.
-			if (annotations.length === 0) {
-				return;
-			} 
-
-            self.div = self.annotationDiv;
-			parameters.div = self.div;
-
-			PDFJS.AnnotationLayer.render(parameters);
-		}
+			renderForms: self.renderInteractiveForms,
+		});
 	});
 };
 

@@ -48,6 +48,9 @@ PDFJS.Reader.TextLayerController.prototype.render = function(timeout) {
     }
     this.cancel();
 
+    // Required by modern pdf.js text-layer layout code.
+    this.textLayerDiv.style.setProperty('--scale-factor', this.viewport.scale);
+
     this.textDivs = [];
     var textLayerFrag = document.createDocumentFragment();
     this.textLayerRenderTask = PDFJS.renderTextLayer({
@@ -342,4 +345,3 @@ PDFJS.Reader.TextLayerController.prototype._bindMouse = function () {
         end.classList.remove('active');
     });
 };
-

@@ -12,6 +12,21 @@ PDFJS.Reader.LinkService = function (options, reader) {
     return this;
 };
 
+function parseQueryString(query) {
+    var params = Object.create(null);
+    var searchParams = new URLSearchParams(query);
+
+    searchParams.forEach(function (value, key) {
+        params[key.toLowerCase()] = value;
+    });
+
+    return params;
+}
+
+function isPageNumber(value) {
+    return /^\d+$/.test(value);
+}
+
 Object.defineProperties(PDFJS.Reader.LinkService, {
     'pagesCount': {
         get: function () { return this.pdfDocument ? this.pdfDocument.numPages : 0; }
