@@ -154,10 +154,11 @@ PDFJS.Reader = function(bookPath, _options) {
         }
     ];
 
-    // list of pages in the render queue which should be discarded
-    this.cancelPage = {};
-
-    this.renderQueue = false;
+    // FIFO render queue to avoid key-repeat starvation.
+    this.renderQueue = [];
+    this.renderQueueRunning = false;
+    this.renderQueuePendingPages = {};
+    this.renderQueuePendingCount = 0;
 
     // used for search, textlayer, hightlight etc
     this.pageContents = [];
@@ -578,7 +579,7 @@ PDFJS.Reader.prototype.cancelRender = function (index) {
     }
 };
 
-PDFJS.Reader.prototype.renderPage = function(pageNum) {
+PDFJS.Reader.prototype.renderPage = function(pageNum, onSettled) {
 
     var reader = this,
         $viewer = $("#viewer");
@@ -615,7 +616,19 @@ PDFJS.Reader.prototype.renderPage = function(pageNum) {
         double_buffer,
         cache_next,
         scroll_to_top,
-        pageShift;
+        pageShift,
+        settled = false;
+
+    function settleRenderQueue() {
+        if (settled) {
+            return;
+        }
+
+        settled = true;
+        if (typeof onSettled === "function") {
+            onSettled(pageNum);
+        }
+    }
 
     max_view_width = window.innerWidth;
     max_view_height = window.innerHeight;
@@ -686,9 +699,6 @@ PDFJS.Reader.prototype.renderPage = function(pageNum) {
         }
 
         resourcelst.pageNum = pageNum;
-
-        if (reader.cancelPage[pageNum])
-            delete reader.cancelPage[pageNum];
 
         this.book.getPage(pageNum).then(function(page) {
             page.getAnnotations().then(function (annotations) {
@@ -854,8 +864,10 @@ PDFJS.Reader.prototype.renderPage = function(pageNum) {
             resourcelst.renderTask = renderTask = page.render(renderContext);
 
             renderTask.promise.then(
-                function pdfPageRenderCallback (something) {
-                    if (reader.cancelPage[pageNum] === undefined) { 
+                function pdfPageRenderCallback () {
+                    resourcelst.renderTask = null;
+
+                    try {
                         if (scroll_to_top)
                             document.getElementById('viewer').scrollTo(0,0);
                         if (double_buffer)
@@ -865,15 +877,39 @@ PDFJS.Reader.prototype.renderPage = function(pageNum) {
                         if (cache_next)
                             reader.getThumb(parseInt(pageNum + pageShift), true);
                         reader.eventBus.dispatch("renderer:pagechanged", {
-                            source: this,
+                            source: reader,
                             pageNum: pageNum
                         });
-                    } 
+                    } catch (error) {
+                        console.log("pdfPageRenderCallback error: " + error);
+                        reader.eventBus.dispatch("renderer:pageerror", {
+                            source: reader,
+                            pageNum: pageNum,
+                            error: error
+                        });
+                    } finally {
+                        settleRenderQueue();
+                    }
                 },
                 function pdfPageRenderError(error) {
+                    resourcelst.renderTask = null;
                     console.log("pdfPageRenderError: " + error);
+                    reader.eventBus.dispatch("renderer:pageerror", {
+                        source: reader,
+                        pageNum: pageNum,
+                        error: error
+                    });
+                    settleRenderQueue();
                 }
             );
+        }).catch(function (error) {
+            console.log("getPage error: " + error);
+            reader.eventBus.dispatch("renderer:pageerror", {
+                source: reader,
+                pageNum: pageNum,
+                error: error
+            });
+            settleRenderQueue();
         });
 
     } else {
@@ -884,18 +920,18 @@ PDFJS.Reader.prototype.renderPage = function(pageNum) {
         canvas.height = reader.roundToDivide(max_view_height * outputscale, fraction[0]);
         if (outputscale !== 1) {
             canvas.style.width = reader.roundToDivide(max_view_width, fraction[1]) + 'px';
-            canvas.style.height = reader.roundToDivide(max_view_height, fraction[1]) + 'px';
+        canvas.style.height = reader.roundToDivide(max_view_height, fraction[1]) + 'px';
         }
         // reset pageNum
         resourcelst.pageNum = null;
+        settleRenderQueue();
     }
 };
 
-PDFJS.Reader.prototype.queuePage = function(page) {
-    
-    var reader = this,
-        zoom = reader.settings.zoomLevel,
-        oddPageRight = reader.settings.oddPageRight,
+PDFJS.Reader.prototype.normalizeQueuedPage = function(page) {
+
+    var zoom = this.settings.zoomLevel,
+        oddPageRight = this.settings.oddPageRight,
         pageShift;
 
     if (page < 1)
@@ -915,27 +951,92 @@ PDFJS.Reader.prototype.queuePage = function(page) {
         pageShift = 1;
     }
 
-    reader.settings.currentPage = page;
+    return {
+        page: page,
+        pageShift: pageShift
+    };
+};
 
-    reader.ControlsController.setCurrentPage(page);
-    reader.settings.session.setCursor(page);
-
-    if (typeof reader.renderQueue === 'number') {
-        window.clearTimeout(reader.renderQueue);
-        reader.renderQueue = false;
+PDFJS.Reader.prototype.scheduleRenderQueue = function() {
+    if (this.renderQueueRunning || this.renderQueue.length === 0) {
+        return;
     }
 
-    reader.renderQueue = window.setTimeout(function queuePages() {
-        for (var i = 0; i < pageShift; i++) {
-            reader.renderPage(page + i);
+    this.startNextRenderQueueItem();
+};
+
+PDFJS.Reader.prototype.startNextRenderQueueItem = function() {
+
+    var nextItem, i, pageNum;
+
+    if (this.renderQueueRunning || this.renderQueue.length === 0) {
+        return;
+    }
+
+    nextItem = this.renderQueue.shift();
+    this.renderQueueRunning = true;
+    this.renderQueuePendingPages = {};
+    this.renderQueuePendingCount = 0;
+
+    for (i = 0; i < nextItem.pageShift; i++) {
+        pageNum = nextItem.page + i;
+
+        if (pageNum < 1 || pageNum > this.settings.numPages) {
+            continue;
         }
-    }, reader.settings.pageRenderDelay);
+
+        if (this.renderQueuePendingPages[pageNum] === true) {
+            continue;
+        }
+
+        this.renderQueuePendingPages[pageNum] = true;
+        this.renderQueuePendingCount++;
+        this.renderPage(pageNum, this.handleRenderQueuePageSettled.bind(this, pageNum));
+    }
+
+    if (this.renderQueuePendingCount === 0) {
+        this.renderQueueRunning = false;
+        this.scheduleRenderQueue();
+    }
+};
+
+PDFJS.Reader.prototype.handleRenderQueuePageSettled = function(pageNum) {
+    if (!this.renderQueueRunning) {
+        return;
+    }
+
+    if (this.renderQueuePendingPages[pageNum] !== true) {
+        return;
+    }
+
+    delete this.renderQueuePendingPages[pageNum];
+    this.renderQueuePendingCount--;
+
+    if (this.renderQueuePendingCount <= 0) {
+        this.renderQueueRunning = false;
+        this.renderQueuePendingPages = {};
+        this.renderQueuePendingCount = 0;
+        this.scheduleRenderQueue();
+    }
+};
+
+PDFJS.Reader.prototype.queuePage = function(page) {
+
+    var normalized = this.normalizeQueuedPage(page);
+
+    this.settings.currentPage = normalized.page;
+    this.ControlsController.setCurrentPage(normalized.page);
+    this.settings.session.setCursor(normalized.page);
+
+    this.renderQueue.push({
+        page: normalized.page,
+        pageShift: normalized.pageShift
+    });
+
+    this.scheduleRenderQueue();
 };
 
 PDFJS.Reader.prototype.prevPage = function() {
-
-    var reader = this;
-
 	var pageShift = (this.settings.zoomLevel === "spread") ? 2 : 1;
 
     var oddPageShift = this.settings.oddPageRight ? 0 : 1;
@@ -943,25 +1044,16 @@ PDFJS.Reader.prototype.prevPage = function() {
     if (this.settings.currentPage - pageShift < oddPageShift) {
         return;
     } else {
-        for (var i = 0; i < pageShift; i++) {
-            reader.cancelPage[this.settings.currentPage - i] = true;
-        }
         this.queuePage(this.settings.currentPage - pageShift);
     }
 };
 
 PDFJS.Reader.prototype.nextPage = function() {
-
-    var reader = this;
-
 	var pageShift = (this.settings.zoomLevel === "spread") ? 2 : 1;
 
     if (this.settings.currentPage + pageShift > this.settings.numPages) {
         return;
     } else {
-        for (var i = 0; i < pageShift; i++) {
-            reader.cancelPage[this.settings.currentPage + i] = true;
-        }
         this.queuePage(this.settings.currentPage + pageShift);
     }
 };

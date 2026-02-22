@@ -12,7 +12,7 @@ $defaults = $_['defaults'];
 $preferences = $_['preferences'];
 $annotations = $_['annotations'];
 $title = htmlentities(basename($downloadLink));
-$revision = '0130';
+$revision = '0134';
 $version = OC::$server->getAppManager()->getAppVersion('epubviewer') . '.' . $revision;
 
 /* Mobile safari, the new IE6 */
