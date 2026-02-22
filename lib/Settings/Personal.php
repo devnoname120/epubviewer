@@ -2,15 +2,16 @@
 
 namespace OCA\Epubviewer\Settings;
 
+use OCA\Epubviewer\AppInfo\Application;
 use OCP\AppFramework\Http\TemplateResponse;
-use OCP\IConfig;
+use OCP\Config\IUserConfig;
 use OCP\Settings\ISettings;
 
 class Personal implements ISettings {
 
 	public function __construct(
 		private string $userId,
-		private IConfig $configManager,
+		private IUserConfig $configManager,
 	) {
 	}
 
@@ -21,9 +22,9 @@ class Personal implements ISettings {
 	public function getForm() {
 
 		$parameters = [
-			'EpubEnable' => $this->configManager->getUserValue($this->userId, 'epubviewer', 'epub_enable', 'true'),
-			'PdfEnable' => $this->configManager->getUserValue($this->userId, 'epubviewer', 'pdf_enable', 'false'),
-			'CbxEnable' => $this->configManager->getUserValue($this->userId, 'epubviewer', 'cbx_enable', 'true'),
+			'EpubEnable' => $this->configManager->getValueString($this->userId, Application::APP_ID, 'epub_enable', 'true'),
+			'PdfEnable' => $this->configManager->getValueString($this->userId, Application::APP_ID, 'pdf_enable', 'false'),
+			'CbxEnable' => $this->configManager->getValueString($this->userId, Application::APP_ID, 'cbx_enable', 'true'),
 		];
 		return new TemplateResponse('epubviewer', 'settings-personal', $parameters, '');
 	}

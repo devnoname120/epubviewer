@@ -3,8 +3,8 @@
 namespace OCA\Epubviewer;
 
 use OCA\Epubviewer\AppInfo\Application;
+use OCP\Config\IUserConfig;
 use OCP\IAppConfig;
-use OCP\IConfig;
 use OCP\IUserSession;
 
 /**
@@ -12,7 +12,7 @@ use OCP\IUserSession;
  */
 class Config {
 	public function __construct(
-		private IConfig $config,
+		private IUserConfig $config,
 		private IAppConfig $appConfig,
 		private IUserSession $userSession
 	) {
@@ -30,7 +30,7 @@ class Config {
 		if (!$user) {
 			return $default;
 		}
-		return $this->config->getUserValue($user->getUID(), Application::APP_ID, $key, $default);
+		return $this->config->getValueString($user->getUID(), Application::APP_ID, $key, $default);
 	}
 
 	/**
@@ -44,7 +44,7 @@ class Config {
 		if (!$user) {
 			return;
 		}
-		$this->config->setUserValue($user->getUID(), Application::APP_ID, $key, $value);
+		$this->config->setValueString($user->getUID(), Application::APP_ID, $key, $value);
 	}
 
 	/**
