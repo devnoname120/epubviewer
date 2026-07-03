@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OCA\Epubviewer\Migration;
 
 use Closure;
-use OC;
 use OCP\DB\ISchemaWrapper;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;

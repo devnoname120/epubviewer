@@ -54,7 +54,7 @@ See [README] for more exhaustive information on features and potential misfeatur
     </screenshot>
     <dependencies>
         <php min-version="8.2" max-version="8.5" />
-        <nextcloud min-version="33" max-version="34" />
+        <nextcloud min-version="33" max-version="35" />
     </dependencies>
     <namespace>Epubviewer</namespace>
     <settings>

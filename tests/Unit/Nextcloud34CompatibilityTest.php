@@ -70,6 +70,33 @@ class Nextcloud34CompatibilityTest extends TestCase {
 		self::assertStringNotContainsString('$_[\'version\']', $contents);
 	}
 
+	public function testAppDoesNotUseDeprecatedUserIdContainerAlias(): void {
+		$contents = file_get_contents($this->repoRoot() . '/lib/AppInfo/Application.php');
+		self::assertIsString($contents);
+
+		self::assertStringNotContainsString('$c->get(\'UserId\')', $contents);
+		self::assertStringContainsString('$c->get(\'userId\')', $contents);
+	}
+
+	public function testAppDoesNotImportBarePrivateOcNamespace(): void {
+		$matches = [];
+
+		foreach ($this->appPhpFiles() as $file) {
+			$contents = file_get_contents($file->getPathname());
+			self::assertIsString($contents);
+
+			if (preg_match('/^use\s+OC;\s*$/m', $contents) === 1) {
+				$matches[] = $this->relativePath($file);
+			}
+		}
+
+		self::assertSame(
+			[],
+			$matches,
+			'Bare private OC namespace imports should be removed. Offending files: ' . implode(', ', $matches),
+		);
+	}
+
 	/**
 	 * @return iterable<SplFileInfo>
 	 */

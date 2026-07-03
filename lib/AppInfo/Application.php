@@ -27,7 +27,7 @@ class Application extends App implements IBootstrap {
 
 		// Register services
 		$context->registerService(\OCA\Epubviewer\Service\BookmarkService::class, function($c) {
-			$userId = $c->get('UserId');
+			$userId = $c->get('userId');
 			if ($userId === null) {
 				return null;
 			}
@@ -38,7 +38,7 @@ class Application extends App implements IBootstrap {
 		});
 
 		$context->registerService(\OCA\Epubviewer\Service\PreferenceService::class, function($c) {
-			$userId = $c->get('UserId');
+			$userId = $c->get('userId');
 			if ($userId === null) {
 				return null;
 			}
