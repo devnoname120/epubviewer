@@ -13,15 +13,13 @@ $preferences = $_['preferences'];
 $annotations = $_['annotations'];
 $title = htmlentities(basename($downloadLink));
 $revision = '0048';
-$version = OC::$server->getAppManager()->getAppVersion('epubviewer') . '.' . $revision;
+$version = $_['appVersion'] . '.' . $revision;
+$nonce = $_['nonce'];
 
 /* Mobile safari, the new IE6 */
 $idevice = (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone')
 	|| strstr($_SERVER['HTTP_USER_AGENT'], 'iPad')
 	|| strstr($_SERVER['HTTP_USER_AGENT'], 'iPod'));
-
-/* Get the content security policy nonce */
-$nonce = \OC::$server->getContentSecurityPolicyNonceManager()->getNonce();
 ?>
 
 <html dir="ltr">

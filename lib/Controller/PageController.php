@@ -6,6 +6,7 @@ namespace OCA\Epubviewer\Controller;
 
 use OCA\Epubviewer\Service\BookmarkService;
 use OCA\Epubviewer\Service\PreferenceService;
+use OCA\Epubviewer\Service\ReaderTemplateContext;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\PublicPage;
@@ -18,13 +19,12 @@ use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IRequest;
 use OCP\IURLGenerator;
+use OCP\Share\Exceptions\ShareNotFound;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
-use OCP\Share\Exceptions\ShareNotFound;
 use function pathinfo;
 
 class PageController extends Controller {
-
 	/**
 	 * @param string $appName
 	 * @param IRequest $request
@@ -41,6 +41,7 @@ class PageController extends Controller {
 		private IURLGenerator $urlGenerator,
 		private IRootFolder $rootFolder,
 		private IManager $shareManager,
+		private ReaderTemplateContext $readerTemplateContext,
 		private ?string $userId,
 		private ?BookmarkService $bookmarkService,
 		private ?PreferenceService $preferenceService,
@@ -83,11 +84,11 @@ class PageController extends Controller {
 
 		if ($this->userId !== null) {
 			$cursor = $this->bookmarkService->getCursor($fileInfo['fileId']);
-			$defaults  = $this->preferenceService->getDefault($scope);
+			$defaults = $this->preferenceService->getDefault($scope);
 			$preferences = $this->preferenceService->get($scope, (int)$fileInfo['fileId']);
 			$annotations = $this->bookmarkService->get((int)$fileInfo['fileId']);
 		}
-		
+
 		$params = [
 			'urlGenerator' => $this->urlGenerator,
 			'downloadLink' => $file,
@@ -98,7 +99,9 @@ class PageController extends Controller {
 			'cursor' => $cursor ? $this->toJson($cursor) : null,
 			'defaults' => $defaults ? $this->toJson($defaults) : null,
 			'preferences' => $preferences ? $this->toJson($preferences) : null,
-			'annotations' => $annotations ? $this->toJson($annotations) : null
+			'annotations' => $annotations ? $this->toJson($annotations) : null,
+			'appVersion' => $this->readerTemplateContext->getAppVersion(),
+			'nonce' => $this->readerTemplateContext->getNonce(),
 		];
 
 		$policy = new ContentSecurityPolicy();

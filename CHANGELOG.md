@@ -4,6 +4,10 @@
 
 - Added support for Nextcloud 34.
 
+### Fixed
+
+- Fixed reader template compatibility with Nextcloud 34 by avoiding removed `OC\Server` getter methods.
+
 ### Changed
 
 - Dropped support for Nextcloud 32.
