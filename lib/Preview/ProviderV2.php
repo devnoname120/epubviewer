@@ -3,7 +3,7 @@
 // Maintainer's note:
 // ---
 // This file is a copy-paste from the nextcloud/server repository, moved to the OCA namespace, because we need it, but it's in the private \OC\Preview namespace.
-// https://github.com/nextcloud/server/blob/64208b6d2273269cd51bb6e4a7aa939a144bc93c/lib/private/Preview/ProviderV2.php
+// https://github.com/nextcloud/server/blob/0e070bb5bb2e5370d57d82143a792c02f009f69b/lib/private/Preview/ProviderV2.php
 // ---
 
 declare(strict_types=1);
@@ -34,6 +34,7 @@ abstract class ProviderV2 implements IProviderV2 {
 	/**
 	 * @return string Regex with the mimetypes that are supported by this provider
 	 */
+	#[\Override]
 	abstract public function getMimeType(): string ;
 
 	/**
@@ -42,6 +43,7 @@ abstract class ProviderV2 implements IProviderV2 {
 	 * @param FileInfo $file
 	 * @return bool
 	 */
+	#[\Override]
 	public function isAvailable(FileInfo $file): bool {
 		return true;
 	}
@@ -55,6 +57,7 @@ abstract class ProviderV2 implements IProviderV2 {
 	 * @return null|IImage null if no preview was generated
 	 * @since 17.0.0
 	 */
+	#[\Override]
 	abstract public function getThumbnail(File $file, int $maxX, int $maxY): ?IImage;
 
 	protected function useTempFile(File $file): bool {
