@@ -16,7 +16,7 @@
 - Dropped support for Nextcloud 32.
 - Supported Nextcloud versions are now 33, 34, and 35.
 - Updated supported PHP range to 8.2-8.5.
-- Updated static analysis CI to validate `stable33`, `stable34`, and `stable35` with matching PHP versions.
+- Updated static analysis CI to validate `stable33` and `stable34` with matching PHP versions.
 - Updated PHP CS lint CI to use the app's supported PHP 8.2 minimum.
 - Removed the personal settings page's dependency on global jQuery.
 

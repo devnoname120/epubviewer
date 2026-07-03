@@ -115,7 +115,7 @@ class PageController extends Controller {
 		$policy->addAllowedImageDomain('blob:');
 		$policy->addAllowedWorkerSrcDomain('\'self\'');
 
-		$response = new TemplateResponse($this->appName, $template, $params, 'blank');
+		$response = new TemplateResponse($this->appName, $template, $params, TemplateResponse::RENDER_AS_BLANK);
 		$response->setContentSecurityPolicy($policy);
 
 		return $response;

@@ -70,6 +70,14 @@ class Nextcloud34CompatibilityTest extends TestCase {
 		self::assertStringNotContainsString('$_[\'version\']', $contents);
 	}
 
+	public function testReaderTemplateResponseUsesPublicBlankRenderConstant(): void {
+		$contents = file_get_contents($this->repoRoot() . '/lib/Controller/PageController.php');
+		self::assertIsString($contents);
+
+		self::assertStringContainsString('TemplateResponse::RENDER_AS_BLANK', $contents);
+		self::assertStringNotContainsString(', \'blank\')', $contents);
+	}
+
 	public function testAppDoesNotUseDeprecatedUserIdContainerAlias(): void {
 		$contents = file_get_contents($this->repoRoot() . '/lib/AppInfo/Application.php');
 		self::assertIsString($contents);

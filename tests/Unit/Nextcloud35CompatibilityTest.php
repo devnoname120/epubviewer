@@ -18,13 +18,13 @@ class Nextcloud35CompatibilityTest extends TestCase {
 		self::assertSame('8.5', (string)$dependencies->php['max-version']);
 	}
 
-	public function testStaticAnalysisRunsAgainstNextcloud35(): void {
+	public function testStaticAnalysisUsesOnlyExistingNextcloudBranches(): void {
 		$workflow = file_get_contents($this->repoRoot() . '/.github/workflows/static-code-analysis.yml');
 		self::assertIsString($workflow);
 
 		self::assertMatchesRegularExpression('/nc_ref:\s+stable33\s+php_version:\s+\'8\.2\'/s', $workflow);
 		self::assertMatchesRegularExpression('/nc_ref:\s+stable34\s+php_version:\s+\'8\.2\'/s', $workflow);
-		self::assertMatchesRegularExpression('/nc_ref:\s+stable35\s+php_version:\s+\'8\.3\'/s', $workflow);
+		self::assertStringNotContainsString('stable35', $workflow);
 		self::assertStringContainsString('php-version: ${{ matrix.php_version }}', $workflow);
 	}
 
