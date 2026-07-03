@@ -53,8 +53,8 @@ See [README] for more exhaustive information on features and potential misfeatur
         https://github.com/devnoname120/epubviewer/blob/master/screenshots/photo_2017-03-15_17-22-02.jpg?raw=true
     </screenshot>
     <dependencies>
-        <php min-version="8.1" max-version="8.5" />
-        <nextcloud min-version="32" max-version="33" />
+        <php min-version="8.2" max-version="8.5" />
+        <nextcloud min-version="33" max-version="34" />
     </dependencies>
     <namespace>Epubviewer</namespace>
     <settings>

@@ -1,3 +1,17 @@
+## 1.9.3 - 2026-07-03
+
+### Added
+
+- Added support for Nextcloud 34.
+
+### Changed
+
+- Dropped support for Nextcloud 32.
+- Supported Nextcloud versions are now 33 and 34.
+- Updated supported PHP range to 8.2-8.5.
+- Updated static analysis CI to validate both `stable33` and `stable34` with matching PHP versions.
+- Removed the personal settings page's dependency on global jQuery.
+
 ## 1.9.2 - 2026-02-19
 
 ### Added
