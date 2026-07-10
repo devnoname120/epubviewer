@@ -5,6 +5,7 @@ declare(strict_types=1);
 return ['routes' => [
 	// Page
 	['name' => 'page#showReader', 'url' => '/', 'verb' => 'GET'],
+	['name' => 'public_reader#showReader', 'url' => '/public/{token}', 'verb' => 'GET'],
 
 	// Bookmarks
 	['name' => 'bookmark#get_cursor', 'url' => '/bookmark/cursor/{fileId}', 'verb' => 'GET'],

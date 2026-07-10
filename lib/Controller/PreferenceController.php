@@ -16,10 +16,12 @@ class PreferenceController extends Controller {
 	 * @param IRequest $request
 	 * @param ?PreferenceService $preferenceService
 	 */
-	public function __construct($appName,
+	public function __construct(
+		$appName,
 		IRequest $request,
 		private ?PreferenceService $preferenceService,
-		private ?string $userId) {
+		private ?string $userId,
+	) {
 
 		parent::__construct($appName, $request);
 	}
@@ -47,7 +49,6 @@ class PreferenceController extends Controller {
 	 * @param string $value
 	 */
 	#[NoAdminRequired]
-	#[NoCSRFRequired]
 	public function set(string $scope, int $fileId, string $name, string $value): void {
 		if ($this->userId === null) {
 			return;
@@ -79,7 +80,6 @@ class PreferenceController extends Controller {
 	 * @param string $value
 	 */
 	#[NoAdminRequired]
-	#[NoCSRFRequired]
 	public function setDefault(string $scope, string $name, string $value): void {
 		if ($this->userId === null) {
 			return;
@@ -95,6 +95,7 @@ class PreferenceController extends Controller {
 	 * @param int $fileId
 	 * @param string $name
 	 */
+	#[NoAdminRequired]
 	public function delete(string $scope, int $fileId, string $name): void {
 		if ($this->userId === null) {
 			return;
@@ -108,6 +109,7 @@ class PreferenceController extends Controller {
 	 * @param $scope
 	 * @param $name
 	 */
+	#[NoAdminRequired]
 	public function deleteDefault(string $scope, string $name): void {
 		if ($this->userId === null) {
 			return;

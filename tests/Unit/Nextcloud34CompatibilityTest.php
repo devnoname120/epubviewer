@@ -52,9 +52,9 @@ class Nextcloud34CompatibilityTest extends TestCase {
 	 */
 	public static function readerTemplateRevisionProvider(): array {
 		return [
-			'comic book reader' => ['templates/cbreader.php', '0048'],
-			'epub reader' => ['templates/epubviewer.php', '0072'],
-			'pdf reader' => ['templates/pdfreader.php', '0134'],
+			'comic book reader' => ['templates/cbreader.php', '0049'],
+			'epub reader' => ['templates/epubviewer.php', '0073'],
+			'pdf reader' => ['templates/pdfreader.php', '0135'],
 		];
 	}
 
@@ -71,7 +71,7 @@ class Nextcloud34CompatibilityTest extends TestCase {
 	}
 
 	public function testReaderTemplateResponseUsesPublicBlankRenderConstant(): void {
-		$contents = file_get_contents($this->repoRoot() . '/lib/Controller/PageController.php');
+		$contents = file_get_contents($this->repoRoot() . '/lib/Service/ReaderResponseBuilder.php');
 		self::assertIsString($contents);
 
 		self::assertStringContainsString('TemplateResponse::RENDER_AS_BLANK', $contents);

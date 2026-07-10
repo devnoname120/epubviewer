@@ -22,6 +22,48 @@ const viewerMimes = [
   ...cbxMimes,
 ];
 
+function getPublicShareToken(fileUrl: string): string | null {
+  let path: string;
+  try {
+    path = new URL(fileUrl, window.location.origin).pathname;
+  } catch {
+    return null;
+  }
+
+  const segments = path.split('/').filter((segment) => segment !== '');
+  const publicDavStart = segments.findIndex(
+    (segment, index) =>
+      segment === 'public.php' &&
+      segments[index + 1] === 'dav' &&
+      segments[index + 2] === 'files',
+  );
+
+  if (publicDavStart === -1) {
+    return null;
+  }
+
+  const userDavStart = segments.findIndex(
+    (segment, index) =>
+      segment === 'remote.php' &&
+      segments[index + 1] === 'dav' &&
+      segments[index + 2] === 'files',
+  );
+  if (userDavStart !== -1 && userDavStart < publicDavStart) {
+    return null;
+  }
+
+  const encodedToken = segments[publicDavStart + 3];
+  if (!encodedToken) {
+    return null;
+  }
+
+  try {
+    return decodeURIComponent(encodedToken);
+  } catch {
+    return null;
+  }
+}
+
 const EpubViewerComponent: AsyncComponent = {
   name: 'EpubViewerComponent',
   props: {
@@ -63,9 +105,21 @@ const EpubViewerComponent: AsyncComponent = {
       throw new Error('No usable file URL for epubviewer handler');
     },
     viewerUrl(): string {
+      const file = this.resolvedFilePath;
+      const token = getPublicShareToken(file);
+
+      if (token !== null) {
+        return generateUrl('/apps/{APP_ID}/public/{token}?file={file}&type={type}', {
+          APP_ID,
+          token,
+          file,
+          type: this.mime,
+        });
+      }
+
       return generateUrl('/apps/{APP_ID}/?file={file}&type={type}', {
         APP_ID,
-        file: this.resolvedFilePath,
+        file,
         type: this.mime,
       });
     },

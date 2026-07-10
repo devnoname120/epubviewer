@@ -1,3 +1,28 @@
+## Unreleased
+
+### Added
+
+- Added deterministic EPUB 2 and EPUB 3 fixtures plus focused archive-reader regression tests for limits, namespaces, cover selection, path resolution, malformed input, and real publication layouts.
+
+### Security
+
+- Restored Nextcloud CSRF validation for all bookmark and preference writes and added the request token to every reader write request.
+- Escaped reader template attributes and removed HTML interpretation from EPUB metadata and annotation popups.
+- Sandboxed EPUB chapter iframes without script permission.
+- Routed public-share readers through Nextcloud's password-aware public-share middleware and blocked the legacy-route bypass.
+- Bounded EPUB preview archive, XML, package-document, and cover processing; prohibited DTD/entity declarations and external XML access.
+- Backported JSZip 2.x protections for prototype-like filenames and unsafe relative archive paths.
+
+### Fixed
+
+- Fixed blank pages in EPUBs whose XHTML chapters use `.html` filenames, including Kobo-generated books with XML self-closing script elements.
+- Restored preference deletion for non-admin users.
+- Removed the dead reader `load()` action and obsolete tokenless DELETE helper.
+
+### Changed
+
+- Replaced `mikespub/php-epub-meta` with a bounded app-owned EPUB cover reader and declared the DOM and ZIP extensions directly.
+
 ## 1.9.3 - 2026-07-03
 
 ### Added

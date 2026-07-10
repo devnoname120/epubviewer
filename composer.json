@@ -60,7 +60,8 @@
   },
   "require": {
     "php": ">=8.2 <=8.5",
+    "ext-dom": "*",
     "ext-json": "*",
-    "mikespub/php-epub-meta": "^2.3.1"
+    "ext-zip": "*"
   }
 }

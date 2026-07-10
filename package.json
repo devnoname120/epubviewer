@@ -25,6 +25,7 @@
     "dev": "vite --mode development build",
     "watch": "vite --mode development build --watch",
     "serve": "vite --mode development serve",
+    "test": "node --test tests/js/*.test.js",
     "lint": "eslint \"src/**/*.{js,ts,vue}\"",
     "lint:fix": "eslint \"src/**/*.{js,ts,vue}\" --fix",
     "stylelint": "stylelint css/*.css css/*.scss src/**/*.scss src/**/*.vue",

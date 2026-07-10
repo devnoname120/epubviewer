@@ -18,9 +18,11 @@ class BookmarkController extends Controller {
 	 * @param IRequest $request
 	 * @param ?BookmarkService $bookmarkService
 	 */
-	public function __construct($appName,
+	public function __construct(
+		$appName,
 		IRequest $request,
-		private ?BookmarkService $bookmarkService) {
+		private ?BookmarkService $bookmarkService,
+	) {
 
 		parent::__construct($appName, $request);
 	}
@@ -47,7 +49,6 @@ class BookmarkController extends Controller {
 	 * @param string $value
 	 */
 	#[NoAdminRequired]
-	#[NoCSRFRequired]
 	public function set(int $fileId, string $name, string $value, ?string $type = null, ?string $content = null): void {
 		$this->bookmarkService->set($fileId, $name, $value, $type, $content);
 	}
@@ -59,7 +60,7 @@ class BookmarkController extends Controller {
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function getCursor(int $fileId): array|null {
+	public function getCursor(int $fileId): ?array {
 		return $this->bookmarkService->getCursor($fileId);
 	}
 
@@ -72,7 +73,6 @@ class BookmarkController extends Controller {
 	 * @param string $value
 	 */
 	#[NoAdminRequired]
-	#[NoCSRFRequired]
 	public function setCursor(int $fileId, string $value): void {
 		$this->bookmarkService->setCursor($fileId, $value);
 	}
@@ -84,13 +84,11 @@ class BookmarkController extends Controller {
 	 * @param string name
 	 */
 	#[NoAdminRequired]
-	#[NoCSRFRequired]
 	public function delete(int $fileId, string $name): void {
 		$this->bookmarkService->delete($fileId, $name);
 	}
 
 	#[NoAdminRequired]
-	#[NoCSRFRequired]
 	public function deleteCursor(int $fileId): void {
 		$this->bookmarkService->deleteCursor($fileId);
 	}

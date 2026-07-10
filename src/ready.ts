@@ -10,7 +10,6 @@ document.onreadystatechange = function () {
     options.session.format = $session.data('filetype');
     options.session.fileId = $session.data('fileid');
     options.session.title = options.session.filename;
-    options.session.nonce = $session.data('nonce') || '';
     options.session.version = $session.data('version') || '';
     options.session.annotations = $session.data('annotations') || {};
     options.session.fileId = $session.data('fileid') || '';
@@ -23,6 +22,17 @@ document.onreadystatechange = function () {
     options.session.staticPath = $session.data('staticpath');
     options.session.downloadLink = $session.data('downloadlink');
 
+    function writeRequest(method: 'POST' | 'DELETE', url: string, data?: object) {
+      return $.ajax({
+        method,
+        url,
+        data,
+        headers: {
+          requesttoken: $session.attr('data-requesttoken') || '',
+        },
+      });
+    }
+
     /* functions return jquery promises */
     options.session.getPreference = function (name: string) {
       return $.get(
@@ -30,7 +40,7 @@ document.onreadystatechange = function () {
       );
     };
     options.session.setPreference = function (name: string, value) {
-      return $.post(options.session.basePath + 'preference', {
+      return writeRequest('POST', options.session.basePath + 'preference', {
         fileId: options.session.fileId,
         scope: options.session.scope,
         name,
@@ -38,7 +48,8 @@ document.onreadystatechange = function () {
       });
     };
     options.session.deletePreference = function (name: string) {
-      return $.delete(
+      return writeRequest(
+        'DELETE',
         options.session.basePath + 'preference/' + options.session.fileId + '/' + options.session.scope + '/' + name,
       );
     };
@@ -46,20 +57,20 @@ document.onreadystatechange = function () {
       return $.get(options.session.basePath + 'preference/default/' + options.session.scope + '/' + name);
     };
     options.session.setDefault = function (name: string, value) {
-      return $.post(options.session.basePath + 'preference/default', {
+      return writeRequest('POST', options.session.basePath + 'preference/default', {
         scope: options.session.scope,
         name,
         value: JSON.stringify(value),
       });
     };
     options.session.deleteDefault = function (name: string) {
-      return $.delete(options.session.basePath + 'preference/default/' + options.session.scope + '/' + name);
+      return writeRequest('DELETE', options.session.basePath + 'preference/default/' + options.session.scope + '/' + name);
     };
     options.session.getBookmark = function (name: string, type: string) {
       return $.get(options.session.basePath + 'bookmark/' + options.session.fileId + '/' + type + '/' + name);
     };
     options.session.setBookmark = function (name: string, value: object, type: string, content: object) {
-      return $.post(options.session.basePath + 'bookmark', {
+      return writeRequest('POST', options.session.basePath + 'bookmark', {
         fileId: options.session.fileId,
         name,
         value: JSON.stringify(value),
@@ -68,19 +79,19 @@ document.onreadystatechange = function () {
       });
     };
     options.session.deleteBookmark = function (name: string) {
-      return $.delete(options.session.basePath + 'bookmark/' + options.session.fileId + '/' + name);
+      return writeRequest('DELETE', options.session.basePath + 'bookmark/' + options.session.fileId + '/' + name);
     };
     options.session.getCursor = function () {
       return $.get(options.session.basePath + 'bookmark/cursor/' + options.session.fileId);
     };
     options.session.setCursor = function (value: object) {
-      return $.post(options.session.basePath + 'bookmark/cursor', {
+      return writeRequest('POST', options.session.basePath + 'bookmark/cursor', {
         fileId: options.session.fileId,
         value: JSON.stringify(value),
       });
     };
     options.session.deleteCursor = function () {
-      return $.delete(options.session.basePath + 'bookmark/cursor/' + options.session.fileId);
+      return writeRequest('DELETE', options.session.basePath + 'bookmark/cursor/' + options.session.fileId);
     };
 
     switch (type) {

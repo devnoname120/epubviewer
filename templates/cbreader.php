@@ -12,9 +12,10 @@ $defaults = $_['defaults'];
 $preferences = $_['preferences'];
 $annotations = $_['annotations'];
 $title = htmlentities(basename($downloadLink));
-$revision = '0048';
+$revision = '0049';
 $version = $_['appVersion'] . '.' . $revision;
 $nonce = $_['nonce'];
+$requestToken = $_['requesttoken'];
 
 /* Mobile safari, the new IE6 */
 $idevice = (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone')
@@ -23,12 +24,12 @@ $idevice = (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone')
 ?>
 
 <html dir="ltr">
-<head class="session" data-nonce='<?php p($nonce); ?>' data-downloadlink='<?php print_unescaped($downloadLink); ?>'
-      data-fileid='<?php print_unescaped($fileId); ?>' data-filetype='<?php print_unescaped($fileType); ?>'
-      data-filename='<?php print_unescaped($fileName); ?>' data-version='<?php print_unescaped($version); ?>'
+<head class="session" data-requesttoken='<?php p($requestToken); ?>' data-downloadlink='<?php p($downloadLink); ?>'
+      data-fileid='<?php p($fileId); ?>' data-filetype='<?php p($fileType); ?>'
+      data-filename='<?php p($fileName); ?>' data-version='<?php p($version); ?>'
       data-basepath='<?php p($urlGenerator->linkToRoute('epubviewer.page.showReader')); ?>'
       data-staticpath='<?php p($urlGenerator->linkTo('epubviewer', '')); ?>'
-      data-scope='<?php print_unescaped($scope); ?>' data-cursor='<?php print_unescaped($cursor); ?>'
+      data-scope='<?php p($scope); ?>' data-cursor='<?php print_unescaped($cursor); ?>'
       data-defaults='<?php print_unescaped($defaults); ?>' data-preferences='<?php print_unescaped($preferences); ?>'
       data-annotations='<?php print_unescaped($annotations); ?>'>
   <meta charset="utf-8">
