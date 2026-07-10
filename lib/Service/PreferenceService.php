@@ -17,7 +17,9 @@ class PreferenceService extends Service {
 	/**
 	 * @param PreferenceMapper $preferenceMapper
 	 */
-	public function __construct(private PreferenceMapper $preferenceMapper) {
+	public function __construct(
+		private PreferenceMapper $preferenceMapper,
+	) {
 		parent::__construct($preferenceMapper);
 	}
 

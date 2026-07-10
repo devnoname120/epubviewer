@@ -13,9 +13,9 @@ use OCP\IDBConnection;
 class PreferenceMapper extends QBMapper {
 
 	public function __construct(
-		IDBConnection $db, 
-		private Time $time, 
-		private ?string $userId
+		IDBConnection $db,
+		private Time $time,
+		private ?string $userId,
 	) {
 		parent::__construct($db, 'reader_prefs', Preference::class);
 		$this->userId = $userId ?? '';
@@ -124,7 +124,7 @@ class PreferenceMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->getTableName())
 			->where($qb->expr()->eq('file_id', $qb->createNamedParameter($fileId)));
-		
+
 		return $this->findEntities($qb);
 	}
 
@@ -138,7 +138,7 @@ class PreferenceMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->getTableName())
 			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($this->userId)));
-		
+
 		return $this->findEntities($qb);
 	}
 }

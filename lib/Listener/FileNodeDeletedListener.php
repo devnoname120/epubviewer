@@ -11,7 +11,9 @@ use OCP\IDBConnection;
 
 /** @template-implements IEventListener<NodeDeletedEvent> */
 class FileNodeDeletedListener implements IEventListener {
-	public function __construct(private IDBConnection $connection) {
+	public function __construct(
+		private IDBConnection $connection,
+	) {
 	}
 
 	public function handle(Event $event): void {
@@ -20,7 +22,7 @@ class FileNodeDeletedListener implements IEventListener {
 		}
 
 		$fileId = $event->getNode()->getId();
-		
+
 		// Delete bookmarks
 		$queryBuilder = $this->connection->getQueryBuilder();
 		$queryBuilder->delete('reader_bookmarks')

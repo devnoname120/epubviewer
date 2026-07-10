@@ -11,7 +11,9 @@ use OCP\User\Events\UserDeletedEvent;
 
 /** @template-implements IEventListener<UserDeletedEvent> */
 class UserDeletedListener implements IEventListener {
-	public function __construct(private IDBConnection $connection) {
+	public function __construct(
+		private IDBConnection $connection,
+	) {
 	}
 
 	public function handle(Event $event): void {

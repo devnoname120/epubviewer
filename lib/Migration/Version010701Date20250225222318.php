@@ -6,12 +6,14 @@ namespace OCA\Epubviewer\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
+use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
-use OCP\IDBConnection;
 
 class Version010701Date20250225222318 extends SimpleMigrationStep {
-	public function __construct(private IDBConnection $connection) {
+	public function __construct(
+		private IDBConnection $connection,
+	) {
 	}
 
 	public function preSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
@@ -42,7 +44,7 @@ class Version010701Date20250225222318 extends SimpleMigrationStep {
 	}
 
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
-		$this->connection->executeStatement("UPDATE `*PREFIX*reader_bookmarks` SET `last_modified` = 0 WHERE `last_modified` IS NULL");
-		$this->connection->executeStatement("UPDATE `*PREFIX*reader_prefs` SET `last_modified` = 0 WHERE `last_modified` IS NULL");
+		$this->connection->executeStatement('UPDATE `*PREFIX*reader_bookmarks` SET `last_modified` = 0 WHERE `last_modified` IS NULL');
+		$this->connection->executeStatement('UPDATE `*PREFIX*reader_prefs` SET `last_modified` = 0 WHERE `last_modified` IS NULL');
 	}
 }

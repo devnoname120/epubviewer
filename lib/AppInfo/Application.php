@@ -26,7 +26,7 @@ class Application extends App implements IBootstrap {
 		include_once __DIR__ . '/../../vendor/autoload.php';
 
 		// Register services
-		$context->registerService(\OCA\Epubviewer\Service\BookmarkService::class, function($c) {
+		$context->registerService(\OCA\Epubviewer\Service\BookmarkService::class, function ($c) {
 			$userId = $c->get('userId');
 			if ($userId === null) {
 				return null;
@@ -37,7 +37,7 @@ class Application extends App implements IBootstrap {
 			);
 		});
 
-		$context->registerService(\OCA\Epubviewer\Service\PreferenceService::class, function($c) {
+		$context->registerService(\OCA\Epubviewer\Service\PreferenceService::class, function ($c) {
 			$userId = $c->get('userId');
 			if ($userId === null) {
 				return null;

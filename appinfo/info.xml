@@ -30,9 +30,10 @@ See [README] for more exhaustive information on features and potential misfeatur
    [README]: https://github.com/devnoname120/epubviewer#readme
 	      ]]>
     </description>
-    <version>1.9.3</version>
+    <version>1.9.4</version>
     <licence>agpl</licence>
     <author mail="devnoname120@gmail.com" homepage="https://github.com/devnoname120">devnoname120</author>
+    <namespace>Epubviewer</namespace>
     <category>files</category>
     <category>multimedia</category>
     <category>office</category>
@@ -58,7 +59,6 @@ See [README] for more exhaustive information on features and potential misfeatur
         <lib>zip</lib>
         <nextcloud min-version="33" max-version="35" />
     </dependencies>
-    <namespace>Epubviewer</namespace>
     <settings>
         <personal>OCA\Epubviewer\Settings\Personal</personal>
         <personal-section>OCA\Epubviewer\Settings\PersonalSection</personal-section>

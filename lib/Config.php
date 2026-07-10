@@ -14,7 +14,7 @@ class Config {
 	public function __construct(
 		private IUserConfig $config,
 		private IAppConfig $appConfig,
-		private IUserSession $userSession
+		private IUserSession $userSession,
 	) {
 	}
 

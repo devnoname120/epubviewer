@@ -5,6 +5,7 @@ namespace OCA\Epubviewer\Db;
 use JsonSerializable;
 use OCP\AppFramework\Db\Entity;
 use OCP\DB\Types;
+
 /**
  * @method string getUserId()
  * @method void setUserId(string $userId)
@@ -69,7 +70,7 @@ class Bookmark extends Entity implements JsonSerializable {
 	/**
 	 * @param null|string $el
 	 */
-	public static function conditional_json_decode(string|null $el): mixed {
+	public static function conditional_json_decode(?string $el): mixed {
 		if (empty($el)) {
 			return $el;
 		}

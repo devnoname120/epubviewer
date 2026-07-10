@@ -1,4 +1,4 @@
-## Unreleased
+## 1.9.4 - 2026-07-11
 
 ### Added
 
@@ -22,6 +22,7 @@
 ### Changed
 
 - Replaced `mikespub/php-epub-meta` with a bounded app-owned EPUB cover reader and declared the DOM and ZIP extensions directly.
+- Updated compatible JavaScript build dependencies to patched versions.
 
 ## 1.9.3 - 2026-07-03
 

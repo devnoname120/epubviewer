@@ -14,7 +14,9 @@ class BookmarkService extends Service {
 	public const CURSOR = '__CURSOR__';
 	public const bookmark_type = 'bookmark';
 
-	public function __construct(private BookmarkMapper $bookmarkMapper) {
+	public function __construct(
+		private BookmarkMapper $bookmarkMapper,
+	) {
 		parent::__construct($bookmarkMapper);
 	}
 
