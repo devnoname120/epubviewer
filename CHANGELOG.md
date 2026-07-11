@@ -1,3 +1,9 @@
+## Unreleased
+
+### Fixed
+
+- Added WebP page support for CBZ/CBR files and visible errors for archives with no supported images or pages that fail to decode.
+
 ## 1.9.4 - 2026-07-11
 
 ### Added

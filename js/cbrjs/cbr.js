@@ -3,6 +3,39 @@ CBRJS.VERSION = "0.0.1";
 
 CBRJS.basePath = CBRJS.basePath || "";
 CBRJS.session = CBRJS.session || {};
+CBRJS.IMAGE_MIME_TYPES = {
+	gif: 'image/gif',
+	jpeg: 'image/jpeg',
+	jpg: 'image/jpeg',
+	png: 'image/png',
+	webp: 'image/webp'
+};
+
+CBRJS.getImageMimeType = function(filename) {
+	if (typeof filename !== 'string') {
+		return null;
+	}
+
+	var extension = filename.toLowerCase().match(/\.([a-z0-9]+)$/);
+	if (!extension || !Object.prototype.hasOwnProperty.call(CBRJS.IMAGE_MIME_TYPES, extension[1])) {
+		return null;
+	}
+
+	return CBRJS.IMAGE_MIME_TYPES[extension[1]];
+};
+
+CBRJS.createImageBlob = function(unarchivedFile) {
+	if (!unarchivedFile) {
+		return null;
+	}
+
+	var mimetype = CBRJS.getImageMimeType(unarchivedFile.filename);
+	if (!mimetype) {
+		return null;
+	}
+
+	return new Blob([unarchivedFile.fileData], { type: mimetype });
+};
 
 CBRJS.Reader = function(bookPath, _options) {
 
@@ -12,6 +45,12 @@ CBRJS.Reader = function(bookPath, _options) {
 		parameters,
         options,
         found;
+
+	function showReaderError(message) {
+		$('.icon-unarchive').removeClass('active ok').addClass('error');
+		$('.message-text').text(message);
+		$('#progressbar').show();
+	}
 
     this.options = options = $.extend(true, _options || {}, {
         bookPath: bookPath,
@@ -34,12 +73,12 @@ CBRJS.Reader = function(bookPath, _options) {
 		var images = [],
 		    xhr = new XMLHttpRequest(),
 		    filename = decodeURIComponent(url.split('/').pop()),
-            re_file_ext = new RegExp(/\.([a-z]+)$/),
 		    options = $.extend({
 			    start: function () {},
 			    extract: function (page_url) {},
 			    progress: function (percent_complete) {},
-			    finish: function (images) {}
+			    finish: function (images) {},
+			    error: function (message) {}
 		    }, opts);
 
 		xhr.open('GET',url, true);
@@ -75,26 +114,12 @@ CBRJS.Reader = function(bookPath, _options) {
 
 				ua.addEventListener(bitjs.archive.UnarchiveEvent.Type.EXTRACT, function (e) {
 
-					var mimetype, blob, url;
-					var file_extension = e.unarchivedFile.filename.toLowerCase().match(re_file_ext)[1];
-
-					switch (file_extension) {
-						case 'jpg':
-						case 'jpeg':
-							mimetype = 'image/jpeg';
-							break;
-						case 'png':
-							mimetype = 'image/png';
-							break;
-						case 'gif':
-							mimetype = 'image/gif';
-							break;
-						default:
-							return false;
+					var blob = CBRJS.createImageBlob(e.unarchivedFile);
+					if (!blob) {
+						return;
 					}
 
-					blob = new Blob([e.unarchivedFile.fileData], { type: mimetype });
-					url = window.URL.createObjectURL(blob);
+					var url = window.URL.createObjectURL(blob);
 
 					images.push(url);
 
@@ -106,14 +131,16 @@ CBRJS.Reader = function(bookPath, _options) {
 				});
 
 				ua.addEventListener(bitjs.archive.UnarchiveEvent.Type.FINISH, function (e) {
+					if (images.length === 0) {
+						options.error('No supported images were found in this comic archive.');
+						return;
+					}
+
 					options.finish(images);
 				});
 
 				ua.addEventListener(bitjs.archive.UnarchiveEvent.Type.ERROR, function (e) {
-					$('.icon-unarchive').removeClass('active');
-					$('.icon-unarchive').addClass('error');
-					$('#message').text('Failed to extract images from archive, file corrupted?');
-
+					options.error('Failed to extract images from archive, file corrupted?');
 				});
 			}
 
@@ -142,9 +169,10 @@ CBRJS.Reader = function(bookPath, _options) {
 			progress: function (percent_complete) {
 				$progressbar.css('width', percent_complete + '%');
 			},
+			error: showReaderError,
 			finish: function (pages) {
 
-			    $('.icon-unarchive').addClass('ok');
+			    $('.icon-unarchive').removeClass('active error').addClass('ok');
 				var name = this.filename.replace(/\.[a-z]+$/, '');
 				var id = encodeURIComponent(name.toLowerCase());
 				var book = new ComicBook('viewer', pages, options);
@@ -184,6 +212,7 @@ CBRJS.Reader = function(bookPath, _options) {
         manga: getPref(options.session.preferences, "manga") || false,
         thumbnails: getPref(options.session.defaults, "thumbnails"),
         thumbnailWidth: parseInt(getPref(options.session.defaults, "thumbnailWidth")) || 200,
+        error: showReaderError,
         session: options.session
     });
 
@@ -255,6 +284,7 @@ ComicBook = (function ($) {
             thumbnailWidth: 200, // width of thumbnail
             sidebarWide: false, // use wide sidbar
             currentPage: 0, // current page
+            error: function(message) {},
             keyboard: {
                 32: 'next', // space
                 34: 'next', // page-down
@@ -679,7 +709,6 @@ ComicBook = (function ($) {
             function loadImage(i) {
 
                 var page = new Image();
-                page.src = srcs[i];
 
                 page.onload = function () {
 
@@ -715,6 +744,13 @@ ComicBook = (function ($) {
                         $('#cbr-status').delay(500).fadeOut();
                     }
                 };
+
+                page.onerror = function () {
+                    self.hideControl('loadingOverlay');
+                    options.error('Failed to decode comic page #' + (i + 1) + '.');
+                };
+
+                page.src = srcs[i];
             }
 
             // loads pages in both directions so you don't have to wait for all pages

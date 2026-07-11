@@ -21,6 +21,8 @@ using the keyboard as well as mouse or touch navigation. Reader generates a visu
 sidebar (thumbnail generation can be disabled for low-memory and/or -speed devices). As CBx files are often of varying
 quality, a set of image enhancement filters are provided.
 
+Comic pages may use JPEG, PNG, GIF, or WebP. TIFF pages are not supported.
+
 # Development
 
 ## GitHub codespaces
