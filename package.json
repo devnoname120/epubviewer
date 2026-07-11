@@ -28,20 +28,21 @@
     "test": "node --test tests/js/*.test.js",
     "lint": "eslint \"src/**/*.{js,ts,vue}\"",
     "lint:fix": "eslint \"src/**/*.{js,ts,vue}\" --fix",
-    "stylelint": "stylelint css/*.css css/*.scss src/**/*.scss src/**/*.vue",
-    "stylelint:fix": "stylelint css/*.css css/*.scss src/**/*.scss src/**/*.vue --fix"
+    "stylelint": "stylelint css/*.css css/*.scss \"src/**/*.{css,scss,vue}\"",
+    "stylelint:fix": "stylelint css/*.css css/*.scss \"src/**/*.{css,scss,vue}\" --fix"
   },
   "dependencies": {
     "@nextcloud/initial-state": "^3.0.0",
+    "@nextcloud/l10n": "^3.4.1",
     "@nextcloud/router": "^3.1.0",
-    "@nextcloud/viewer": "^1.0.0",
-    "vue": "^2.7.16"
+    "@nextcloud/vue": "^9.8.2",
+    "vue": "^3.5.39"
   },
   "browserslist": [
     "extends @nextcloud/browserslist-config"
   ],
   "engines": {
-    "node": "^20.0.0",
+    "node": "^22.0.0 || ^24.0.0",
     "npm": "^10.0.0"
   },
   "overrides": {

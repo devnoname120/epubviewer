@@ -1,0 +1,14 @@
+.epubviewer-personal-settings__options {
+  display: grid;
+  gap: calc(var(--default-grid-baseline) * 2);
+  max-width: 32rem;
+}
+
+.epubviewer-personal-settings__message {
+  margin-block: calc(var(--default-grid-baseline) * 2) 0;
+  color: var(--color-text-maxcontrast);
+}
+
+.epubviewer-personal-settings__message--error {
+  color: var(--color-error-text);
+}

@@ -1,7 +1,7 @@
 import { generateUrl } from '@nextcloud/router';
-import { registerHandler } from '@nextcloud/viewer';
 import { loadState } from '@nextcloud/initial-state';
-import type { AsyncComponent } from 'vue';
+
+import { registerHandler } from './nextcloudViewerRegistration.js';
 
 const APP_ID = 'epubviewer';
 
@@ -64,7 +64,7 @@ function getPublicShareToken(fileUrl: string): string | null {
   }
 }
 
-const EpubViewerComponent: AsyncComponent = {
+const EpubViewerComponent = {
   name: 'EpubViewerComponent',
   props: {
     path: {

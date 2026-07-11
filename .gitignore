@@ -3,6 +3,7 @@ nextcloud-docker-dev
 vendor
 build
 .php-cs-fixer.cache
+css/epubviewer-settings.css
 js/*
 !js/cbrjs
 !js/lib

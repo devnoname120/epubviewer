@@ -4,14 +4,17 @@ namespace OCA\Epubviewer\Settings;
 
 use OCA\Epubviewer\AppInfo\Application;
 use OCP\AppFramework\Http\TemplateResponse;
+use OCP\AppFramework\Services\IInitialState;
 use OCP\Config\IUserConfig;
 use OCP\Settings\ISettings;
+use OCP\Util;
 
 class Personal implements ISettings {
 
 	public function __construct(
 		private string $userId,
 		private IUserConfig $configManager,
+		private IInitialState $initialState,
 	) {
 	}
 
@@ -20,13 +23,16 @@ class Personal implements ISettings {
 	 * @since 9.1
 	 */
 	public function getForm() {
+		$this->initialState->provideInitialState('personalSettings', [
+			'epubEnabled' => $this->configManager->getValueString($this->userId, Application::APP_ID, 'epub_enable', 'true') === 'true',
+			'pdfEnabled' => $this->configManager->getValueString($this->userId, Application::APP_ID, 'pdf_enable', 'false') === 'true',
+			'cbxEnabled' => $this->configManager->getValueString($this->userId, Application::APP_ID, 'cbx_enable', 'true') === 'true',
+		]);
+		Util::addScript(Application::APP_ID, 'epubviewer-settings', 'core');
+		Util::addStyle(Application::APP_ID, 'settings');
+		Util::addStyle(Application::APP_ID, 'epubviewer-settings');
 
-		$parameters = [
-			'EpubEnable' => $this->configManager->getValueString($this->userId, Application::APP_ID, 'epub_enable', 'true'),
-			'PdfEnable' => $this->configManager->getValueString($this->userId, Application::APP_ID, 'pdf_enable', 'false'),
-			'CbxEnable' => $this->configManager->getValueString($this->userId, Application::APP_ID, 'cbx_enable', 'true'),
-		];
-		return new TemplateResponse('epubviewer', 'settings-personal', $parameters, '');
+		return new TemplateResponse(Application::APP_ID, 'settings-personal', [], '');
 	}
 
 	/**

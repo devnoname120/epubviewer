@@ -22,6 +22,9 @@ export default defineConfig({
 				chunkFileNames: 'js/[name]-[hash].chunk.mjs',
 				assetFileNames: (assetInfo) => {
 					const name = assetInfo.names?.[0] ?? ''
+					if (name === 'settings.css') {
+						return 'css/epubviewer-settings.css'
+					}
 					if (name.endsWith('.css')) {
 						return 'css/[name]-[hash][extname]'
 					}
