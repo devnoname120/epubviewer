@@ -8,6 +8,8 @@ Local compatibility changes:
 
 - `v1.2.6/archive/unzip.js` decodes ZIP entry names marked with the UTF-8 general-purpose flag before
   exposing them to the comic reader.
+- The BitJS RAR backend and its `unrar.js`/`rarvm.js` files are omitted. The comic reader routes RAR
+  archives exclusively through `@mary/rar` and uses BitJS only for the remaining archive formats.
 
 The versioned directory keeps module-worker URLs distinct from older BitJS files that browsers may
 still have cached. The browser integration lives in `../cbrjs/bitjs.js`.

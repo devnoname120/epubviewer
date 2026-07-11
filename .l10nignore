@@ -7,8 +7,6 @@ js/bitjs/v1.2.6/io/bytestream.js
 js/bitjs/v1.2.6/io/bitstream.js
 js/bitjs/v1.2.6/archive/unzip.js
 js/bitjs/v1.2.6/archive/untar.js
-js/bitjs/v1.2.6/archive/unrar.js
-js/bitjs/v1.2.6/archive/rarvm.js
 js/bitjs/v1.2.6/archive/archive.js
 js/bitjs/v1.2.6/archive/common.js
 js/bitjs/v1.2.6/archive/compress.js

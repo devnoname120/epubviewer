@@ -14,7 +14,7 @@
 import { UnarchiveAppendEvent, UnarchiveErrorEvent, UnarchiveEvent, UnarchiveEventType,
          UnarchiveExtractEvent, UnarchiveFinishEvent, UnarchiveInfoEvent,
          UnarchiveProgressEvent, UnarchiveStartEvent } from './events.js';
-import { Unarchiver, Unzipper, Unrarrer, Untarrer, getUnarchiver } from './decompress.js';
+import { Unarchiver, Unzipper, Untarrer, getUnarchiver } from './decompress.js';
 
 export {
   UnarchiveAppendEvent,
@@ -27,7 +27,7 @@ export {
   UnarchiveProgressEvent,
   UnarchiveStartEvent,
   Unarchiver,
-  Unzipper, Unrarrer, Untarrer, getUnarchiver
+  Unzipper, Untarrer, getUnarchiver
 }
 
 console.error(`bitjs: Stop importing archive.js, this module will be removed. Import decompress.js instead.`);

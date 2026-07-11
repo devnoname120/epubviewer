@@ -2,9 +2,18 @@ import path from 'node:path'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+	base: './',
 	css: {
 		modules: {
 			localsConvention: 'camelCase',
+		},
+	},
+	worker: {
+		format: 'es',
+		rollupOptions: {
+			output: {
+				entryFileNames: 'js/epubviewer-rar-worker.mjs',
+			},
 		},
 	},
 	build: {
@@ -12,8 +21,10 @@ export default defineConfig({
 		emptyOutDir: false,
 		sourcemap: true,
 		rollupOptions: {
+			preserveEntrySignatures: 'strict',
 			input: {
 				main: path.resolve(__dirname, 'src/main.ts'),
+				rar: path.resolve(__dirname, 'src/rar.ts'),
 				settings: path.resolve(__dirname, 'src/settings.ts'),
 				ready: path.resolve(__dirname, 'src/ready.ts'),
 			},

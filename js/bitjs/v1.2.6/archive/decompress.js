@@ -293,19 +293,6 @@ export class Unzipper extends Unarchiver {
   getScriptFileName() { return './unzip.js'; }
 }
 
-export class Unrarrer extends Unarchiver {
-  /**
-   * @param {ArrayBuffer} ab
-   * @param {UnarchiverOptions} options
-   */
-  constructor(ab, options = {}) {
-    super(ab, options);
-  }
-
-  getMIMEType() { return 'application/x-rar-compressed'; }
-  getScriptFileName() { return './unrar.js'; }
-}
-
 export class Untarrer extends Unarchiver {
   /**
    * @param {ArrayBuffer} ab
@@ -365,8 +352,8 @@ export function getUnarchiver(ab, options = {}) {
   let unarchiver = null;
   const mimeType = findMimeType(ab);
 
-  if (mimeType === 'application/x-rar-compressed') { // Rar!
-    unarchiver = new Unrarrer(ab, options);
+  if (mimeType === 'application/x-rar-compressed') {
+    throw new TypeError('RAR archives require the dedicated RAR extractor');
   } else if (mimeType === 'application/zip') { // PK (Zip)
     unarchiver = new Unzipper(ab, options);
   } else if (mimeType === 'application/gzip') { // GZIP
