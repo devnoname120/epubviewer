@@ -56,7 +56,6 @@ class PreferenceController extends Controller {
 		$this->preferenceService->set($scope, $fileId, $name, $value);
 	}
 
-
 	/**
 	 * @brief return default preference
 	 *

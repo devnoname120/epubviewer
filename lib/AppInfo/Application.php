@@ -8,7 +8,6 @@ use OCA\Epubviewer\Listener\BeforeTemplateRenderedListener;
 use OCA\Epubviewer\Listener\FileNodeDeletedListener;
 use OCA\Epubviewer\Listener\LoadViewerListener;
 use OCA\Epubviewer\Listener\UserDeletedListener;
-
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -20,7 +19,6 @@ class Application extends App implements IBootstrap {
 	public function __construct() {
 		parent::__construct(self::APP_ID);
 	}
-
 
 	public function register(IRegistrationContext $context): void {
 		include_once __DIR__ . '/../../vendor/autoload.php';

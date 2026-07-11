@@ -7,8 +7,6 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\JSONResponse;
-
-
 use OCP\IRequest;
 
 class BookmarkController extends Controller {
@@ -63,8 +61,6 @@ class BookmarkController extends Controller {
 	public function getCursor(int $fileId): ?array {
 		return $this->bookmarkService->getCursor($fileId);
 	}
-
-
 
 	/**
 	 * @brief write cursor for $fileId
