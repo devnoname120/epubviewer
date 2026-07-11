@@ -1,3 +1,10 @@
+## Unreleased
+
+### Fixed
+
+- Updated the comic archive reader to BitJS 1.2.6, including support for CBZ files that use ZIP
+  data descriptors and correct UTF-8 page filenames.
+
 ## 1.9.5 - 2026-07-11
 
 ### Fixed

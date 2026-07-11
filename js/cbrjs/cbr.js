@@ -105,14 +105,41 @@ CBRJS.Reader = function(bookPath, _options) {
 		xhr.onload = function () {
 			if ((this.status === 200) && this.response) {
 				var done = false;
-				var ua = new bitjs.archive.GetUnarchiver(this.response, document.head.dataset.staticpath + 'js/bitjs/');
+				var eventTypes = CBRJS.UnarchiveEventType;
+				var ua;
 
-				ua.addEventListener(bitjs.archive.UnarchiveEvent.Type.START, function (e) {
+				function failArchive() {
+					if (done) {
+						return;
+					}
+
+					done = true;
+					options.error('Failed to extract images from archive, file corrupted or unsupported?');
+				}
+
+				if (typeof CBRJS.getUnarchiver !== 'function' || !eventTypes) {
+					options.error('Archive support failed to load.');
+					return;
+				}
+
+				try {
+					ua = CBRJS.getUnarchiver(this.response);
+				} catch (error) {
+					failArchive();
+					return;
+				}
+
+				if (!ua) {
+					failArchive();
+					return;
+				}
+
+				ua.addEventListener(eventTypes.START, function (e) {
 					$progressbar.css('width', '0%');
 					$('.icon-unarchive').addClass('active');
 				});
 
-				ua.addEventListener(bitjs.archive.UnarchiveEvent.Type.EXTRACT, function (e) {
+				ua.addEventListener(eventTypes.EXTRACT, function (e) {
 
 					var blob = CBRJS.createImageBlob(e.unarchivedFile);
 					if (!blob) {
@@ -126,11 +153,18 @@ CBRJS.Reader = function(bookPath, _options) {
 					options.extract(url, blob);
 				});
 
-				ua.addEventListener(bitjs.archive.UnarchiveEvent.Type.PROGRESS, function (e) {
-					options.progress(Math.floor(e.currentBytesUnarchived / e.totalUncompressedBytesInArchive * 100));
+				ua.addEventListener(eventTypes.PROGRESS, function (e) {
+					if (e.totalUncompressedBytesInArchive > 0) {
+						options.progress(Math.floor(e.currentBytesUnarchived / e.totalUncompressedBytesInArchive * 100));
+					}
 				});
 
-				ua.addEventListener(bitjs.archive.UnarchiveEvent.Type.FINISH, function (e) {
+				ua.addEventListener(eventTypes.FINISH, function (e) {
+					if (done) {
+						return;
+					}
+
+					done = true;
 					if (images.length === 0) {
 						options.error('No supported images were found in this comic archive.');
 						return;
@@ -139,12 +173,21 @@ CBRJS.Reader = function(bookPath, _options) {
 					options.finish(images);
 				});
 
-				ua.addEventListener(bitjs.archive.UnarchiveEvent.Type.ERROR, function (e) {
-					options.error('Failed to extract images from archive, file corrupted?');
+				ua.addEventListener(eventTypes.ERROR, function (e) {
+					failArchive();
 				});
-			}
 
-			ua.start();
+				try {
+					var startResult = ua.start();
+					if (startResult && typeof startResult.catch === 'function') {
+						startResult.catch(failArchive);
+					}
+				} catch (error) {
+					failArchive();
+				}
+			} else {
+				options.error('Failed to download comic archive.');
+			}
 		};
 
 		xhr.send();

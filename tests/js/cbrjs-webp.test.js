@@ -126,11 +126,11 @@ function createHarness(entries) {
     Blob,
     XMLHttpRequest: FakeXMLHttpRequest,
     Uint8Array,
-    bitjs: {
-      archive: {
-        GetUnarchiver: FakeUnarchiver,
-        UnarchiveEvent: { Type: eventTypes },
+    CBRJS: {
+      getUnarchiver() {
+        return new FakeUnarchiver();
       },
+      UnarchiveEventType: eventTypes,
     },
     console,
     document: {

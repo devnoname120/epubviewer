@@ -72,6 +72,16 @@ class ReaderSecurityBoundaryTest extends TestCase {
 		}
 	}
 
+	public function testComicReaderLoadsTheBitJsModuleBridge(): void {
+		$contents = $this->readRepoFile('templates/cbreader.php');
+		$bridge = $this->readRepoFile('js/cbrjs/bitjs.js');
+
+		self::assertStringContainsString('type="module"', $contents);
+		self::assertStringContainsString('js/cbrjs/bitjs.js', $contents);
+		self::assertStringNotContainsString('js/bitjs/archive/archive.js', $contents);
+		self::assertStringContainsString('../bitjs/v1.2.6/archive/decompress.js', $bridge);
+	}
+
 	/**
 	 * @return array<string, array{string}>
 	 */

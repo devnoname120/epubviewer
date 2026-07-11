@@ -12,7 +12,7 @@ $defaults = $_['defaults'];
 $preferences = $_['preferences'];
 $annotations = $_['annotations'];
 $title = htmlentities(basename($downloadLink));
-$revision = '0050';
+$revision = '0051';
 $version = $_['appVersion'] . '.' . $revision;
 $nonce = $_['nonce'];
 $requestToken = $_['requesttoken'];
@@ -52,8 +52,8 @@ $idevice = (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone')
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/sindresorhus/screenfull.js')) ?>?v=<?php p($version) ?>"></script>
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/pixastic/pixastic_combined.js')) ?>?v=<?php p($version) ?>"></script>
-  <script type="text/javascript" nonce="<?php p($nonce) ?>"
-          src="<?php p($urlGenerator->linkTo('epubviewer', 'js/bitjs/archive/archive.js')) ?>?v=<?php p($version) ?>"></script>
+  <script type="module" nonce="<?php p($nonce) ?>"
+          src="<?php p($urlGenerator->linkTo('epubviewer', 'js/cbrjs/bitjs.js')) ?>?v=<?php p($version) ?>"></script>
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/cbrjs/cbr.js')) ?>?v=<?php p($version) ?>"></script>
 
