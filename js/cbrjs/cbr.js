@@ -37,6 +37,38 @@ CBRJS.createImageBlob = function(unarchivedFile) {
 	return new Blob([unarchivedFile.fileData], { type: mimetype });
 };
 
+CBRJS.getCanvasPixelRatio = function(pageScale) {
+	var devicePixelRatio = Number(window.devicePixelRatio) || 1;
+	var sourcePixelRatio = 1;
+
+	if (!isFinite(devicePixelRatio) || devicePixelRatio < 1) {
+		devicePixelRatio = 1;
+	}
+
+	if (typeof pageScale === 'number' && isFinite(pageScale) && pageScale > 0) {
+		sourcePixelRatio = Math.max(1, 1 / pageScale);
+	}
+
+	return Math.min(devicePixelRatio, sourcePixelRatio);
+};
+
+CBRJS.configureCanvas = function(canvas, context, width, height, pageScale) {
+	var pixelRatio = CBRJS.getCanvasPixelRatio(pageScale);
+
+	canvas.style.width = width + 'px';
+	canvas.style.height = height + 'px';
+	canvas.width = Math.ceil(width * pixelRatio);
+	canvas.height = Math.ceil(height * pixelRatio);
+
+	context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+	context.imageSmoothingEnabled = true;
+	if ('imageSmoothingQuality' in context) {
+		context.imageSmoothingQuality = 'high';
+	}
+
+	return pixelRatio;
+};
+
 CBRJS.Reader = function(bookPath, _options) {
 
     var reader = this,
@@ -949,9 +981,18 @@ ComicBook = (function ($) {
 
             canvas_height = page_height;
 
-            // make sure the canvas is always at least full screen, even if the page is more narrow than the screen
-            canvas.width = (canvas_width < windowWidth()) ? windowWidth() : canvas_width;
-            canvas.height = (canvas_height < window.innerHeight) ? window.innerHeight : canvas_height;
+            // Keep the canvas at its logical CSS size while rendering its backing bitmap at the
+            // display pixel density. Capping the ratio at the source image density avoids allocating
+            // oversized canvases when a page is shown at or above its native size.
+            var logical_canvas_width = (canvas_width < windowWidth()) ? windowWidth() : canvas_width;
+            var logical_canvas_height = (canvas_height < window.innerHeight) ? window.innerHeight : canvas_height;
+            CBRJS.configureCanvas(
+                canvas,
+                context,
+                logical_canvas_width,
+                logical_canvas_height,
+                page_width / page.width
+            );
 
             // always keep pages centered
             if (options.zoomMode === 'manual' || options.zoomMode === 'fitWindow') {

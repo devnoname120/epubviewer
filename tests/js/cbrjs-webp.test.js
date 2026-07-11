@@ -184,7 +184,7 @@ function createHarness(entries) {
     },
   });
 
-  return { blobs, books, messages };
+  return { blobs, books, context, messages };
 }
 
 test('routes JPEG and WebP archive entries to the comic renderer', () => {
@@ -205,4 +205,46 @@ test('reports an archive with no supported image pages', () => {
   assert.equal(result.blobs.length, 0);
   assert.equal(result.books.length, 0);
   assert.equal(result.messages.at(-1), 'No supported images were found in this comic archive.');
+});
+
+test('renders fitted comic pages at the display pixel density', () => {
+  const result = createHarness([]);
+  const transforms = [];
+  const canvas = { height: 0, style: {}, width: 0 };
+  const drawingContext = {
+    imageSmoothingEnabled: false,
+    imageSmoothingQuality: 'low',
+    setTransform(...transform) {
+      transforms.push(transform);
+    },
+  };
+
+  result.context.devicePixelRatio = 3;
+
+  const pixelRatio = result.context.CBRJS.configureCanvas(canvas, drawingContext, 390, 844, 0.2);
+
+  assert.equal(pixelRatio, 3);
+  assert.equal(canvas.style.width, '390px');
+  assert.equal(canvas.style.height, '844px');
+  assert.equal(canvas.width, 1170);
+  assert.equal(canvas.height, 2532);
+  assert.deepEqual(transforms, [[3, 0, 0, 3, 0, 0]]);
+  assert.equal(drawingContext.imageSmoothingEnabled, true);
+  assert.equal(drawingContext.imageSmoothingQuality, 'high');
+});
+
+test('does not allocate a backing canvas larger than the source page can benefit from', () => {
+  const result = createHarness([]);
+  const canvas = { height: 0, style: {}, width: 0 };
+  const drawingContext = {
+    setTransform() {},
+  };
+
+  result.context.devicePixelRatio = 3;
+
+  const pixelRatio = result.context.CBRJS.configureCanvas(canvas, drawingContext, 1000, 1400, 0.5);
+
+  assert.equal(pixelRatio, 2);
+  assert.equal(canvas.width, 2000);
+  assert.equal(canvas.height, 2800);
 });
