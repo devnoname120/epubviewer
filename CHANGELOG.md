@@ -1,3 +1,14 @@
+## 1.9.7 - 2026-07-11
+
+### Added
+
+- Added RAR 5 support for comic archives with a dedicated `@mary/rar` worker while retaining RAR 4 compatibility.
+
+### Changed
+
+- Migrated the personal settings interface to Vue 3 and native Nextcloud UI components, with app-local Viewer registration that avoids the legacy global Vue runtime.
+- Removed the legacy BitJS RAR extractor and compatibility setting; all CBR/RAR archives now use the new extractor.
+
 ## 1.9.6 - 2026-07-11
 
 ### Fixed
