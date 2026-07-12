@@ -1,5 +1,7 @@
 ## epubviewer
 
+<a href="https://ateeducacion.github.io/nextcloud-playground/?blueprint-url=https://raw.githubusercontent.com/devnoname120/epubviewer/refs/heads/master/blueprint.json" target="_blank" rel="noopener noreferrer"><img src="https://raw.githubusercontent.com/ateeducacion/nextcloud-playground/refs/heads/main/assets/playground-preview-button.svg" alt="Open in Nextcloud Playground" width="224"></a>
+
 Reader is an ebook reader based on pure javascript renderers. It works for publications formatted according to the
 following standards:
 
@@ -22,6 +24,16 @@ sidebar (thumbnail generation can be disabled for low-memory and/or -speed devic
 quality, a set of image enhancement filters are provided.
 
 Comic pages may use JPEG, PNG, GIF, or WebP. TIFF pages are not supported.
+
+## Try in Nextcloud Playground
+
+Click the badge above (or [this link](https://ateeducacion.github.io/nextcloud-playground/?blueprint-url=https://raw.githubusercontent.com/devnoname120/epubviewer/refs/heads/master/blueprint.json)) to open a full Nextcloud instance running entirely in your browser (via WebAssembly). It comes with the EPUB Viewer app pre-installed, admin logged in, and a few sample EPUB files ready in Files.
+
+No local setup or Docker required. The instance is provisioned from [`blueprint.json`](blueprint.json) at the repository root using the [`installApp`](https://github.com/ateeducacion/nextcloud-playground/blob/main/docs/blueprint-json.md#installapp) step.
+
+Every pull request automatically receives a "Preview this PR in the Nextcloud Playground" comment with a one-click link built from that branch's code (see [`.github/workflows/playground-preview.yml`](.github/workflows/playground-preview.yml)). Reviewers can test changes live with zero installation.
+
+The preview button and automation are modeled after the [Moodle Playground PR preview flow](https://github.com/erseco/moodle-mod_questionnaire/pull/1) and the approach used in sibling Nextcloud apps.
 
 # Development
 
