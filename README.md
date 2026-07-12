@@ -1,4 +1,4 @@
-## epubviewer
+## epubviewer    <a href="https://ateeducacion.github.io/nextcloud-playground/?blueprint-url=https://raw.githubusercontent.com/devnoname120/epubviewer/refs/heads/master/blueprint.json" target="_blank" rel="noopener noreferrer"><img width="150px" src="https://raw.githubusercontent.com/ateeducacion/nextcloud-playground/refs/heads/main/assets/playground-preview-button.svg" alt="Open in Nextcloud Playground" width="224"></a>
 
 Reader is an ebook reader based on pure javascript renderers. It works for publications formatted according to the
 following standards:

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://raw.githubusercontent.com/ateeducacion/nextcloud-playground/main/assets/blueprints/blueprint-schema.json",
+  "meta": {
+    "title": "EPUB Viewer Playground",
+    "author": "epubviewer",
+    "description": "A fresh Nextcloud in the browser with the EPUB Viewer app installed. Browse sample EPUB, PDF and CBR files directly in Files."
+  },
+  "landingPage": "/index.php/apps/files/",
+  "siteOptions": {
+    "title": "Nextcloud + EPUB Viewer",
+    "locale": "en",
+    "timezone": "UTC"
+  },
+  "admin": {
+    "username": "admin",
+    "password": "admin",
+    "email": "admin@example.com"
+  },
+  "steps": [
+    { "step": "disableApp", "app": "firstrunwizard" },
+    {
+      "step": "installApp",
+      "appId": "epubviewer",
+      "url": "https://github-proxy.exelearning.dev/?repo=devnoname120/epubviewer&release=playground&asset=epubviewer.zip"
+    },
+    {
+      "step": "writeFile",
+      "path": "data/admin/files/epub-samples/epub2-metadata-cover.epub",
+      "url": "https://raw.githubusercontent.com/devnoname120/epubviewer/master/tests/fixtures/epub/epub2-metadata-cover.epub"
+    },
+    {
+      "step": "writeFile",
+      "path": "data/admin/files/epub-samples/epub3-cover-image-properties.epub",
+      "url": "https://raw.githubusercontent.com/devnoname120/epubviewer/master/tests/fixtures/epub/epub3-cover-image-properties.epub"
+    },
+    {
+      "step": "writeFile",
+      "path": "data/admin/files/epub-samples/no-cover.epub",
+      "url": "https://raw.githubusercontent.com/devnoname120/epubviewer/master/tests/fixtures/epub/no-cover.epub"
+    },
+    { "step": "runOcc", "args": ["files:scan", "admin"] }
+  ]
+}
