@@ -21,7 +21,7 @@
     {
       "step": "installApp",
       "appId": "epubviewer",
-      "url": "https://github-proxy.exelearning.dev/?repo=devnoname120/epubviewer&release=playground&asset=epubviewer.zip"
+      "url": "https://github-proxy.exelearning.dev/?repo=devnoname120/epubviewer&release=latest&asset-pattern=epubviewer-*.tar.gz"
     },
     {
       "step": "writeFile",
