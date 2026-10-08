@@ -1,3 +1,28 @@
+## 1.9.8 - 2026-10-08
+
+### Security
+
+- Validate EPUB ZIP and ZIP64 central-directory size and entry count before opening archives for server previews.
+- Check cover-image dimensions, pixel counts, and frames before decoding; reject malformed and animated covers.
+- Reject unsafe authenticated/public DAV path segments and verify resolved files stay inside the permitted user folder or share.
+- Render PDF page labels and search snippets as literal text instead of HTML.
+- Bound EPUB and comic downloads, archive metadata, extraction output, compression ratios, and elapsed extraction work; validate RAR decoder dictionary requirements before allocation.
+- Replace comic ZIP data-descriptor scanning with validated central-directory sizes, removing the non-progress loop.
+- Bound PDF page/search state and comic decoded images/canvases; cancel work and release partial resources on failure or close.
+
+### Changed
+
+- Comic rendering retains only four nearby decoded pages and revokes object URLs outside that window.
+- PDF search text is extracted on demand with cancellation, character limits, and bounded search results and annotation imports.
+- PDFs and comics are limited to 1,000 pages. Animated comic/cover images and interactive ZIP64 archives are refused; bounded ZIP64 EPUB server previews remain supported.
+- Updated compatible JavaScript and PHP dependencies, including Vite 8, TypeScript 6, PHPUnit 11, and Psalm 6.
+- Build tooling supports Node.js 22.12+ or 24 and npm 10 or 11; Nextcloud 33-35 and PHP 8.2-8.5 support is unchanged.
+
+### Added
+
+- Added a ready-to-use Nextcloud Playground preview with demo publications.
+- Added regression coverage for archive/image limits, path containment, PDF text rendering, cancellation, and resource cleanup.
+
 ## 1.9.7 - 2026-07-11
 
 ### Added
