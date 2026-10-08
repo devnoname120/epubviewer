@@ -1,4 +1,5 @@
-import { fromUint8Array, unrar } from '@mary/rar'
+import '../js/reader-limits.js'
+import { fromUint8Array, unrar, walkRar3Archive, walkRar5Archive } from '@mary/rar'
 
 interface ExtractRequest {
 	type: 'extract'
@@ -28,20 +29,43 @@ function errorMessage(error: unknown): string {
 }
 
 async function extractArchive(arrayBuffer: ArrayBuffer): Promise<void> {
+	const limits = (globalThis as any).ReaderLimits
 	const archiveSize = arrayBuffer.byteLength
+	limits.assert(archiveSize <= limits.policy.archiveBytes, 'RAR exceeds the input limit.')
+	let entryCount = 0
+	let declaredBytes = 0
+	const source = fromUint8Array(new Uint8Array(arrayBuffer))
+	const walk = new Uint8Array(arrayBuffer)[6] === 1 ? walkRar5Archive : walkRar3Archive
+	let headerCount = 0
+	let preflightBytes = 0
+	// The backend allocates its dictionary before yielding an entry. Validate
+	// every header before calling unrar, as well as guarding each output stream.
+	for await (const { block } of walk(source)) {
+		limits.assert(++headerCount <= limits.policy.entries, 'RAR exceeds the header-count limit.')
+		if (block.kind === 'file') {
+			preflightBytes = limits.entry(block.unpackedSize, block.dataSize, preflightBytes)
+			if ('compressionInfo' in block) {
+				const dictionaryBytes = 128 * 1024 * 2 ** ((block.compressionInfo >> 10) & 15)
+				limits.assert(dictionaryBytes <= limits.policy.entryBytes, 'RAR exceeds the dictionary memory limit.')
+			}
+		}
+	}
 	let currentBytes = 0
 	let currentFileNumber = 0
 	let compressedBytesRead = 0
 
 	send({ type: 'start' })
 
-	for await (const entry of unrar(fromUint8Array(new Uint8Array(arrayBuffer)))) {
+	for await (const entry of unrar(source)) {
+		limits.assert(++entryCount <= limits.policy.entries, 'RAR exceeds the entry-count limit.')
+		declaredBytes = limits.entry(entry.size, entry.compressedSize, declaredBytes)
 		compressedBytesRead += entry.compressedSize
 		if (entry.isDirectory || entry.isSymlink) {
 			continue
 		}
 
-		const fileData = await entry.bytes()
+		const fileData = await limits.readStream(entry.body, entry.size)
+		limits.assert(fileData.byteLength === entry.size, 'RAR output size differs from metadata.')
 		currentBytes += fileData.byteLength
 		currentFileNumber += 1
 

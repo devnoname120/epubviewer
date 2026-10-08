@@ -49,6 +49,9 @@ final class EPubArchiveLimits {
 		public readonly int $maxContainerXmlBytes = self::DEFAULT_MAX_CONTAINER_XML_BYTES,
 		public readonly int $maxPackageDocumentBytes = self::DEFAULT_MAX_PACKAGE_DOCUMENT_BYTES,
 		public readonly int $maxCoverBytes = self::DEFAULT_MAX_COVER_BYTES,
+		public readonly int $maxCentralDirectoryBytes = 16 * 1024 * 1024,
+		public readonly int $maxImageDimension = 8192,
+		public readonly int $maxImagePixels = 16 * 1024 * 1024,
 	) {
 		foreach (get_object_vars($this) as $name => $value) {
 			if ($value < 1) {

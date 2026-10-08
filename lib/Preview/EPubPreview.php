@@ -59,6 +59,7 @@ class EPubPreview extends ProviderV2 {
 			}
 
 			// Found a cover, so attempt to convert it to an OC\Image.
+			$this->archiveReader->assertCoverImageSafe($coverInfo['data']);
 			$image = new Image();
 			$image->loadFromData($coverInfo['data']);
 			if (!$image->valid()) {

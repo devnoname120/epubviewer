@@ -29,11 +29,16 @@ final class EPubArchiveReader {
 		return $this->limits->maxArchiveBytes;
 	}
 
+	public function assertCoverImageSafe(string $data): void {
+		ImageHeaderPreflight::check($data, $this->limits);
+	}
+
 	/**
 	 * @return null|array{data: string, mime: string, path: string}
 	 */
 	public function readCover(string $file): ?array {
 		$this->assertArchiveFileSize($file);
+		ZipMetadataPreflight::check($file, $this->limits);
 
 		$zip = new ZipArchive();
 		$result = $zip->open($file, ZipArchive::RDONLY | ZipArchive::CHECKCONS);

@@ -37,7 +37,7 @@ PDFJS.Reader = function(bookPath, _options) {
         bookPath: bookPath,
         textRenderDelay: TEXT_RENDER_DELAY,
         pageRenderDelay: PAGE_RENDER_DELAY,
-        preloadTextcontent: true,   // true || false, preload text content to speed up first full-text search operation
+        preloadTextcontent: false,   // true || false, preload text content to speed up first full-text search operation
         canvasLimit: 0,
         cssZoomOnly: false, // true || false, only zoom using CSS, render document at 100% size
         textSelect: true,   // true || false, add selectable text layer
@@ -223,7 +223,12 @@ PDFJS.Reader = function(bookPath, _options) {
 	loadingTask.promise.then(
 
 		function(_book) {
-			reader.book = book = _book;
+			try { ReaderLimits.documentPages(_book.numPages); } catch (error) {
+                _book.destroy();
+                reader.ProgressController.setMessage('PDF exceeds the ' + ReaderLimits.policy.pages + '-page reader limit.', 'download', 'error');
+                return;
+            }
+            reader.book = book = _book;
 			reader.settings.numPages = reader.book.numPages;
 			document.getElementById('total_pages').textContent = reader.settings.numPages;
 			if(!$.isEmptyObject(reader.settings.session.cursor)
@@ -241,9 +246,9 @@ PDFJS.Reader = function(bookPath, _options) {
 			// set labels
 			reader.book.getPageLabels().then(function (labels) {
 				if (labels) {
-					for (var i = 0; i < labels.length; i++) {
+					for (var i = 0; i < Math.min(labels.length, ReaderLimits.policy.pages); i++) {
 						if (labels[i] !== (i + 1).toString()) {
-							reader.pageLabels[i + 1] = labels[i];
+							reader.pageLabels[i + 1] = String(labels[i]).slice(0, 1024);
 						}
 					}
 				}
@@ -279,14 +284,16 @@ PDFJS.Reader = function(bookPath, _options) {
 
             if (reader.settings.mergeAnnotations) {
                 reader.firstPagePromise.then(function() {
-                    var numPages = reader.settings.numPages;
+                    var numPages = reader.settings.numPages, annotationCount = 0;
 
                     function extractAnnotations(pageIndex) {
                         reader.book.getPage(pageIndex).then(function(page) {
                             page.getAnnotations().then(function(annotations) {
                                 if (annotations.length > 0) {
                                     for (var annotation in annotations) {
+                                        if (annotationCount >= ReaderLimits.policy.searchResults) return;
                                         if (annotations.hasOwnProperty(annotation) && !annotations[annotation].parentId) {
+                                            annotationCount++;
                                             var ann = annotations[annotation],
                                                 //type = (ann.contents && ann.contents !== "") ? "annotation" : "bookmark",
                                                 type = "annotation",
@@ -305,11 +312,10 @@ PDFJS.Reader = function(bookPath, _options) {
                                         }
                                     }
                                 }
+                                if (pageIndex < numPages && annotationCount < ReaderLimits.policy.searchResults) extractAnnotations(pageIndex + 1);
                             });
 
-                            if ((pageIndex + 1) <= reader.settings.numPages) {
-                                extractAnnotations(pageIndex + 1);
-                            }
+                            // Wait for this page before requesting the next annotation batch.
                         });
                     }
                     extractAnnotations(1);
@@ -1185,10 +1191,28 @@ PDFJS.Reader.prototype.getPageTextContent = function (pageIndex) {
     var reader = this,
         book = reader.book;
 
-    return book.getPage(pageIndex + 1).then(function (page) {
-        return page.getTextContent({
-            normalizeWhitespace: true,
-        });
+    return book.getPage(pageIndex + 1).then(async function (page) {
+        var stream = page.streamTextContent({ disableNormalization: false }).getReader();
+        var items = [], characters = 0, complete = false;
+        reader.activeSearchStream = stream;
+        try {
+            while (true) {
+                var chunk = await stream.read();
+                if (chunk.done) { complete = true; break; }
+                for (var item of chunk.value.items) {
+                    var text = item.str || '';
+                    characters += text.length;
+                    ReaderLimits.assert(characters <= ReaderLimits.policy.pageTextCharacters
+                        && items.length < ReaderLimits.policy.pageTextCharacters, 'PDF page text exceeds the character limit.');
+                    items.push({ str: text });
+                }
+            }
+            return { items: items };
+        } finally {
+            if (!complete) await stream.cancel().catch(function () {});
+            stream.releaseLock();
+            if (reader.activeSearchStream === stream) reader.activeSearchStream = null;
+        }
     });
 };
 

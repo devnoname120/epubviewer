@@ -27,6 +27,7 @@ function loadJsZip() {
     module: { exports: {} },
   });
 
+  vm.runInContext(fs.readFileSync(new URL('../../js/reader-limits.js', import.meta.url), 'utf8'), context);
   vm.runInContext(fs.readFileSync(zipBundlePath, 'utf8'), context, {
     filename: zipBundlePath.pathname,
   });
@@ -74,6 +75,7 @@ function loadEpubJs(JSZip, parserCalls) {
   context.self = context;
   context.window = context;
 
+  vm.runInContext(fs.readFileSync(new URL('../../js/reader-limits.js', import.meta.url), 'utf8'), context);
   vm.runInContext(fs.readFileSync(epubBundlePath, 'utf8'), context, {
     filename: epubBundlePath.pathname,
   });

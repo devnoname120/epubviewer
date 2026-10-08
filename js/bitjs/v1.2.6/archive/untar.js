@@ -10,6 +10,10 @@
  * TAR format: http://www.gnu.org/software/automake/manual/tar/Standard.html
  */
 
+import '../../../reader-limits.js';
+const limits = globalThis.ReaderLimits;
+let entryCount = 0, declaredBytes = 0;
+
 import { ByteStream } from '../io/bytestream.js';
 
 const UnarchiveState = {
@@ -108,6 +112,8 @@ class TarLocalFile {
 
     bytesRead += 512;
 
+    limits.assert(++entryCount <= limits.policy.entries, 'TAR exceeds the entry-count limit.');
+    declaredBytes = limits.entry(this.size, this.size, declaredBytes);
     // Done header, now rest of blocks are the file contents.
     this.filename = this.name;
     /** @type {Uint8Array} */
@@ -225,7 +231,9 @@ export function connect(port) {
     throw `hostPort already connected in untar.js`;
   }
   hostPort = port;
-  port.onmessage = onmessage;
+  port.onmessage = event => {
+    try { onmessage(event); } catch (error) { hostPort.postMessage({ type: 'error', msg: String(error) }); }
+  };
 }
 
 export function disconnect() {
@@ -236,6 +244,8 @@ export function disconnect() {
   hostPort = null;
 
   unarchiveState = UnarchiveState.NOT_STARTED;
+  entryCount = 0;
+  declaredBytes = 0;
   bytestream = null;
   allLocalFiles = null;
   logToConsole = false;

@@ -10,6 +10,8 @@
  * https://www.ietf.org/rfc/rfc1952.txt
  */
 
+import '../../../reader-limits.js';
+
 import { BitStream } from '../io/bitstream.js';
 import { ByteStream } from '../io/bytestream.js';
 
@@ -77,7 +79,10 @@ async function gunzip() {
   // Now try to use native implementation of INFLATE, if supported by the runtime.
   const blob = new Blob([bstream.bytes.buffer]);
   const decompressedStream = blob.stream().pipeThrough(new DecompressionStream('gzip'));
-  const fileData = new Uint8Array(await new Response(decompressedStream).arrayBuffer());
+  const limits = globalThis.ReaderLimits;
+  const maximum = Math.min(limits.policy.entryBytes, Math.max(limits.policy.ratioMinimum - 1, bstream.bytes.byteLength * limits.policy.ratio));
+  const fileData = await limits.readStream(decompressedStream, maximum);
+  limits.entry(fileData.byteLength, bstream.bytes.byteLength, 0);
   const unarchivedFile = { filename, fileData };
   hostPort.postMessage({ type: 'extract', unarchivedFile }, [fileData.buffer]);
 
@@ -111,7 +116,7 @@ export function connect(port) {
   }
 
   hostPort = port;
-  port.onmessage = onmessage;
+  port.onmessage = event => { onmessage(event).catch(error => err(String(error))); };
 }
 
 export function disconnect() {

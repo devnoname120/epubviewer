@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { randomBytes } from 'node:crypto';
 import fs from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
@@ -14,6 +15,7 @@ const context = vm.createContext({
   exports: {},
   module: { exports: {} },
 });
+vm.runInContext(fs.readFileSync(new URL('../../js/reader-limits.js', import.meta.url), 'utf8'), context);
 vm.runInContext(fs.readFileSync(bundlePath, 'utf8'), context, { filename: bundlePath.pathname });
 const JSZip = context.module.exports;
 
@@ -74,4 +76,21 @@ test('sanitizes relative entry names while retaining synchronous access', () => 
   // JSZip 2.x remains synchronous: no promise or async extraction API was introduced.
   assert.equal(typeof loaded.then, 'undefined');
   assert.equal(typeof loaded.file('OPS/normal.xhtml').asText(), 'string');
+});
+
+test('bounded synchronous inflation still loads ordinary compressed EPUB resources', () => {
+  const zip = new JSZip();
+  const text = 'ordinary EPUB chapter text '.repeat(100);
+  zip.file('OPS/chapter.xhtml', text);
+  const archive = zip.generate({ type: 'nodebuffer', compression: 'DEFLATE' });
+  assert.equal(new JSZip(archive).file('OPS/chapter.xhtml').asText(), text);
+});
+
+test('EPUB inflation preserves entries spanning multiple compressed input chunks', () => {
+  const zip = new JSZip();
+  const contents = randomBytes(128 * 1024);
+  zip.file('OPS/resource.bin', contents);
+  const archive = zip.generate({ type: 'nodebuffer', compression: 'DEFLATE' });
+  assert.ok(archive.length > 65536);
+  assert.deepEqual(Buffer.from(new JSZip(archive).file('OPS/resource.bin').asUint8Array()), contents);
 });

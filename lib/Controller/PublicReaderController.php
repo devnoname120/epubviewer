@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\Epubviewer\Controller;
 
 use OCA\Epubviewer\Service\PublicSharePath;
+use OCA\Epubviewer\Service\ReaderPath;
 use OCA\Epubviewer\Service\ReaderResponseBuilder;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\PublicPage;
@@ -44,14 +45,17 @@ class PublicReaderController extends PublicShareController {
 			throw new NotFoundException('Share token mismatch');
 		}
 
-		$node = $this->getShare()->getNode();
+		$sharedRoot = $this->getShare()->getNode();
+		$node = $sharedRoot;
 		foreach ($parsedPath['segments'] as $segment) {
 			if (!$node instanceof Folder) {
 				throw new NotFoundException('Shared file path not found');
 			}
 
 			$node = $node->get($segment);
+			ReaderPath::assertContained($sharedRoot, $node);
 		}
+		ReaderPath::assertContained($sharedRoot, $node);
 
 		if ($node->getType() === FileInfo::TYPE_FOLDER) {
 			throw new NotFoundException('Shared file path or name not set');

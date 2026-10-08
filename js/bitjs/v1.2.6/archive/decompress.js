@@ -8,6 +8,8 @@
  * Copyright(c) 2021 Google Inc.
  */
 
+import '../../../reader-limits.js';
+
 import { UnarchiveAppendEvent, UnarchiveErrorEvent, UnarchiveEvent, UnarchiveEventType,
          UnarchiveExtractEvent, UnarchiveFinishEvent, UnarchiveInfoEvent,
          UnarchiveProgressEvent, UnarchiveStartEvent } from './events.js';
@@ -87,6 +89,7 @@ export class Unarchiver extends EventTarget {
      * @type {ArrayBuffer}
      * @protected
      */
+    globalThis.ReaderLimits.assert(arrayBuffer.byteLength <= globalThis.ReaderLimits.policy.archiveBytes, 'Archive exceeds the input limit.');
     this.ab = arrayBuffer;
 
     /**
@@ -216,8 +219,14 @@ export class Unarchiver extends EventTarget {
     this.port_ = impl.hostPort;
     this.disconnectFn_ = impl.disconnectFn;
     return new Promise((resolve, reject) => {
+      this.timer_ = setTimeout(() => {
+        this.dispatchEvent(new UnarchiveErrorEvent('Archive extraction exceeded the time limit.'));
+        this.stop();
+        reject(new Error('Archive extraction exceeded the time limit.'));
+      }, globalThis.ReaderLimits.policy.workMilliseconds);
       this.port_.onerror = (evt) => {
         console.log('Impl error: message = ' + evt.message);
+        this.stop();
         reject(evt);
       };
 
@@ -226,6 +235,12 @@ export class Unarchiver extends EventTarget {
           // Just log any strings the implementation pumps our way.
           console.log(evt.data);
         } else {
+          if (evt.data.type === UnarchiveEventType.ERROR) {
+            this.handlePortEvent_(evt.data);
+            this.stop();
+            reject(new Error(evt.data.msg));
+            return;
+          }
           if (this.handlePortEvent_(evt.data)) {
             resolve();
           }
@@ -269,6 +284,7 @@ export class Unarchiver extends EventTarget {
    * Closes the port to the decompressor implementation and terminates it.
    */
   stop() {
+    clearTimeout(this.timer_);
     if (this.port_) {
       this.port_.close();
       this.disconnectFn_();

@@ -49,6 +49,8 @@ $idevice = (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone')
   <link rel="stylesheet"
         href="<?php p($urlGenerator->linkTo('epubviewer', 'js/epubjs/css/popup.css')) ?>?v=<?php p($version) ?>">
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
+          src="<?php p($urlGenerator->linkTo('epubviewer', 'js/reader-limits.js')) ?>?v=<?php p($version) ?>"></script>
+  <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/lib/typedarray.min.js')) ?>?v=<?php p($version) ?>"></script>
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/epubjs/libs/jquery.min.js')) ?>?v=<?php p($version) ?>"></script>

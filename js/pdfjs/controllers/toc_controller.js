@@ -101,7 +101,7 @@ PDFJS.reader.TocController = function() {
             placeholder.style.width = reader.settings.thumbnailWidth;
             placeholder.style.height = parseInt(reader.settings.thumbnailWidth / aspect);
             placeholder.classList.add("placeholder");
-            label.innerHTML = page_label || (i + 1).toString();
+            label.textContent = page_label || (i + 1).toString();
             label.classList.add("page_label");
             //label.style.left = width;
             item.appendChild(placeholder);

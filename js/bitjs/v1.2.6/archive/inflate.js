@@ -13,6 +13,8 @@
  * DEFLATE format: http://tools.ietf.org/html/rfc1951
  */
 
+import '../../../reader-limits.js';
+
 import { BitStream } from '../io/bitstream.js';
 import { ByteBuffer } from '../io/bytebuffer.js';
 
@@ -295,13 +297,18 @@ function inflateBlockData(bstream, hcLiteralTable, hcDistanceTable, buffer) {
  * @returns {Promise<Uint8Array>} The decompressed array.
  */
 export async function inflate(compressedData, numDecompressedBytes) {
-  // Try to use native implementation of DEFLATE if it exists.
+  globalThis.ReaderLimits.entry(numDecompressedBytes, compressedData.byteLength, 0);
+  let decompressor;
   try {
-    const blob = new Blob([compressedData.buffer]);
-    const decompressedStream = blob.stream().pipeThrough(new DecompressionStream('deflate-raw'));
-    return new Uint8Array(await new Response(decompressedStream).arrayBuffer());
-  } catch (err) {
-    // Fall through to non-native implementation of DEFLATE.
+    decompressor = new DecompressionStream('deflate-raw');
+  } catch (error) {
+    // Only an unsupported codec triggers the bounded JavaScript fallback.
+  }
+  if (decompressor) {
+    const decompressedStream = new Blob([compressedData]).stream().pipeThrough(decompressor);
+    const output = await globalThis.ReaderLimits.readStream(decompressedStream, numDecompressedBytes);
+    globalThis.ReaderLimits.assert(output.byteLength === numDecompressedBytes, 'Inconsistent DEFLATE output size.');
+    return output;
   }
 
   // Bit stream representing the compressed data.

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\Epubviewer\Controller;
 
 use OCA\Epubviewer\Service\PublicSharePath;
+use OCA\Epubviewer\Service\ReaderPath;
 use OCA\Epubviewer\Service\ReaderResponseBuilder;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
@@ -65,7 +66,9 @@ class PageController extends Controller {
 
 		$filePath = $this->extractUserRelativePath($path);
 		$userFolder = $this->rootFolder->getUserFolder($this->userId);
-		$fileId = $userFolder->get($filePath)->getId();
+		$node = $userFolder->get($filePath);
+		ReaderPath::assertContained($userFolder, $node);
+		$fileId = $node->getId();
 
 		$filename = pathinfo($filePath, PATHINFO_FILENAME);
 		$extension = pathinfo($filePath, PATHINFO_EXTENSION);
@@ -113,7 +116,7 @@ class PageController extends Controller {
 			return [];
 		}
 
-		return array_map(static fn (string $segment): string => rawurldecode($segment), explode('/', $path));
+		return ReaderPath::segments($path);
 	}
 
 	/**

@@ -5,6 +5,7 @@ build
 .php-cs-fixer.cache
 css/epubviewer-settings.css
 js/*
+!js/reader-limits.js
 !js/cbrjs
 !js/lib
 !js/bitjs

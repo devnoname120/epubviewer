@@ -36,6 +36,9 @@ class EPubArchiveLimitsTest extends TestCase {
 			'maximum container XML bytes' => ['maxContainerXmlBytes'],
 			'maximum package document bytes' => ['maxPackageDocumentBytes'],
 			'maximum cover bytes' => ['maxCoverBytes'],
+			'maximum central directory bytes' => ['maxCentralDirectoryBytes'],
+			'maximum image dimension' => ['maxImageDimension'],
+			'maximum image pixels' => ['maxImagePixels'],
 		];
 	}
 

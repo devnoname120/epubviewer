@@ -1,3 +1,4 @@
+import '../js/reader-limits.js'
 const RAR3_SIGNATURE = [0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00]
 const RAR5_SIGNATURE = [0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x01, 0x00]
 
@@ -38,6 +39,7 @@ export class MaryRarUnarchiver extends EventTarget {
 			throw new TypeError('RAR input must be an ArrayBuffer')
 		}
 
+		globalThis.ReaderLimits.assert(arrayBuffer.byteLength <= globalThis.ReaderLimits.policy.archiveBytes, 'RAR exceeds the input limit.')
 		this.arrayBuffer = arrayBuffer
 		this.workerFactory = options.workerFactory ?? createWorker
 		this.worker = null
@@ -66,6 +68,8 @@ export class MaryRarUnarchiver extends EventTarget {
 				this.stop()
 				reject(new Error(detail))
 			}
+
+			this.timer = setTimeout(() => fail('RAR extraction exceeded the time limit.'), globalThis.ReaderLimits.policy.workMilliseconds)
 
 			worker.addEventListener('message', (event) => {
 				const message = event.data
@@ -106,6 +110,8 @@ export class MaryRarUnarchiver extends EventTarget {
 	}
 
 	stop() {
+		clearTimeout(this.timer)
+		this.arrayBuffer = null
 		if (this.worker !== null) {
 			this.worker.terminate()
 			this.worker = null

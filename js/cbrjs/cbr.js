@@ -34,6 +34,7 @@ CBRJS.createImageBlob = function(unarchivedFile) {
 		return null;
 	}
 
+	ReaderLimits.image(unarchivedFile.fileData);
 	return new Blob([unarchivedFile.fileData], { type: mimetype });
 };
 
@@ -54,11 +55,14 @@ CBRJS.getCanvasPixelRatio = function(pageScale) {
 
 CBRJS.configureCanvas = function(canvas, context, width, height, pageScale) {
 	var pixelRatio = CBRJS.getCanvasPixelRatio(pageScale);
+    ReaderLimits.assert(isFinite(width) && isFinite(height) && width > 0 && height > 0, 'Invalid comic canvas dimensions.');
+    pixelRatio = Math.min(pixelRatio, Math.sqrt(ReaderLimits.policy.canvasPixels / (Math.ceil(width) * Math.ceil(height))), ReaderLimits.policy.imageDimension / width, ReaderLimits.policy.imageDimension / height);
 
 	canvas.style.width = width + 'px';
 	canvas.style.height = height + 'px';
-	canvas.width = Math.ceil(width * pixelRatio);
-	canvas.height = Math.ceil(height * pixelRatio);
+	canvas.width = Math.max(1, Math.floor(width * pixelRatio));
+	canvas.height = Math.max(1, Math.floor(height * pixelRatio));
+    ReaderLimits.assert(canvas.width * canvas.height <= ReaderLimits.policy.canvasPixels, 'Comic canvas exceeds the pixel limit.');
 
 	context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 	context.imageSmoothingEnabled = true;
@@ -101,129 +105,94 @@ CBRJS.Reader = function(bookPath, _options) {
     }
 
 	function extractImages(url, opts) {
+        var images = [], ua, done = false;
+        var controller = new AbortController();
+        var filename = decodeURIComponent(url.split('/').pop());
+        var options = $.extend({
+            start: function () {}, extract: function () {}, progress: function () {},
+            finish: function () {}, error: function () {}
+        }, opts);
+        images.blobs = [];
 
-		var images = [],
-		    xhr = new XMLHttpRequest(),
-		    filename = decodeURIComponent(url.split('/').pop()),
-		    options = $.extend({
-			    start: function () {},
-			    extract: function (page_url) {},
-			    progress: function (percent_complete) {},
-			    finish: function (images) {},
-			    error: function (message) {}
-		    }, opts);
+        function revoke() {
+            images.forEach(function (url) { if (url) window.URL.revokeObjectURL(url); });
+            images.blobs.length = 0;
+            images.length = 0;
+        }
 
-		xhr.open('GET',url, true);
+        function failArchive(error) {
+            if (done) return;
+            done = true;
+            clearTimeout(timer);
+            controller.abort();
+            if (ua) ua.stop();
+            revoke();
+            options.error(typeof error === 'string' ? error : (error && error.message) || 'Failed to extract images from archive, file corrupted or unsupported?');
+        }
 
-		options.start(filename);
+        var timer = setTimeout(function () {
+            failArchive('Comic download exceeded the time limit.');
+        }, ReaderLimits.policy.workMilliseconds);
+        window.addEventListener('pagehide', function () {
+            done = true;
+            clearTimeout(timer);
+            controller.abort();
+            if (ua) ua.stop();
+            revoke();
+        });
+        options.start(filename);
+        $progressbar.css('width', '0%');
 
-		xhr.responseType = "arraybuffer";
-
-		xhr.onprogress = function (e) {
-			if (e.lengthComputable) {
-				$progressbar.css('width', Math.floor((e.loaded / e.total) * 100) + '%');
-			}
-		};
-
-		xhr.onloadstart = function (e) {
-			$progressbar.css('width', '0%');
-		};
-
-		xhr.onloadend = function (e) {
-			$('.icon-cloud_download').addClass('ok');
-            reader.options.session.size = e.total;
-		};
-
-		xhr.onload = function () {
-			if ((this.status === 200) && this.response) {
-				var done = false;
-				var eventTypes = CBRJS.UnarchiveEventType;
-				var ua;
-
-				function failArchive() {
-					if (done) {
-						return;
-					}
-
-					done = true;
-					options.error('Failed to extract images from archive, file corrupted or unsupported?');
-				}
-
-				if (typeof CBRJS.getUnarchiver !== 'function' || !eventTypes) {
-					options.error('Archive support failed to load.');
-					return;
-				}
-
-				try {
-					ua = CBRJS.getUnarchiver(this.response);
-				} catch (error) {
-					failArchive();
-					return;
-				}
-
-				if (!ua) {
-					failArchive();
-					return;
-				}
-
-				ua.addEventListener(eventTypes.START, function (e) {
-					$progressbar.css('width', '0%');
-					$('.icon-unarchive').addClass('active');
-				});
-
-				ua.addEventListener(eventTypes.EXTRACT, function (e) {
-
-					var blob = CBRJS.createImageBlob(e.unarchivedFile);
-					if (!blob) {
-						return;
-					}
-
-					var url = window.URL.createObjectURL(blob);
-
-					images.push(url);
-
-					options.extract(url, blob);
-				});
-
-				ua.addEventListener(eventTypes.PROGRESS, function (e) {
-					if (e.totalUncompressedBytesInArchive > 0) {
-						options.progress(Math.floor(e.currentBytesUnarchived / e.totalUncompressedBytesInArchive * 100));
-					}
-				});
-
-				ua.addEventListener(eventTypes.FINISH, function (e) {
-					if (done) {
-						return;
-					}
-
-					done = true;
-					if (images.length === 0) {
-						options.error('No supported images were found in this comic archive.');
-						return;
-					}
-
-					options.finish(images);
-				});
-
-				ua.addEventListener(eventTypes.ERROR, function (e) {
-					failArchive();
-				});
-
-				try {
-					var startResult = ua.start();
-					if (startResult && typeof startResult.catch === 'function') {
-						startResult.catch(failArchive);
-					}
-				} catch (error) {
-					failArchive();
-				}
-			} else {
-				options.error('Failed to download comic archive.');
-			}
-		};
-
-		xhr.send();
-	}
+        ReaderLimits.download(url, controller.signal, function (loaded, total) {
+            if (total > 0) $progressbar.css('width', Math.floor(loaded / total * 100) + '%');
+        }).then(function (arrayBuffer) {
+            clearTimeout(timer);
+            if (done) return;
+            $('.icon-cloud_download').addClass('ok');
+            reader.options.session.size = arrayBuffer.byteLength;
+            var eventTypes = CBRJS.UnarchiveEventType;
+            if (typeof CBRJS.getUnarchiver !== 'function' || !eventTypes) {
+                failArchive('Archive support failed to load.');
+                return;
+            }
+            ua = CBRJS.getUnarchiver(arrayBuffer);
+            if (!ua) { failArchive(); return; }
+            ua.addEventListener(eventTypes.START, function () {
+                $progressbar.css('width', '0%');
+                $('.icon-unarchive').addClass('active');
+            });
+            ua.addEventListener(eventTypes.EXTRACT, function (event) {
+                if (done) return;
+                try {
+                    var blob = CBRJS.createImageBlob(event.unarchivedFile);
+                    if (!blob) return;
+                    ReaderLimits.assert(images.length < ReaderLimits.policy.pages, 'Comic exceeds the page limit.');
+                    var imageUrl = window.URL.createObjectURL(blob);
+                    images.push(imageUrl);
+                    images.blobs.push(blob);
+                    options.extract(imageUrl, blob);
+                } catch (error) { failArchive(error); }
+            });
+            ua.addEventListener(eventTypes.PROGRESS, function (event) {
+                if (!done && event.totalUncompressedBytesInArchive > 0) {
+                    options.progress(Math.floor(event.currentBytesUnarchived / event.totalUncompressedBytesInArchive * 100));
+                }
+            });
+            ua.addEventListener(eventTypes.FINISH, function () {
+                if (done) return;
+                done = true;
+                if (!images.length) {
+                    revoke();
+                    options.error('No supported images were found in this comic archive.');
+                    return;
+                }
+                options.finish(images);
+            });
+            ua.addEventListener(eventTypes.ERROR, function (event) { failArchive(event.msg); });
+            var startResult = ua.start();
+            if (startResult && typeof startResult.catch === 'function') startResult.catch(failArchive);
+        }).catch(failArchive);
+    }
 
 	function openComicArchive(url, options) {
 
@@ -411,6 +380,9 @@ ComicBook = (function ($) {
         $.extend(true, options, defaults, opts); // options array for internal use
 
         var no_pages = srcs.length;
+        var blobs = srcs.blobs || null;
+        ReaderLimits.assert(no_pages <= ReaderLimits.policy.pages, 'Comic exceeds the page limit.');
+        var destroyed = false, preloadRunning = false;
         var pages = []; // array of preloaded Image objects
         var canvas; // the HTML5 canvas object
         var context; // the 2d drawing context
@@ -633,8 +605,11 @@ ComicBook = (function ($) {
         ComicBook.prototype.getThumb = function (image) {
             var thumb = new Image();
             var scale = image.width / options.thumbnailWidth;
-            tcv.width = options.thumbnailWidth;
-            tcv.height = Math.floor(image.height / scale);
+            var thumbWidth = Math.min(200, Math.max(1, options.thumbnailWidth));
+            var thumbHeight = Math.max(1, Math.floor(image.height * thumbWidth / image.width));
+            var ratio = Math.min(1, Math.sqrt(65536 / (thumbWidth * thumbHeight)));
+            tcv.width = Math.max(1, Math.floor(thumbWidth * ratio));
+            tcv.height = Math.max(1, Math.floor(thumbHeight * ratio));
             tctx.drawImage(image, 0, 0, tcv.width, tcv.height);
             thumb.src = tcv.toDataURL();
             tctx.clearRect(0, 0, tcv.width, tcv.height);
@@ -690,7 +665,7 @@ ComicBook = (function ($) {
         ComicBook.prototype.tocPopulate = function () {
             var i = 0;
             while (i < srcs.length) {
-                self.tocInsert(pages[i], i, true);
+                if (pages[i]) self.tocInsert(pages[i], i, true);
                 i++;
             }
 
@@ -715,6 +690,7 @@ ComicBook = (function ($) {
             } else {
                 page_requested = i;
                 this.showControl('loadingOverlay');
+                this.preload();
             }
         };
 
@@ -774,95 +750,76 @@ ComicBook = (function ($) {
          * @see #drawPage
          */
         ComicBook.prototype.preload = function () {
-
-            var i = options.currentPage; // the current page counter for this method
-            var rendered = false;
+            if (destroyed || preloadRunning) return;
+            var start = Math.max(0, options.currentPage - 1);
+            var end = Math.min(no_pages - 1, options.currentPage + 2);
             var queue = [];
-
+            pages.forEach(function (page, index) {
+                if (index < start || index > end) {
+                    page.src = '';
+                    delete pages[index];
+                    loaded = loaded.filter(function (value) { return value !== index; });
+                    if (toc.children[index]) toc.children[index].firstChild.src = '';
+                }
+            });
+            // Keep encoded blobs for navigation, but revoke URLs outside the
+            // decode window so the browser can release cached raster images.
+            if (blobs) srcs.forEach(function (url, index) {
+                if (url && (index < start || index > end)) {
+                    window.URL.revokeObjectURL(url);
+                    srcs[index] = null;
+                }
+            });
+            for (var index = options.currentPage; index <= end; index++) if (!pages[index]) queue.push(index);
+            for (var index = options.currentPage - 1; index >= start; index--) if (!pages[index]) queue.push(index);
+            if (!queue.length) { self.drawPage(); self.hideControl('loadingOverlay'); return; }
+            preloadRunning = true;
             this.showControl('loadingOverlay');
-
-            function loadImage(i) {
-
-                var page = new Image();
-
+            function next() {
+                if (destroyed) { preloadRunning = false; return; }
+                if (!queue.length) {
+                    preloadRunning = false;
+                    self.preload(); // Recompute the window if navigation changed while an image loaded.
+                    return;
+                }
+                var index = queue.shift(), page = new Image();
                 page.onload = function () {
-
-                    pages[i] = this;
-
-                    self.tocInsert(this, i, options.thumbnails);
-
-                    loaded.push(i);
-
-                    $('#cbr-progress-bar .progressbar-value').css('width', Math.floor((loaded.length / no_pages) * 100) + '%');
-
-                    // double page mode needs an extra page added
-                    var buffer = (options.displayMode === 'double' && options.currentPage < srcs.length - 1) ? 1 : 0;
-
-                    // start rendering the comic when the requested page is ready
-                    if ((rendered === false && ($.inArray(options.currentPage + buffer, loaded) !== -1) ||
-                        (typeof page_requested === 'number' && $.inArray(page_requested, loaded) !== -1))) {
-                        // if the user is waiting for a page to be loaded, render that one instead of the default options.currentPage
-                        if (typeof page_requested === 'number') {
-                            options.currentPage = page_requested - 1;
-                            page_requested = false;
+                    if (destroyed) { this.src = ''; return; }
+                    try {
+                        var pixels = ReaderLimits.dimensions(this.naturalWidth || this.width, this.naturalHeight || this.height);
+                        pages.forEach(function (cached) { pixels += cached.width * cached.height; });
+                        ReaderLimits.assert(pixels <= ReaderLimits.policy.totalImagePixels, 'Comic exceeds the retained image pixel limit.');
+                        pages[index] = this;
+                        loaded.push(index);
+                        self.tocInsert(this, index, options.thumbnails);
+                        var buffer = options.displayMode === 'double' && options.currentPage < no_pages - 1 ? 1 : 0;
+                        if (pages[options.currentPage] && pages[options.currentPage + buffer]) {
+                            self.drawPage(); self.hideControl('loadingOverlay');
                         }
-
-                        self.drawPage();
+                        next();
+                    } catch (error) {
+                        preloadRunning = false;
+                        this.src = '';
+                        self.destroy();
                         self.hideControl('loadingOverlay');
-                        rendered = true;
-                    }
-
-                    if (queue.length) {
-                        loadImage(queue[0]);
-                        queue.splice(0, 1);
-                    } else {
-                        $('#cbr-status').delay(500).fadeOut();
+                        options.error(error.message);
                     }
                 };
-
                 page.onerror = function () {
+                    if (destroyed) return;
+                    preloadRunning = false;
+                    self.destroy();
                     self.hideControl('loadingOverlay');
-                    options.error('Failed to decode comic page #' + (i + 1) + '.');
+                    options.error('Failed to decode comic page #' + (index + 1) + '.');
                 };
-
-                page.src = srcs[i];
+                if (blobs && !srcs[index]) srcs[index] = window.URL.createObjectURL(blobs[index]);
+                page.src = srcs[index];
             }
-
-            // loads pages in both directions so you don't have to wait for all pages
-            // to be loaded before you can scroll backwards
-            function preload(start, stop) {
-
-                var j = 0;
-                var count = 1;
-                var forward = start;
-                var backward = start - 1;
-
-                while (forward <= stop) {
-
-                    if (count > options.forward_buffer && backward > -1) {
-                        queue.push(backward);
-                        backward--;
-                        count = 0;
-                    } else {
-                        queue.push(forward);
-                        forward++;
-                    }
-                    count++;
-                }
-
-                while (backward > -1) {
-                    queue.push(backward);
-                    backward--;
-                }
-
-                loadImage(queue[j]);
-            }
-
-            preload(i, srcs.length - 1);
+            next();
         };
 
         ComicBook.prototype.pageLoaded = function (page_no) {
-            return (typeof loaded[page_no - 1] !== 'undefined');
+            return typeof pages[page_no - 1] === 'object';
         };
 
         /**
@@ -876,10 +833,11 @@ ComicBook = (function ($) {
             scrollY = reset_scroll ? 0 : window.scrollY;
 
             // if a specific page is given try to render it, if not bail and wait for preload() to render it
-            if (typeof page_no === 'number' && page_no < srcs.length && page_no > 0) {
+            if (typeof page_no === 'number' && page_no <= srcs.length && page_no > 0) {
                 options.currentPage = page_no - 1;
                 if (!this.pageLoaded(page_no)) {
                     this.showControl('loadingOverlay');
+                    this.preload();
                     return;
                 }
             }
@@ -1548,12 +1506,19 @@ ComicBook = (function ($) {
 
         ComicBook.prototype.destroy = function () {
 
+            destroyed = true;
+            pages.forEach(function (page) { page.src = ''; });
+            pages.length = 0;
+            loaded.length = 0;
+            srcs.forEach(function (url) { if (url) window.URL.revokeObjectURL(url); });
+            if (blobs) blobs.length = 0;
+            srcs.length = 0;
+            tcv.width = 0; tcv.height = 0;
             $.each(this.controls, function (name, $control) {
                 $control.remove();
             });
 
-            canvas.width = 0;
-            canvas.height = 0;
+            if (canvas) { canvas.width = 0; canvas.height = 0; }
 
             window.removeEventListener('keydown', this.navigation, false);
             window.removeEventListener('hashchange', checkHash, false);

@@ -12,6 +12,11 @@
  * DEFLATE format: http://tools.ietf.org/html/rfc1951
  */
 
+import '../../../reader-limits.js';
+
+const limits = globalThis.ReaderLimits;
+let zipEntries = null;
+
 import { ByteStream } from '../io/bytestream.js';
 import { ARCHIVE_EXTRA_DATA_SIG, CENTRAL_FILE_HEADER_SIG, CRC32_MAGIC_NUMBER,
   DATA_DESCRIPTOR_SIG, DIGITAL_SIGNATURE_SIG, END_OF_CENTRAL_DIR_SIG,
@@ -87,7 +92,7 @@ function readZipString(bstream, length, utf8) {
 
 class ZipLocalFile {
   /** @param {ByteStream} bstream */
-  constructor(bstream) {
+  constructor(bstream, metadata) {
     if (typeof bstream != typeof {} || !bstream.readNumber || typeof bstream.readNumber != typeof function () { }) {
       return null;
     }
@@ -118,61 +123,27 @@ class ZipLocalFile {
       this.extraField = bstream.readString(this.extraFieldLength);
     }
 
-    // Data descriptor is present if this bit is set, compressed size should be zero.
+    limits.assert(metadata && metadata.method === this.compressionMethod && metadata.flags === this.generalPurpose,
+      'ZIP member is missing from the validated central directory.');
     this.hasDataDescriptor = ((this.generalPurpose & BIT[3]) !== 0);
-    if (this.hasDataDescriptor &&
-      (this.crc32 !== 0 || this.compressedSize !== 0 || this.uncompressedSize !== 0)) {
-      err('Zip local file with a data descriptor and non-zero crc/compressedSize/uncompressedSize');
+    if (!this.hasDataDescriptor) {
+      limits.assert(this.compressedSize === metadata.compressed && this.uncompressedSize === metadata.size,
+        'ZIP local and central sizes differ.');
     }
-
-    // Read in the compressed data if we have no data descriptor.
-    /** @type {Uint8Array} */
-    this.fileData = null;
+    this.compressedSize = metadata.compressed;
+    this.uncompressedSize = metadata.size;
+    this.crc32 = metadata.crc;
+    // Use the validated size, never scan compressed bytes for a header delimiter.
     let descriptorSize = 0;
     if (this.hasDataDescriptor) {
-      // Hold on to a reference to the bstream, since that is where the compressed file data begins.
-      let savedBstream = bstream.tee();
-
-      // Seek ahead one byte at a time, looking for the next local file header signature or the end
-      // of all local files.
-      let foundDataDescriptor = false;
-      let numBytesSeeked = 0;
-      while (!foundDataDescriptor) {
-        while (bstream.peekNumber(4) !== LOCAL_FILE_HEADER_SIG &&
-          bstream.peekNumber(4) !== ARCHIVE_EXTRA_DATA_SIG &&
-          bstream.peekNumber(4) !== CENTRAL_FILE_HEADER_SIG) {
-          numBytesSeeked++;
-          bstream.readBytes(1);
-        }
-
-        // Copy all the read bytes into a buffer and examine the last 16 bytes to see if they are the
-        // data descriptor.
-        let bufferedByteArr = savedBstream.peekBytes(numBytesSeeked);
-        const descriptorStream = new ByteStream(bufferedByteArr.buffer, numBytesSeeked - 16, 16);
-        const maybeDescriptorSig = descriptorStream.readNumber(4);
-        const maybeCrc32 = descriptorStream.readNumber(4);
-        const maybeCompressedSize = descriptorStream.readNumber(4);
-        const maybeUncompressedSize = descriptorStream.readNumber(4);
-
-        // From the PKZIP App Note: "The signature value 0x08074b50 is also used by some ZIP
-        // implementations as a marker for the Data Descriptor record".
-        if (maybeDescriptorSig === DATA_DESCRIPTOR_SIG) {
-          if (maybeCompressedSize === (numBytesSeeked - 16)) {
-            foundDataDescriptor = true;
-            descriptorSize = 16;
-          }
-        } else if (maybeCompressedSize === (numBytesSeeked - 12)) {
-          foundDataDescriptor = true;
-          descriptorSize = 12;
-        }
-
-        if (foundDataDescriptor) {
-          this.crc32 = maybeCrc32;
-          this.compressedSize = maybeCompressedSize;
-          this.uncompressedSize = maybeUncompressedSize;
-        }
-      }
-      bstream = savedBstream;
+      const descriptor = bstream.tee();
+      descriptor.readBytes(this.compressedSize);
+      const signed = descriptor.peekNumber(4) === DATA_DESCRIPTOR_SIG;
+      if (signed) descriptor.readNumber(4);
+      limits.assert((descriptor.readNumber(4) >>> 0) === this.crc32
+        && descriptor.readNumber(4) === this.compressedSize
+        && descriptor.readNumber(4) === this.uncompressedSize, 'Invalid ZIP data descriptor.');
+      descriptorSize = signed ? 16 : 12;
     }
 
     this.fileData = new Uint8Array(bstream.readBytes(this.compressedSize));
@@ -216,6 +187,7 @@ class ZipLocalFile {
         info(`ZIP v2.0, DEFLATE: ${this.filename} (${this.compressedSize} bytes)`);
       }
       this.fileData = await inflate(this.fileData, this.uncompressedSize);
+      limits.assert(this.fileData.byteLength === this.uncompressedSize, 'ZIP output size differs from metadata.');
     }
     else {
       err(`UNSUPPORTED VERSION/FORMAT: ZIP v${this.version}, ` +
@@ -233,7 +205,7 @@ async function archiveUnzip() {
   while (bstream.peekNumber(4) == LOCAL_FILE_HEADER_SIG) {
     // Note that this could throw an error if the bstream overflows, which is caught in the
     // message handler.
-    const oneLocalFile = new ZipLocalFile(bstream);
+    const oneLocalFile = new ZipLocalFile(bstream, zipEntries.get(bstream.getNumBytesRead()));
     // this should strip out directories/folders
     if (oneLocalFile && oneLocalFile.uncompressedSize > 0 && oneLocalFile.fileData) {
       // If we make it to this point and haven't thrown an error, we have successfully
@@ -361,6 +333,7 @@ const onmessage = async function (event) {
 
   // This is the very first time we have been called. Initialize the bytestream.
   if (!bytestream) {
+    zipEntries = limits.inspectZip(bytes);
     bytestream = new ByteStream(bytes);
   } else {
     bytestream.push(bytes);
@@ -410,7 +383,9 @@ export function connect(port) {
   }
 
   hostPort = port;
-  port.onmessage = onmessage;
+  port.onmessage = event => {
+    onmessage(event).catch(error => err(String(error)));
+  };
 }
 
 export function disconnect() {
@@ -422,6 +397,7 @@ export function disconnect() {
 
   unarchiveState = UnarchiveState.NOT_STARTED;
   bytestream = null;
+  zipEntries = null;
   allLocalFiles = null;
   logToConsole = false;
 

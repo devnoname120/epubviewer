@@ -87,11 +87,13 @@ class PublicReaderControllerTest extends TestCase {
 		$fileUrl = 'https://cloud.example/public.php/dav/files/folder-token/Book%20Shelf/Novel.epub';
 		$file = $this->createFile('/owner/files/Library/Book Shelf/Novel.epub', 43);
 		$bookShelf = $this->createMock(Folder::class);
+		$bookShelf->method('getPath')->willReturn('/owner/files/Library/Book Shelf');
 		$bookShelf->expects(self::once())
 			->method('get')
 			->with('Novel.epub')
 			->willReturn($file);
 		$root = $this->createMock(Folder::class);
+		$root->method('getPath')->willReturn('/owner/files/Library');
 		$root->method('isReadable')->willReturn(true);
 		$root->expects(self::once())
 			->method('get')
@@ -141,6 +143,21 @@ class PublicReaderControllerTest extends TestCase {
 
 		$this->expectException(NotFoundException::class);
 		$controller->showReader();
+	}
+
+	public function testRejectsResolverReturningNodeOutsideTheShare(): void {
+		$token = 'folder-token';
+		$file = $this->createFile('/owner/files/Private/Secret.epub', 99);
+		$root = $this->createMock(Folder::class);
+		$root->method('getPath')->willReturn('/owner/files/Library');
+		$root->method('isReadable')->willReturn(true);
+		$root->method('get')->with('Book.epub')->willReturn($file);
+		$this->expectShareLookup($token, $this->createShare($root, null));
+		$this->readerResponseBuilder->expects(self::never())->method('build');
+		$controller = $this->createController();
+		$this->runPublicShareMiddleware($controller, $token);
+		$this->expectException(NotFoundException::class);
+		$controller->showReader($token, '/public.php/dav/files/folder-token/Book.epub', 'application/epub+zip');
 	}
 
 	public function testFileUrlTokenMustMatchGuardedRouteToken(): void {

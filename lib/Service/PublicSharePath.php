@@ -14,6 +14,9 @@ class PublicSharePath {
 	 * @throws NotFoundException
 	 */
 	public function parse(string $value): ?array {
+		if (str_contains($value, "\0")) {
+			throw new NotFoundException('Unsafe reader URL');
+		}
 		$path = parse_url($value, PHP_URL_PATH);
 		if (!is_string($path)) {
 			$path = $value;
@@ -50,7 +53,7 @@ class PublicSharePath {
 			return [];
 		}
 
-		return array_map(static fn (string $segment): string => rawurldecode($segment), explode('/', $path));
+		return ReaderPath::segments($path);
 	}
 
 	/**
