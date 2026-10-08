@@ -6,6 +6,7 @@ namespace OCA\Epubviewer\Tests\Unit;
 
 use OCA\Epubviewer\Preview\EPubArchiveLimits;
 use OCA\Epubviewer\Preview\EPubArchiveReader;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ZipArchive;
 
@@ -223,9 +224,7 @@ class EPubArchiveReaderTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider xmlDocumentProvider
-	 */
+	#[DataProvider('xmlDocumentProvider')]
 	public function testRejectsDtdBeforeParsingXml(bool $dtdInContainer): void {
 		$container = $this->containerXml();
 		$package = $this->packageXml();
@@ -259,9 +258,7 @@ class EPubArchiveReaderTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider unsafeCoverHrefProvider
-	 */
+	#[DataProvider('unsafeCoverHrefProvider')]
 	public function testRejectsUnsafeCoverHref(string $href, string $expectedMessage): void {
 		$file = $this->createEpub([
 			'META-INF/container.xml' => $this->containerXml(),

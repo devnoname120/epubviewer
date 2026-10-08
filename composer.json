@@ -53,9 +53,9 @@
     "psr/log": "^1.0.4|^2|^3"
   },
   "require-dev": {
-    "phpunit/phpunit": "^10.5.63",
+    "phpunit/phpunit": "^11.5.57",
     "friendsofphp/php-cs-fixer": "^3.59.3",
-    "psalm/phar": "^5.26.1",
+    "psalm/phar": "^6.19.2",
     "nextcloud/coding-standard": "^v1.3.2"
   },
   "require": {

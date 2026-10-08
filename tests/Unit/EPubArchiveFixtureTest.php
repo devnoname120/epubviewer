@@ -6,6 +6,7 @@ namespace OCA\Epubviewer\Tests\Unit;
 
 use OCA\Epubviewer\Preview\EPubArchiveLimits;
 use OCA\Epubviewer\Preview\EPubArchiveReader;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ZipArchive;
 
@@ -70,9 +71,7 @@ class EPubArchiveFixtureTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider coverFixtureProvider
-	 */
+	#[DataProvider('coverFixtureProvider')]
 	public function testReadsExpectedCoverFromFixture(
 		string $fixture,
 		string $expectedPath,
@@ -185,9 +184,7 @@ class EPubArchiveFixtureTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider rejectedFixtureProvider
-	 */
+	#[DataProvider('rejectedFixtureProvider')]
 	public function testRejectsUnsafeFixture(string $fixture, string $expectedMessage): void {
 		$this->expectException(\UnexpectedValueException::class);
 		$this->expectExceptionMessage($expectedMessage);
@@ -211,9 +208,7 @@ class EPubArchiveFixtureTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider allFixtureProvider
-	 */
+	#[DataProvider('allFixtureProvider')]
 	public function testFixtureHasRequiredEpubZipStructure(string $fixture): void {
 		$zip = new ZipArchive();
 		self::assertTrue($zip->open($this->fixturePath($fixture), ZipArchive::RDONLY | ZipArchive::CHECKCONS));

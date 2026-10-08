@@ -23,10 +23,10 @@ export default defineConfig({
 		rollupOptions: {
 			preserveEntrySignatures: 'strict',
 			input: {
-				main: path.resolve(__dirname, 'src/main.ts'),
-				rar: path.resolve(__dirname, 'src/rar.ts'),
-				settings: path.resolve(__dirname, 'src/settings.ts'),
-				ready: path.resolve(__dirname, 'src/ready.ts'),
+				main: path.resolve(import.meta.dirname, 'src/main.ts'),
+				rar: path.resolve(import.meta.dirname, 'src/rar.ts'),
+				settings: path.resolve(import.meta.dirname, 'src/settings.ts'),
+				ready: path.resolve(import.meta.dirname, 'src/ready.ts'),
 			},
 			output: {
 				entryFileNames: 'js/epubviewer-[name].mjs',

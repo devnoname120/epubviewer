@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OCA\Epubviewer\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ReaderSecurityBoundaryTest extends TestCase {
@@ -23,9 +24,7 @@ class ReaderSecurityBoundaryTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider stateChangingControllerMethodProvider
-	 */
+	#[DataProvider('stateChangingControllerMethodProvider')]
 	public function testStateChangingControllerMethodsRequireCsrfAndAllowRegularUsers(string $path, string $method): void {
 		$attributes = $this->methodAttributes($path, $method);
 
@@ -45,9 +44,7 @@ class ReaderSecurityBoundaryTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider readOnlyControllerMethodProvider
-	 */
+	#[DataProvider('readOnlyControllerMethodProvider')]
 	public function testReadOnlyControllerMethodsKeepCsrfExemption(string $path, string $method): void {
 		$attributes = $this->methodAttributes($path, $method);
 
@@ -93,9 +90,7 @@ class ReaderSecurityBoundaryTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider readerTemplateProvider
-	 */
+	#[DataProvider('readerTemplateProvider')]
 	public function testReaderTemplateEscapesScalarAttributesAndExposesRequestToken(string $path): void {
 		$contents = $this->readRepoFile($path);
 

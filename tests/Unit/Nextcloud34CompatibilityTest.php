@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OCA\Epubviewer\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -20,9 +21,7 @@ class Nextcloud34CompatibilityTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider removedServerGetterProvider
-	 */
+	#[DataProvider('removedServerGetterProvider')]
 	public function testAppDoesNotCallServerGettersRemovedInNextcloud34(string $methodName, string $replacement): void {
 		$matches = [];
 
@@ -58,9 +57,7 @@ class Nextcloud34CompatibilityTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider readerTemplateRevisionProvider
-	 */
+	#[DataProvider('readerTemplateRevisionProvider')]
 	public function testReaderTemplateRevisionStaysInTemplate(string $templatePath, string $revision): void {
 		$contents = file_get_contents($this->repoRoot() . '/' . $templatePath);
 		self::assertIsString($contents);

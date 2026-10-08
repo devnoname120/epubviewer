@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\Epubviewer\Tests\Unit;
 
 use OCA\Epubviewer\Preview\EPubArchiveLimits;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class EPubArchiveLimitsTest extends TestCase {
@@ -42,9 +43,7 @@ class EPubArchiveLimitsTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider positiveLimitProvider
-	 */
+	#[DataProvider('positiveLimitProvider')]
 	public function testRejectsNonPositiveLimit(string $property): void {
 		$this->expectException(\InvalidArgumentException::class);
 		$this->expectExceptionMessage(sprintf('%s must be greater than zero.', $property));
@@ -80,9 +79,7 @@ class EPubArchiveLimitsTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider specializedLimitProvider
-	 */
+	#[DataProvider('specializedLimitProvider')]
 	public function testRejectsSpecializedLimitAbovePerEntryLimit(string $property): void {
 		$arguments = [
 			'maxTotalUncompressedBytes' => 1024,

@@ -16,6 +16,7 @@ use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
 use OCP\IRequest;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class SecurityReportTest extends TestCase {
@@ -28,13 +29,13 @@ class SecurityReportTest extends TestCase {
 		]);
 	}
 
-	/** @dataProvider unsafePaths */
+	#[DataProvider('unsafePaths')]
 	public function testRejectsUnsafePublicSegments(string $path): void {
 		$this->expectException(NotFoundException::class);
 		(new PublicSharePath())->parse('/public.php/dav/files/token/' . $path);
 	}
 
-	/** @dataProvider unsafePaths */
+	#[DataProvider('unsafePaths')]
 	public function testRejectsUnsafeAuthenticatedSegmentsBeforeResolution(string $path): void {
 		$request = $this->createMock(IRequest::class);
 		$request->method('getParam')->willReturnMap([
@@ -59,7 +60,7 @@ class SecurityReportTest extends TestCase {
 		];
 	}
 
-	/** @dataProvider escapedNodes */
+	#[DataProvider('escapedNodes')]
 	public function testRejectsOutOfRootResolverResult(string $path): void {
 		$root = $this->createMock(Folder::class);
 		$root->method('getPath')->willReturn('/alice/files/Library');

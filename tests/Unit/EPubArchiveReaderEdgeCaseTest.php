@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\Epubviewer\Tests\Unit;
 
 use OCA\Epubviewer\Preview\EPubArchiveReader;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ZipArchive;
 
@@ -187,9 +188,7 @@ class EPubArchiveReaderEdgeCaseTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider malformedXmlProvider
-	 */
+	#[DataProvider('malformedXmlProvider')]
 	public function testRejectsMalformedXml(string $malformedEntry, string $malformedXml): void {
 		$entries = [
 			'META-INF/container.xml' => $this->containerXml(),
@@ -259,9 +258,7 @@ class EPubArchiveReaderEdgeCaseTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider encodedCoverNameProvider
-	 */
+	#[DataProvider('encodedCoverNameProvider')]
 	public function testDecodesPercentEncodedCoverName(string $href, string $entryName): void {
 		$file = $this->createEpub([
 			'META-INF/container.xml' => $this->containerXml(),
@@ -327,9 +324,7 @@ class EPubArchiveReaderEdgeCaseTest extends TestCase {
 		];
 	}
 
-	/**
-	 * @dataProvider unsafeCoverHrefProvider
-	 */
+	#[DataProvider('unsafeCoverHrefProvider')]
 	public function testRejectsUnsafeCoverPathVariant(string $href, string $expectedMessage): void {
 		$file = $this->createEpub([
 			'META-INF/container.xml' => $this->containerXml(),
