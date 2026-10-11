@@ -1,3 +1,11 @@
+## 1.9.9 - 2026-10-11
+
+### Fixed
+
+- Fix CBZ/CBR readers going blank when cached images are evicted: detach image load/error handlers before removing their source, preventing cleanup from being mistaken for a decode failure (#46).
+- Wait for evicted pages to finish decoding before drawing them during comic navigation.
+- Give the comic reader an opaque dark background and readable loading/error messages instead of black text over Nextcloud Viewer's dark backdrop.
+
 ## 1.9.8 - 2026-10-08
 
 ### Security
