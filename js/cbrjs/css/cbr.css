@@ -164,7 +164,8 @@ body {
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: 12px;
 	line-height: 20px;
-	color: #333;
+	color: #f8f8f8;
+	background-color: #111;
 }
 
 button,
@@ -436,11 +437,11 @@ body:not(.mobile) .toolbar button[data-action=close]:hover {
 
 .message-text {
 	font-size: 1.5em;
-    color: black;
+    color: inherit;
 }
 
 .active {
-    color:black;
+    color:inherit;
 }
 
 .ok {

@@ -47,6 +47,9 @@ function createHarness(entries) {
 
   function createChain(selector) {
     return {
+      attr() {
+        return this;
+      },
       addClass() {
         return this;
       },
@@ -289,19 +292,30 @@ test('revokes partial comic URLs when a later image header is rejected', async (
 test('comic preload retains only the nearby page window and releases URLs on destroy', async () => {
   const { context, OriginalComicBook, revoked } = createHarness([]);
   const images = [];
+  const errors = [];
   context.Image = class {
     constructor() { this.width = 1000; this.height = 1000; this.value = ''; images.push(this); }
-    set src(value) { this.value = value; if (value) queueMicrotask(() => this.onload?.()); }
+    set src(value) {
+      this.value = value;
+      // Firefox reports a decode error when src is assigned an empty string.
+      queueMicrotask(() => value ? this.onload?.() : this.onerror?.());
+    }
     get src() { return this.value; }
+    removeAttribute(name) {
+      assert.equal(name, 'src');
+      this.value = '';
+      // Also exercise a queued event after removal: cleanup must detach handlers.
+      queueMicrotask(() => this.onerror?.());
+    }
   };
-  const toc = { children: Array.from({ length: 100 }, () => ({ firstChild: { src: '' } })) };
+  const toc = { children: Array.from({ length: 100 }, () => ({ firstChild: { removeAttribute() {} } })) };
   context.document.getElementById = () => toc;
   context.document.createElement = () => ({ getContext: () => ({}) });
   context.removeEventListener = () => {};
   context.jQuery.each = () => {};
   const pages = Array.from({ length: 100 }, (_, index) => `blob:page-${index}`);
   const blobs = pages.blobs = pages.map(() => new Blob([validImage('page.jpg')]));
-  const book = new OriginalComicBook('viewer', pages, { currentPage: 0, displayMode: 'single' });
+  const book = new OriginalComicBook('viewer', pages, { currentPage: 0, displayMode: 'single', error: message => errors.push(message) });
   const drawPage = book.drawPage;
   book.showControl = book.hideControl = book.tocInsert = () => {};
   book.drawPage = function (number) { if (number !== undefined) drawPage.call(this, number); };
@@ -310,13 +324,18 @@ test('comic preload retains only the nearby page window and releases URLs on des
   assert.equal(images.filter(image => image.src).length, 3);
   assert.equal(pages.filter(Boolean).length, 3);
   book.drawPage(80);
+  assert.doesNotThrow(() => drawPage.call(book), 'drawing an evicted page must wait for decoding');
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(images.filter(image => image.src).length, 4);
   assert.equal(pages.filter(Boolean).length, 4);
   assert.ok(images.length < pages.length, 'faraway pages must not be decoded');
+  assert.deepEqual(errors, [], 'evicting decoded images must not destroy the reader');
   book.controls = {};
   book.destroy();
+  await new Promise(resolve => setImmediate(resolve));
   assert.equal(images.filter(image => image.src).length, 0);
   assert.equal(revoked.length, 104);
   assert.equal(blobs.length, 0);
+  assert.deepEqual(errors, [], 'destroying images must detach pending decode callbacks');
+  assert.ok(images.every(image => image.onload === null && image.onerror === null));
 });

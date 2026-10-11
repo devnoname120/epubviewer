@@ -84,7 +84,7 @@ CBRJS.Reader = function(bookPath, _options) {
 
 	function showReaderError(message) {
 		$('.icon-unarchive').removeClass('active ok').addClass('error');
-		$('.message-text').text(message);
+		$('.message-text').attr('role', 'alert').text(message);
 		$('#progressbar').show();
 	}
 
@@ -394,6 +394,14 @@ ComicBook = (function ($) {
         var is_double_page_spread = false;
         var controlsRendered = false; // have the user controls been inserted into the dom yet?
         var page_requested = false; // used to request non preloaded pages
+
+        function releaseImage(image) {
+            // Clearing src can fire an error event and resolve to the containing
+            // page in Firefox. Detach callbacks before releasing a cached image.
+            image.onload = null;
+            image.onerror = null;
+            image.removeAttribute('src');
+        }
         var shiv = false;
 
         /**
@@ -756,10 +764,10 @@ ComicBook = (function ($) {
             var queue = [];
             pages.forEach(function (page, index) {
                 if (index < start || index > end) {
-                    page.src = '';
+                    releaseImage(page);
                     delete pages[index];
                     loaded = loaded.filter(function (value) { return value !== index; });
-                    if (toc.children[index]) toc.children[index].firstChild.src = '';
+                    if (toc.children[index]) releaseImage(toc.children[index].firstChild);
                 }
             });
             // Keep encoded blobs for navigation, but revoke URLs outside the
@@ -784,7 +792,7 @@ ComicBook = (function ($) {
                 }
                 var index = queue.shift(), page = new Image();
                 page.onload = function () {
-                    if (destroyed) { this.src = ''; return; }
+                    if (destroyed) { releaseImage(this); return; }
                     try {
                         var pixels = ReaderLimits.dimensions(this.naturalWidth || this.width, this.naturalHeight || this.height);
                         pages.forEach(function (cached) { pixels += cached.width * cached.height; });
@@ -799,7 +807,7 @@ ComicBook = (function ($) {
                         next();
                     } catch (error) {
                         preloadRunning = false;
-                        this.src = '';
+                        releaseImage(this);
                         self.destroy();
                         self.hideControl('loadingOverlay');
                         options.error(error.message);
@@ -855,6 +863,12 @@ ComicBook = (function ($) {
 
             if (options.displayMode === 'double' && options.currentPage < srcs.length - 1) {
                 page2 = self.getPage(options.currentPage + 1);
+            }
+
+            // Evicted pages are decoded asynchronously by getPage/preload.
+            // Keep the current canvas until all pages needed for the spread load.
+            if (page === undefined || page2 === undefined) {
+                return;
             }
 
             if (typeof page !== 'object') {
@@ -1507,7 +1521,7 @@ ComicBook = (function ($) {
         ComicBook.prototype.destroy = function () {
 
             destroyed = true;
-            pages.forEach(function (page) { page.src = ''; });
+            pages.forEach(releaseImage);
             pages.length = 0;
             loaded.length = 0;
             srcs.forEach(function (url) { if (url) window.URL.revokeObjectURL(url); });

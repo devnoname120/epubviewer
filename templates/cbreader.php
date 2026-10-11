@@ -77,7 +77,7 @@ $idevice = (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone')
   <span class="progress"><span class="bar"></span></span>
   <br>
   <div class="message"><span class="message-icons"><span class="icon-cloud_download"></span><span
-        class="icon-unarchive"></span></span> <span class="message-text"></span></div>
+        class="icon-unarchive"></span></span> <span class="message-text" role="status"></span></div>
 </div>
 <!-- /loading progressbar -->
 
