@@ -6,12 +6,33 @@ name: Release appstore
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Existing release version; no rebuild or asset replacement'
+        required: true
+        default: '1.9.9'
+        type: string
+      download_source:
+        description: 'Download location to submit to the App Store'
+        required: true
+        default: raw-cdn
+        type: choice
+        options:
+          - github-release
+          - raw-cdn
+      cdn_commit:
+        description: 'Commit containing the archive on the release-assets branch'
+        required: false
+        default: 'b7e35a0e7509ee79d8902d66bf12c6514ef1094e'
+        type: string
 
 permissions:
   contents: write
 
 jobs:
   release-appstore:
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
 
     steps:
@@ -56,3 +77,77 @@ jobs:
           download_url: ${{ steps.tarball.outputs.download_url }}
           app_private_key: ${{ secrets.NC_APP_PRIVATE_KEY }}
           nightly: ${{ github.event.release.prerelease }}
+
+  publish-existing-release:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Verify existing published archive
+        id: archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_DOWNLOAD_SOURCE: ${{ inputs.download_source }}
+          RELEASE_CDN_COMMIT: ${{ inputs.cdn_commit }}
+        run: |
+          set -eu
+          [[ "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          gh release view "$RELEASE_VERSION" --repo "$GITHUB_REPOSITORY" --json isDraft,assets > release.json
+          python3 - <<'PYVERIFY'
+          import hashlib, io, json, os, re, tarfile, urllib.request
+          release = json.load(open('release.json'))
+          assert not release['isDraft'], 'Release must already be published'
+          name = 'epubviewer-' + os.environ['RELEASE_VERSION'] + '.tar.gz'
+          assets = [a for a in release['assets'] if a['name'] == name]
+          assert len(assets) == 1, 'Expected exactly one published archive'
+          asset = assets[0]
+          assert asset['size'] <= 30 * 1024 * 1024, 'Archive exceeds App Store size limit'
+          source = os.environ['RELEASE_DOWNLOAD_SOURCE']
+          if source == 'raw-cdn':
+              commit = os.environ['RELEASE_CDN_COMMIT']
+              assert re.fullmatch('[0-9a-f]{40}', commit), 'Invalid CDN commit'
+              url = 'https://raw.githubusercontent.com/' + os.environ['GITHUB_REPOSITORY'] + '/' + commit + '/' + name
+          else:
+              assert source == 'github-release', 'Invalid download source'
+              url = asset['url']
+          with urllib.request.urlopen(url, timeout=60) as response:
+              data = response.read(asset['size'] + 1)
+          assert len(data) == asset['size'], 'Archive size does not match published asset'
+          digest = 'sha256:' + hashlib.sha256(data).hexdigest()
+          assert digest == asset['digest'], 'Archive digest does not match published asset'
+          with tarfile.open(fileobj=io.BytesIO(data), mode='r:gz') as archive:
+              assert 'epubviewer/appinfo/info.xml' in archive.getnames()
+          print('Verified archive:', source, name, digest)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('url=' + url + '\n')
+          PYVERIFY
+
+      - name: Prepare publishing tools
+        run: |
+          mkdir -p "$RUNNER_TEMP/appstore-tools"
+          cat > "$RUNNER_TEMP/appstore-tools/curl" <<'SH'
+          #!/bin/sh
+          exec /usr/bin/curl -q "$@"
+          SH
+          cat > "$RUNNER_TEMP/appstore-tools/wget" <<'SH'
+          #!/bin/sh
+          exec /usr/bin/wget --quiet "$@"
+          SH
+          chmod +x "$RUNNER_TEMP/appstore-tools/curl" "$RUNNER_TEMP/appstore-tools/wget"
+          echo "$RUNNER_TEMP/appstore-tools" >> "$GITHUB_PATH"
+          install -m 600 /dev/null "$GITHUB_WORKSPACE/epubviewer.key"
+
+      - name: Push existing archive to Nextcloud appstore
+        uses: R0Wi/nextcloud-appstore-push-action@9244bb5445776688cfe90fa1903ea8dff95b0c28 # v1
+        with:
+          app_name: epubviewer
+          appstore_token: ${{ secrets.NC_APPSTORE_TOKEN }}
+          download_url: ${{ steps.archive.outputs.url }}
+          app_private_key: ${{ secrets.NC_APP_PRIVATE_KEY }}
+          nightly: false
+
+      - name: Remove temporary signing key
+        if: always()
+        run: rm -f "$GITHUB_WORKSPACE/epubviewer.key"
