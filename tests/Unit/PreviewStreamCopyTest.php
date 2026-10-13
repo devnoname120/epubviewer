@@ -84,17 +84,13 @@ final class PreviewStreamCopyTest extends TestCase {
 		// Opening a directory succeeds on the supported Unix test platforms; reading it fails.
 		$source = fopen(sys_get_temp_dir(), 'r');
 		self::assertIsResource($source);
-		$warnings = [];
-		set_error_handler(static function (int $severity, string $message) use (&$warnings): bool {
-			$warnings[] = $message;
-			return true;
-		});
+		// PHP reports the read failure with or without a warning depending on the platform.
+		set_error_handler(static fn (): bool => true);
 		try {
 			self::assertFalse($this->provider->copy($this->file($source), 4));
 		} finally {
 			restore_error_handler();
 		}
-		self::assertNotEmpty($warnings);
 		self::assertFalse(is_resource($source));
 		$this->provider->cleanup();
 		self::assertFileDoesNotExist($this->temporaryPath);
