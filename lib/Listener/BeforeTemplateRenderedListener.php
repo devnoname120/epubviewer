@@ -13,7 +13,7 @@ use OCP\EventDispatcher\IEventListener;
 use OCP\IUserSession;
 
 /** @template-implements IEventListener<\OCP\AppFramework\Http\Events\BeforeTemplateRenderedEvent> */
-class BeforeTemplateRenderedListener implements IEventListener {
+final class BeforeTemplateRenderedListener implements IEventListener {
 	public function __construct(
 		private IInitialState $initialState,
 		private IUserSession $userSession,

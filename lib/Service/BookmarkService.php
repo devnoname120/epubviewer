@@ -8,7 +8,7 @@ use OCA\Epubviewer\Db\BookmarkMapper;
 /**
  * @template-extends Service<Bookmark>
  */
-class BookmarkService extends Service {
+final class BookmarkService extends Service {
 
 	// "bookmark" name to use for the cursor (current reading position)
 	public const CURSOR = '__CURSOR__';

@@ -10,7 +10,7 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Files\NotFoundException;
 use OCP\IURLGenerator;
 
-class ReaderResponseBuilder {
+final class ReaderResponseBuilder implements IReaderResponseBuilder {
 	public function __construct(
 		private IURLGenerator $urlGenerator,
 		private ReaderTemplateContext $readerTemplateContext,
@@ -63,10 +63,10 @@ class ReaderResponseBuilder {
 			'fileId' => $fileInfo['fileId'],
 			'fileName' => $fileInfo['fileName'],
 			'fileType' => $fileInfo['fileType'],
-			'cursor' => $cursor ? $this->toJson($cursor) : null,
-			'defaults' => $defaults ? $this->toJson($defaults) : null,
-			'preferences' => $preferences ? $this->toJson($preferences) : null,
-			'annotations' => $annotations ? $this->toJson($annotations) : null,
+			'cursor' => $cursor !== null && $cursor !== [] ? $this->toJson($cursor) : null,
+			'defaults' => $defaults !== null && $defaults !== [] ? $this->toJson($defaults) : null,
+			'preferences' => $preferences !== null && $preferences !== [] ? $this->toJson($preferences) : null,
+			'annotations' => $annotations !== null && $annotations !== [] ? $this->toJson($annotations) : null,
 			'appVersion' => $this->readerTemplateContext->getAppVersion(),
 			'nonce' => $this->readerTemplateContext->getNonce(),
 		];
@@ -89,6 +89,6 @@ class ReaderResponseBuilder {
 	}
 
 	private function toJson(array $value): string {
-		return htmlspecialchars(json_encode($value), ENT_QUOTES, 'UTF-8');
+		return htmlspecialchars(json_encode($value, JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE), ENT_QUOTES, 'UTF-8');
 	}
 }

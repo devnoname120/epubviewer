@@ -64,6 +64,10 @@ abstract class ProviderV2 implements IProviderV2 {
 		return $file->isEncrypted() || !$file->getStorage()->isLocal();
 	}
 
+	protected function getTemporaryFile(): string|false {
+		return Server::get(ITempManager::class)->getTemporaryFile();
+	}
+
 	/**
 	 * Get a path to either the local file or temporary file
 	 *
@@ -72,7 +76,7 @@ abstract class ProviderV2 implements IProviderV2 {
 	 */
 	protected function getLocalFile(File $file, ?int $maxSize = null): string|false {
 		if ($this->useTempFile($file)) {
-			$absPath = Server::get(ITempManager::class)->getTemporaryFile();
+			$absPath = $this->getTemporaryFile();
 
 			if ($absPath === false) {
 				Server::get(LoggerInterface::class)->error(
@@ -81,18 +85,30 @@ abstract class ProviderV2 implements IProviderV2 {
 				);
 				return false;
 			}
+			$this->tmpFiles[] = $absPath;
 
-			$content = $file->fopen('r');
-			if ($content === false) {
+			$source = $file->fopen('r');
+			if ($source === false) {
 				return false;
 			}
 
-			if ($maxSize !== null && $maxSize !== 0) {
-				$content = stream_get_contents($content, $maxSize);
+			try {
+				$target = fopen($absPath, 'wb');
+				if ($target === false) {
+					return false;
+				}
+				try {
+					$copied = stream_copy_to_stream($source, $target, $maxSize === null || $maxSize === 0 ? -1 : $maxSize);
+					if ($copied === false) {
+						return false;
+					}
+				} finally {
+					fclose($target);
+				}
+			} finally {
+				fclose($source);
 			}
 
-			file_put_contents($absPath, $content);
-			$this->tmpFiles[] = $absPath;
 			return $absPath;
 		} else {
 			$path = $file->getStorage()->getLocalFile($file->getInternalPath());

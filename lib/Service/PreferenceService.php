@@ -8,7 +8,7 @@ use OCA\Epubviewer\Db\PreferenceMapper;
 /**
  * @template-extends Service<Preference>
  */
-class PreferenceService extends Service {
+final class PreferenceService extends Service {
 
 	// (ab)use the fact that $fileId never goes below 1 by using the
 	// value 0 to indicate a default preference

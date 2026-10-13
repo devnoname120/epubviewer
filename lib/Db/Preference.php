@@ -20,14 +20,14 @@ use OCP\DB\Types;
  * @method string getLastModified()
  * @method void setLastModified(string $lastModified)
  */
-class Preference extends Entity implements JsonSerializable {
+final class Preference extends Entity implements JsonSerializable {
 
-	protected $userId;  // user for whom this preference is valid
-	protected $scope;   // scope (default or specific renderer)
-	protected $fileId;  // file for which this preference is set
-	protected $name;    // preference name
-	protected $value;   // preference value
-	protected $lastModified;
+	protected ?string $userId = null;  // user for whom this preference is valid
+	protected ?string $scope = null;   // scope (default or specific renderer)
+	protected ?int $fileId = null;  // file for which this preference is set
+	protected ?string $name = null;    // preference name
+	protected ?string $value = null;   // preference value
+	protected ?string $lastModified = null;
 
 	public function __construct() {
 		$this->addType('userId', Types::STRING);
@@ -38,8 +38,8 @@ class Preference extends Entity implements JsonSerializable {
 		$this->addType('lastModified', Types::STRING);
 	}
 
-	public static function conditional_json_decode(string $el): mixed {
-		if (empty($el)) {
+	public static function conditional_json_decode(?string $el): mixed {
+		if ($el === null || $el === '') {
 			return $el;
 		}
 		$decoded = json_decode($el, true);

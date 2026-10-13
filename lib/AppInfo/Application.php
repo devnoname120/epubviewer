@@ -13,7 +13,7 @@ use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
-class Application extends App implements IBootstrap {
+final class Application extends App implements IBootstrap {
 	public const APP_ID = 'epubviewer';
 
 	public function __construct() {
@@ -22,6 +22,7 @@ class Application extends App implements IBootstrap {
 
 	public function register(IRegistrationContext $context): void {
 		include_once __DIR__ . '/../../vendor/autoload.php';
+		$context->registerServiceAlias(\OCA\Epubviewer\Service\IReaderResponseBuilder::class, \OCA\Epubviewer\Service\ReaderResponseBuilder::class);
 
 		// Register services
 		$context->registerService(\OCA\Epubviewer\Service\BookmarkService::class, function ($c) {

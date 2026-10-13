@@ -9,7 +9,7 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\IL10N;
 use OCP\IRequest;
 
-class SettingsController extends Controller {
+final class SettingsController extends Controller {
 	/**
 	 * @param string $appName
 	 * @param IRequest $request

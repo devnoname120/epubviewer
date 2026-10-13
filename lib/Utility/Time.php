@@ -2,7 +2,7 @@
 
 namespace OCA\Epubviewer\Utility;
 
-class Time {
+final class Time {
 	/**
 	 * @psalm-return int<1, max>
 	 */

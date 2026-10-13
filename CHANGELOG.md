@@ -1,3 +1,16 @@
+## Unreleased
+
+### Fixed
+
+- Handle JSON encoding failures and malformed UTF-8 in reader state, and preserve numeric zero when decoding stored bookmarks and preferences.
+- Check preview stream read/write failures, preserve copy limits, close streams, and clean up temporary files on failure.
+- Make nullable reader services and database entity field types explicit while preserving Nextcloud's database-assigned entity IDs.
+- Resolve image-header parsing and concrete-class Psalm findings; use a reader response interface so controller tests remain mockable.
+
+### Changed
+
+- Test Nextcloud 35 with PHP 8.3 and 8.5 alongside Nextcloud 33/34, and reject informational Psalm findings in CI.
+
 ## 1.9.9 - 2026-10-11
 
 ### Fixed

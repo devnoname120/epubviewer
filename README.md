@@ -23,12 +23,22 @@ quality, a set of image enhancement filters are provided.
 
 Comic pages may use JPEG, PNG, GIF, or WebP. TIFF pages are not supported.
 
+## Supported Nextcloud versions
+
+EPUB Viewer supports Nextcloud 33, 34, and 35. PHP 8.2–8.5 is supported on
+Nextcloud 33 and 34; Nextcloud 35 requires PHP 8.3–8.5.
+
+The app uses APIs available in Nextcloud 33, so its minimum supported version
+remains 33. PHP tests, static analysis, and security analysis cover all three
+Nextcloud versions, including PHP 8.3 and 8.5 for Nextcloud 35. Compatibility changes are checked
+against the [Nextcloud developer release notes](https://docs.nextcloud.com/server/stable/developer_manual/release_notes/index.html).
+
 # Development
 
 ## GitHub codespaces
 
 - Go to https://codespaces.new/nextcloud/server and use the default settings. You can also change the branch to
-  e.g. `stable28` if you want to use a specific version of Nextcloud. It takes around 5 minutes to initialize. Then it
+  e.g. `stable35` if you want to use a supported version of Nextcloud. It takes around 5 minutes to initialize. Then it
   starts automatically.
 - In the Codespace vscode interface, click on the burger menu in the upper left corner → `Terminal` → `New Terminal` and
   then run the following in the newly-open terminal:

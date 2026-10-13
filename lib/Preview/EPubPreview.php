@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Preview generator for .epub e-book files.
  */
-class EPubPreview extends ProviderV2 {
+final class EPubPreview extends ProviderV2 {
 	private EPubArchiveReader $archiveReader;
 
 	/**

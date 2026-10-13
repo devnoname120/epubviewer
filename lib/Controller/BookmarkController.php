@@ -9,7 +9,7 @@ use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 
-class BookmarkController extends Controller {
+final class BookmarkController extends Controller {
 
 	/**
 	 * @param string $appName
@@ -36,6 +36,9 @@ class BookmarkController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function get(int $fileId, string $name, ?string $type = null): array|JSONResponse {
+		if ($this->bookmarkService === null) {
+			return [];
+		}
 		return $this->bookmarkService->get($fileId, $name, $type);
 	}
 
@@ -48,6 +51,9 @@ class BookmarkController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function set(int $fileId, string $name, string $value, ?string $type = null, ?string $content = null): void {
+		if ($this->bookmarkService === null) {
+			return;
+		}
 		$this->bookmarkService->set($fileId, $name, $value, $type, $content);
 	}
 
@@ -59,6 +65,9 @@ class BookmarkController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function getCursor(int $fileId): ?array {
+		if ($this->bookmarkService === null) {
+			return null;
+		}
 		return $this->bookmarkService->getCursor($fileId);
 	}
 
@@ -70,6 +79,9 @@ class BookmarkController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function setCursor(int $fileId, string $value): void {
+		if ($this->bookmarkService === null) {
+			return;
+		}
 		$this->bookmarkService->setCursor($fileId, $value);
 	}
 
@@ -81,11 +93,17 @@ class BookmarkController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function delete(int $fileId, string $name): void {
+		if ($this->bookmarkService === null) {
+			return;
+		}
 		$this->bookmarkService->delete($fileId, $name);
 	}
 
 	#[NoAdminRequired]
 	public function deleteCursor(int $fileId): void {
+		if ($this->bookmarkService === null) {
+			return;
+		}
 		$this->bookmarkService->deleteCursor($fileId);
 	}
 }

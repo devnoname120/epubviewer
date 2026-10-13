@@ -9,7 +9,7 @@ use OCP\Config\IUserConfig;
 use OCP\Settings\ISettings;
 use OCP\Util;
 
-class Personal implements ISettings {
+final class Personal implements ISettings {
 
 	public function __construct(
 		private string $userId,

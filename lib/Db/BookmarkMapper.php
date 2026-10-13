@@ -10,7 +10,8 @@ use OCP\IDBConnection;
 /**
  * @template-extends QBMapper<Bookmark>
  */
-class BookmarkMapper extends QBMapper {
+final class BookmarkMapper extends QBMapper {
+	private string $userId;
 
 	/**
 	 * @param IDbConnection $db
@@ -19,7 +20,7 @@ class BookmarkMapper extends QBMapper {
 	 */
 	public function __construct(
 		IDBConnection $db,
-		private ?string $userId,
+		?string $userId,
 		private Time $time,
 	) {
 		parent::__construct($db, 'reader_bookmarks', Bookmark::class);

@@ -12,7 +12,7 @@ use OCP\Util;
 /**
  * @template-implements IEventListener<\OCA\Viewer\Event\LoadViewer>
  */
-class LoadViewerListener implements IEventListener {
+final class LoadViewerListener implements IEventListener {
 
 	public function __construct() {
 	}

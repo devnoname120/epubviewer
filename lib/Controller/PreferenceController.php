@@ -9,7 +9,7 @@ use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 
-class PreferenceController extends Controller {
+final class PreferenceController extends Controller {
 
 	/**
 	 * @param string $appName
@@ -34,7 +34,7 @@ class PreferenceController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function get(string $scope, int $fileId, string $name): array|JSONResponse {
-		if ($this->userId === null) {
+		if ($this->userId === null || $this->preferenceService === null) {
 			return new JSONResponse([]);
 		}
 		return $this->preferenceService->get($scope, $fileId, $name);
@@ -50,7 +50,7 @@ class PreferenceController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function set(string $scope, int $fileId, string $name, string $value): void {
-		if ($this->userId === null) {
+		if ($this->userId === null || $this->preferenceService === null) {
 			return;
 		}
 		$this->preferenceService->set($scope, $fileId, $name, $value);
@@ -65,7 +65,7 @@ class PreferenceController extends Controller {
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	public function getDefault(string $scope, string $name): array|JSONResponse {
-		if ($this->userId === null) {
+		if ($this->userId === null || $this->preferenceService === null) {
 			return new JSONResponse([]);
 		}
 		return $this->preferenceService->getDefault($scope, $name);
@@ -80,7 +80,7 @@ class PreferenceController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function setDefault(string $scope, string $name, string $value): void {
-		if ($this->userId === null) {
+		if ($this->userId === null || $this->preferenceService === null) {
 			return;
 		}
 
@@ -96,7 +96,7 @@ class PreferenceController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function delete(string $scope, int $fileId, string $name): void {
-		if ($this->userId === null) {
+		if ($this->userId === null || $this->preferenceService === null) {
 			return;
 		}
 		$this->preferenceService->delete($scope, $fileId, $name);
@@ -110,7 +110,7 @@ class PreferenceController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function deleteDefault(string $scope, string $name): void {
-		if ($this->userId === null) {
+		if ($this->userId === null || $this->preferenceService === null) {
 			return;
 		}
 		$this->preferenceService->deleteDefault($scope, $name);

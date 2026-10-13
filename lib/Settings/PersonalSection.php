@@ -6,7 +6,7 @@ use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\Settings\IIconSection;
 
-class PersonalSection implements IIconSection {
+final class PersonalSection implements IIconSection {
 	public function __construct(
 		private IURLGenerator $urlGenerator,
 		private IL10N $l,

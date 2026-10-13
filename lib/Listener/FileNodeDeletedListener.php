@@ -10,7 +10,7 @@ use OCP\Files\Events\Node\NodeDeletedEvent;
 use OCP\IDBConnection;
 
 /** @template-implements IEventListener<NodeDeletedEvent> */
-class FileNodeDeletedListener implements IEventListener {
+final class FileNodeDeletedListener implements IEventListener {
 	public function __construct(
 		private IDBConnection $connection,
 	) {

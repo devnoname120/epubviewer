@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OCA\Epubviewer\Controller;
 
+use OCA\Epubviewer\Service\IReaderResponseBuilder;
 use OCA\Epubviewer\Service\PublicSharePath;
 use OCA\Epubviewer\Service\ReaderPath;
-use OCA\Epubviewer\Service\ReaderResponseBuilder;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\PublicPage;
@@ -16,7 +16,7 @@ use OCP\Files\NotFoundException;
 use OCP\IRequest;
 use function pathinfo;
 
-class PageController extends Controller {
+final class PageController extends Controller {
 	/**
 	 * @param string $appName
 	 * @param IRequest $request
@@ -28,7 +28,7 @@ class PageController extends Controller {
 		IRequest $request,
 		private IRootFolder $rootFolder,
 		private PublicSharePath $publicSharePath,
-		private ReaderResponseBuilder $readerResponseBuilder,
+		private IReaderResponseBuilder $readerResponseBuilder,
 		private ?string $userId,
 	) {
 		parent::__construct($appName, $request);

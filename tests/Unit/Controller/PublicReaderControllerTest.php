@@ -7,8 +7,8 @@ namespace OCA\Epubviewer\Tests\Unit\Controller;
 use OC\AppFramework\Middleware\PublicShare\PublicShareMiddleware;
 use OCA\Epubviewer\Controller\PageController;
 use OCA\Epubviewer\Controller\PublicReaderController;
+use OCA\Epubviewer\Service\IReaderResponseBuilder;
 use OCA\Epubviewer\Service\PublicSharePath;
-use OCA\Epubviewer\Service\ReaderResponseBuilder;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\PublicShareController;
 use OCP\Constants;
@@ -17,6 +17,7 @@ use OCP\Files\FileInfo;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
 use OCP\Files\NotFoundException;
+use OCP\IAppConfig;
 use OCP\IConfig;
 use OCP\IRequest;
 use OCP\ISession;
@@ -25,12 +26,13 @@ use OCP\Share\IManager;
 use OCP\Share\IShare;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class PublicReaderControllerTest extends TestCase {
 	private IRequest&MockObject $request;
 	private ISession&MockObject $session;
 	private IManager&MockObject $shareManager;
-	private ReaderResponseBuilder&MockObject $readerResponseBuilder;
+	private IReaderResponseBuilder&MockObject $readerResponseBuilder;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -38,7 +40,7 @@ class PublicReaderControllerTest extends TestCase {
 		$this->request = $this->createMock(IRequest::class);
 		$this->session = $this->createMock(ISession::class);
 		$this->shareManager = $this->createMock(IManager::class);
-		$this->readerResponseBuilder = $this->createMock(ReaderResponseBuilder::class);
+		$this->readerResponseBuilder = $this->createMock(IReaderResponseBuilder::class);
 	}
 
 	public function testUnprotectedFileSharePassesMiddlewareAndRenders(): void {
@@ -228,8 +230,15 @@ class PublicReaderControllerTest extends TestCase {
 			static fn (string $key): ?string => $key === 'token' ? $token : null,
 		);
 
-		$config = $this->createMock(IConfig::class);
-		$config->method('getAppValue')->willReturn('yes');
+		// Nextcloud 35 uses IAppConfig here; Nextcloud 33/34 use IConfig.
+		$constructor = new ReflectionMethod(PublicShareMiddleware::class, '__construct');
+		if ((string)$constructor->getParameters()[2]->getType() === IAppConfig::class) {
+			$config = $this->createMock(IAppConfig::class);
+			$config->method('getValueBool')->willReturn(true);
+		} else {
+			$config = $this->createMock(IConfig::class);
+			$config->method('getAppValue')->willReturn('yes');
+		}
 		$middleware = new PublicShareMiddleware(
 			$this->request,
 			$this->session,

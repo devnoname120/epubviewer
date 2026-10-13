@@ -35,7 +35,11 @@ final class ImageHeaderPreflight {
 			if ($offset + 8 > $end) {
 				throw new \UnexpectedValueException('The cover has a truncated image header.');
 			}
-			$length = unpack($png ? 'N' : 'V', substr($data, $offset + ($png ? 0 : 4), 4))[1];
+			$chunkLength = unpack($png ? 'N' : 'V', substr($data, $offset + ($png ? 0 : 4), 4));
+			if ($chunkLength === false) {
+				throw new \UnexpectedValueException('The cover has a truncated image chunk length.');
+			}
+			$length = $chunkLength[1];
 			$tag = substr($data, $offset + ($png ? 4 : 0), 4);
 			if ($offset + 8 + $length + ($png ? 4 : $length % 2) > $end) {
 				throw new \UnexpectedValueException('The cover has an invalid image chunk length.');
@@ -48,11 +52,18 @@ final class ImageHeaderPreflight {
 					throw new \UnexpectedValueException('Multiple WebP cover frames are not supported.');
 				}
 				if ($tag === 'VP8L' && $length >= 5 && ord($data[$offset + 8]) === 0x2f) {
-					$bits = unpack('V', substr($data, $offset + 9, 4))[1];
+					$frameBits = unpack('V', substr($data, $offset + 9, 4));
+					if ($frameBits === false) {
+						throw new \UnexpectedValueException('The WebP cover has a truncated frame header.');
+					}
+					$bits = $frameBits[1];
 					$frameWidth = 1 + ($bits & 0x3fff);
 					$frameHeight = 1 + (($bits >> 14) & 0x3fff);
 				} elseif ($tag === 'VP8 ' && $length >= 10 && substr($data, $offset + 11, 3) === "\x9d\x01\x2a") {
 					$dimensions = unpack('vwidth/vheight', substr($data, $offset + 14, 4));
+					if ($dimensions === false) {
+						throw new \UnexpectedValueException('The WebP cover has a truncated frame dimensions header.');
+					}
 					$frameWidth = $dimensions['width'] & 0x3fff;
 					$frameHeight = $dimensions['height'] & 0x3fff;
 				} else {
@@ -94,6 +105,9 @@ final class ImageHeaderPreflight {
 					break;
 				}
 				$frame = unpack('vx/vy/vwidth/vheight', substr($data, $offset, 8));
+				if ($frame === false) {
+					throw new \UnexpectedValueException('The GIF cover has a truncated frame header.');
+				}
 				if ($frame['width'] < 1 || $frame['height'] < 1
 					|| $width < $frame['x'] + $frame['width'] || $height < $frame['y'] + $frame['height']) {
 					throw new \UnexpectedValueException('The GIF frame exceeds the validated image dimensions.');

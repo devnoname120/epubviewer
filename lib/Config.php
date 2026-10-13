@@ -10,7 +10,7 @@ use OCP\IUserSession;
 /**
  * Config class for Reader
  */
-class Config {
+final class Config {
 	public function __construct(
 		private IUserConfig $config,
 		private IAppConfig $appConfig,

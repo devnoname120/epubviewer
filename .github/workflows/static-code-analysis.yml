@@ -27,6 +27,10 @@ jobs:
             php_version: '8.2'
           - nc_ref: stable34
             php_version: '8.2'
+          - nc_ref: stable35
+            php_version: '8.3'
+          - nc_ref: stable35
+            php_version: '8.5'
     steps:
       - name: Checkout epubviewer app
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -70,8 +74,13 @@ jobs:
           composer install --dev
           composer dump-autoload --dev
 
+      - name: PHP unit tests
+        run: vendor/bin/phpunit --bootstrap vendor/autoload.php --configuration tests/phpunit.xml
+
       - name: Psalm
-        run: composer run psalm:ci -- --monochrome --no-progress --output-format=github --update-baseline --report=results.sarif
+        run: |
+          composer run psalm:ci -- --monochrome --no-progress --output-format=github --update-baseline --report=results.sarif
+          php -r '$report = json_decode(file_get_contents("results.sarif"), true, 512, JSON_THROW_ON_ERROR); foreach ($report["runs"] as $run) { if (($run["results"] ?? []) !== []) { fwrite(STDERR, "Psalm reported findings, including informational notes. Review results.sarif.\n"); exit(1); } }'
 
       - name: Show potential changes in Psalm baseline
         if: always()
@@ -93,6 +102,10 @@ jobs:
             php_version: '8.2'
           - nc_ref: stable34
             php_version: '8.2'
+          - nc_ref: stable35
+            php_version: '8.3'
+          - nc_ref: stable35
+            php_version: '8.5'
 
     steps:
       - name: Checkout epubviewer app

@@ -10,7 +10,7 @@ use OCP\IDBConnection;
 use OCP\User\Events\UserDeletedEvent;
 
 /** @template-implements IEventListener<UserDeletedEvent> */
-class UserDeletedListener implements IEventListener {
+final class UserDeletedListener implements IEventListener {
 	public function __construct(
 		private IDBConnection $connection,
 	) {

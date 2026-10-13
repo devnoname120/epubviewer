@@ -6,7 +6,7 @@ namespace OCA\Epubviewer\Service;
 
 use OCP\Files\NotFoundException;
 
-class PublicSharePath {
+final class PublicSharePath {
 	/**
 	 * Parse a public DAV URL into its share token and share-relative path.
 	 *

@@ -22,15 +22,15 @@ use OCP\DB\Types;
  * @method string getLastModified()
  * @method void setLastModified(string $lastModified)
  */
-class Bookmark extends Entity implements JsonSerializable {
+final class Bookmark extends Entity implements JsonSerializable {
 
-	protected $userId;  // user
-	protected $fileId;  // book (identified by fileId) for which this mark is valid
-	protected $type;    // type, defaults to "bookmark"
-	protected $name;    // name, defaults to $location
-	protected $value;   // bookmark value (format-specific, eg. page number for PDF, CFI for epub, etc)
-	protected $content; // bookmark content (annotations, etc.), can be empty
-	protected $lastModified;
+	protected ?string $userId = null;  // user
+	protected ?int $fileId = null;  // book (identified by fileId) for which this mark is valid
+	protected ?string $type = null;    // type, defaults to "bookmark"
+	protected ?string $name = null;    // name, defaults to $location
+	protected ?string $value = null;   // bookmark value (format-specific, eg. page number for PDF, CFI for epub, etc)
+	protected ?string $content = null; // bookmark content (annotations, etc.), can be empty
+	protected ?string $lastModified = null;
 
 	public function __construct() {
 		$this->addType('userId', Types::STRING);
@@ -71,7 +71,7 @@ class Bookmark extends Entity implements JsonSerializable {
 	 * @param null|string $el
 	 */
 	public static function conditional_json_decode(?string $el): mixed {
-		if (empty($el)) {
+		if ($el === null || $el === '') {
 			return $el;
 		}
 		$decoded = json_decode($el, true);

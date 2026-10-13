@@ -9,7 +9,7 @@ use OCA\Epubviewer\AppInfo\Application;
 use OCP\App\IAppManager;
 use OCP\Server;
 
-class ReaderTemplateContext {
+final class ReaderTemplateContext {
 	public function __construct(
 		private IAppManager $appManager,
 	) {

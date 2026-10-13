@@ -12,6 +12,15 @@
         phpVersion="8.2"
         ensureOverrideAttribute="false"
 >
+    <issueHandlers>
+        <!-- Nextcloud Entity's inherited ID stays null until insert/fromRow.
+             Initializing it in the app constructor changes that ORM lifecycle. -->
+        <PropertyNotSetInConstructor>
+            <errorLevel type="suppress">
+                <referencedProperty name="OCP\AppFramework\Db\Entity::$id"/>
+            </errorLevel>
+        </PropertyNotSetInConstructor>
+    </issueHandlers>
     <projectFiles>
         <directory name="lib"/>
         <ignoreFiles>

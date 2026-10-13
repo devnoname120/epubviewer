@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OCA\Epubviewer\Controller;
 
+use OCA\Epubviewer\Service\IReaderResponseBuilder;
 use OCA\Epubviewer\Service\PublicSharePath;
 use OCA\Epubviewer\Service\ReaderPath;
-use OCA\Epubviewer\Service\ReaderResponseBuilder;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -23,7 +23,7 @@ use OCP\Share\IManager;
 use OCP\Share\IShare;
 use function pathinfo;
 
-class PublicReaderController extends PublicShareController {
+final class PublicReaderController extends PublicShareController {
 	private ?IShare $share = null;
 
 	public function __construct(
@@ -32,7 +32,7 @@ class PublicReaderController extends PublicShareController {
 		ISession $session,
 		private IManager $shareManager,
 		private PublicSharePath $publicSharePath,
-		private ReaderResponseBuilder $readerResponseBuilder,
+		private IReaderResponseBuilder $readerResponseBuilder,
 	) {
 		parent::__construct($appName, $request, $session);
 	}
