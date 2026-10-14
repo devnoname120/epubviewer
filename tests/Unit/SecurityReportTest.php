@@ -82,13 +82,23 @@ class SecurityReportTest extends TestCase {
 	public function testCentralDirectoryBudgetRunsBeforeZipOpening(): void {
 		$this->expectException(\UnexpectedValueException::class);
 		$this->expectExceptionMessage('more than 1 archive entries before ZIP opening');
-		ZipMetadataPreflight::check($this->fixture(), new EPubArchiveLimits(maxEntryCount: 1));
+		ZipMetadataPreflight::check(
+			$this->fixture(),
+			maxEntryCount: 1,
+			maxCentralDirectoryBytes: 16 * 1024 * 1024,
+			archiveDescription: 'EPUB',
+		);
 	}
 
 	public function testCentralDirectoryByteBudget(): void {
 		$this->expectException(\UnexpectedValueException::class);
 		$this->expectExceptionMessage('central directory is oversized');
-		ZipMetadataPreflight::check($this->fixture(), new EPubArchiveLimits(maxCentralDirectoryBytes: 1));
+		ZipMetadataPreflight::check(
+			$this->fixture(),
+			maxEntryCount: EPubArchiveLimits::DEFAULT_MAX_ENTRY_COUNT,
+			maxCentralDirectoryBytes: 1,
+			archiveDescription: 'EPUB',
+		);
 	}
 
 	public function testDoesNotTrustUnderreportedEntryCount(): void {
@@ -128,7 +138,12 @@ class SecurityReportTest extends TestCase {
 	public function testAcceptsNormalPngCoverWithoutDecoding(): void {
 		$data = file_get_contents(dirname(__DIR__, 2) . '/img/book.png');
 		self::assertIsString($data);
-		ImageHeaderPreflight::check($data, new EPubArchiveLimits());
+		ImageHeaderPreflight::check(
+			$data,
+			maxBytes: EPubArchiveLimits::DEFAULT_MAX_COVER_BYTES,
+			maxDimension: 8192,
+			maxPixels: 16 * 1024 * 1024,
+		);
 		self::assertTrue(true);
 	}
 
@@ -137,7 +152,12 @@ class SecurityReportTest extends TestCase {
 		self::assertIsString($data);
 		$this->expectException(\UnexpectedValueException::class);
 		$this->expectExceptionMessage('pixel limit');
-		ImageHeaderPreflight::check($data, new EPubArchiveLimits(maxImagePixels: 1));
+		ImageHeaderPreflight::check(
+			$data,
+			maxBytes: EPubArchiveLimits::DEFAULT_MAX_COVER_BYTES,
+			maxDimension: 8192,
+			maxPixels: 1,
+		);
 	}
 
 	public function testRejectsAnimatedGifCover(): void {
@@ -145,12 +165,22 @@ class SecurityReportTest extends TestCase {
 		self::assertIsString($data);
 		$this->expectException(\UnexpectedValueException::class);
 		$this->expectExceptionMessage('Animated');
-		ImageHeaderPreflight::check($data, new EPubArchiveLimits());
+		ImageHeaderPreflight::check(
+			$data,
+			maxBytes: EPubArchiveLimits::DEFAULT_MAX_COVER_BYTES,
+			maxDimension: 8192,
+			maxPixels: 16 * 1024 * 1024,
+		);
 	}
 
 	public function testRejectsUnknownCoverHeader(): void {
 		$this->expectException(\UnexpectedValueException::class);
-		ImageHeaderPreflight::check('not an image', new EPubArchiveLimits());
+		ImageHeaderPreflight::check(
+			'not an image',
+			maxBytes: EPubArchiveLimits::DEFAULT_MAX_COVER_BYTES,
+			maxDimension: 8192,
+			maxPixels: 16 * 1024 * 1024,
+		);
 	}
 
 	private function fixture(): string {
@@ -162,7 +192,12 @@ class SecurityReportTest extends TestCase {
 		self::assertIsString($file);
 		try {
 			file_put_contents($file, $data);
-			ZipMetadataPreflight::check($file, new EPubArchiveLimits());
+			ZipMetadataPreflight::check(
+				$file,
+				maxEntryCount: EPubArchiveLimits::DEFAULT_MAX_ENTRY_COUNT,
+				maxCentralDirectoryBytes: 16 * 1024 * 1024,
+				archiveDescription: 'EPUB',
+			);
 		} finally {
 			unlink($file);
 		}
