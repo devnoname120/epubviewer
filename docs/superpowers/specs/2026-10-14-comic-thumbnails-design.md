@@ -134,11 +134,11 @@ Encrypted selected entries are rejected. When available, ZIP encryption metadata
 
 ## CBR reader
 
-The reader first verifies that `RarArchive` is available, then opens the archive without a password or volume callback. Header-encrypted archives therefore fail to open, and missing volume requests cannot be satisfied by application code.
+A minimal `RarMetadataPreflight` parses the RAR4 or RAR5 signature and main header before invoking the extension. It rejects header-encrypted and multi-volume archives. This is required because UnRAR automatically discovers conventionally named sibling volumes even when the caller supplies no volume callback; explicit preflight prevents a preview request from opening adjacent volume files.
 
-It iterates `RarArchive` rather than calling `getEntries()`, avoiding a complete PHP array. During traversal it validates metadata, tracks entry count and the cumulative declared uncompressed prefix, and retains the best `RarEntry` object.
+The reader then verifies that `RarArchive` is available and opens the archive without a password or volume callback. It iterates `RarArchive` rather than calling `getEntries()`, avoiding a complete PHP array. During traversal it validates metadata, tracks entry count and the cumulative declared uncompressed prefix, and retains the best `RarEntry` object.
 
-The selected entry must not be a directory, encrypted, split across volumes, oversized, or inconsistent. `RarEntry::getStream()` supplies the payload. Solid archives remain supported, subject to the 1 GiB prefix bound.
+The selected entry must not be a directory, encrypted, redirected, oversized, or inconsistent. `RarEntry::getStream()` supplies the payload. Solid archives remain supported, subject to the 1 GiB prefix bound.
 
 The reader does not enable the extension's global exception mode, because changing global RAR error behavior could affect unrelated code in the same PHP process. Native warnings are contained and converted into local preview failure.
 
