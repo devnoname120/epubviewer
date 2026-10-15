@@ -21,6 +21,9 @@
             </errorLevel>
         </PropertyNotSetInConstructor>
     </issueHandlers>
+    <stubs>
+        <file name="tests/stubs/rar.php"/>
+    </stubs>
     <projectFiles>
         <directory name="lib"/>
         <ignoreFiles>

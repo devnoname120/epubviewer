@@ -6,8 +6,13 @@ namespace OCA\Epubviewer\Preview;
 
 /** Header-only checks; no raster allocation is permitted before this succeeds. */
 final class ImageHeaderPreflight {
-	public static function check(string $data, EPubArchiveLimits $limits): void {
-		if (strlen($data) > $limits->maxCoverBytes) {
+	public static function check(
+		string $data,
+		int $maxBytes,
+		int $maxDimension,
+		int $maxPixels,
+	): string {
+		if (strlen($data) > $maxBytes) {
 			throw new \UnexpectedValueException('The cover exceeds the encoded image limit.');
 		}
 		$info = @getimagesizefromstring($data);
@@ -15,8 +20,8 @@ final class ImageHeaderPreflight {
 			throw new \UnexpectedValueException('The cover has unknown or invalid image dimensions.');
 		}
 		[$width, $height, $type] = $info;
-		if ($width < 1 || $height < 1 || $width > $limits->maxImageDimension
-			|| $height > $limits->maxImageDimension || $width * $height > $limits->maxImagePixels) {
+		if ($width < 1 || $height < 1 || $width > $maxDimension
+			|| $height > $maxDimension || $width * $height > $maxPixels) {
 			throw new \UnexpectedValueException('The cover exceeds the decoded image pixel limit.');
 		}
 		// Animated covers are refused so the decoder cannot allocate additional frames.
@@ -25,6 +30,8 @@ final class ImageHeaderPreflight {
 		} elseif ($type === IMAGETYPE_PNG || $type === IMAGETYPE_WEBP) {
 			self::checkChunks($data, $type === IMAGETYPE_PNG, $width, $height);
 		}
+
+		return image_type_to_mime_type($type);
 	}
 
 	private static function checkChunks(string $data, bool $png, int $width, int $height): void {

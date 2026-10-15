@@ -30,7 +30,12 @@ final class EPubArchiveReader {
 	}
 
 	public function assertCoverImageSafe(string $data): void {
-		ImageHeaderPreflight::check($data, $this->limits);
+		ImageHeaderPreflight::check(
+			$data,
+			$this->limits->maxCoverBytes,
+			$this->limits->maxImageDimension,
+			$this->limits->maxImagePixels,
+		);
 	}
 
 	/**
@@ -38,7 +43,12 @@ final class EPubArchiveReader {
 	 */
 	public function readCover(string $file): ?array {
 		$this->assertArchiveFileSize($file);
-		ZipMetadataPreflight::check($file, $this->limits);
+		ZipMetadataPreflight::check(
+			$file,
+			$this->limits->maxEntryCount,
+			$this->limits->maxCentralDirectoryBytes,
+			'EPUB',
+		);
 
 		$zip = new ZipArchive();
 		$result = $zip->open($file, ZipArchive::RDONLY | ZipArchive::CHECKCONS);

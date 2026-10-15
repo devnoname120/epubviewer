@@ -1,3 +1,19 @@
+## 1.9.11 - 2026-10-15
+
+### Added
+
+- Generate Nextcloud file thumbnails from the first naturally ordered JPEG, PNG, GIF, or WebP image in CBZ archives.
+- Generate CBR thumbnails through the optional PHP `rar` extension, with real RAR 4 and RAR 5 coverage and no external archive utilities.
+
+### Security
+
+- Bound remote and encrypted temporary copies, archive metadata, entry paths, selected-image expansion, solid-RAR prefix work, image dimensions, and decoded pixels; reject encrypted, redirected, multi-volume, header-encrypted, malformed, and inconsistent archives.
+
+### Changed
+
+- Share ZIP and image preflight checks across EPUB and comic thumbnails, and support ZIP64 metadata beyond 4 GiB for already-local archives on 64-bit PHP without imposing a total local-archive size cap.
+- Exercise optional CBR extraction in the PHP unit and static-analysis CI matrix.
+
 ## 1.9.10 - 2026-10-14
 
 ### Fixed

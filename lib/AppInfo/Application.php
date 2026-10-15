@@ -62,6 +62,16 @@ final class Application extends App implements IBootstrap {
 
 	private function registerPreviewProviders(IRegistrationContext $context): void {
 		$context->registerPreviewProvider(\OCA\Epubviewer\Preview\EPubPreview::class, '/^application\/epub\+zip$/');
+		$context->registerPreviewProvider(
+			\OCA\Epubviewer\Preview\CBZPreview::class,
+			'/^(?:application\/x-cbz|application\/comicbook\+zip)$/',
+		);
+		if (extension_loaded('rar')) {
+			$context->registerPreviewProvider(
+				\OCA\Epubviewer\Preview\CBRPreview::class,
+				'/^(?:application\/x-cbr|application\/comicbook\+rar)$/',
+			);
+		}
 	}
 
 	public function boot(IBootContext $context): void {

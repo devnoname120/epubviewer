@@ -23,6 +23,10 @@ quality, a set of image enhancement filters are provided.
 
 Comic pages may use JPEG, PNG, GIF, or WebP. TIFF pages are not supported.
 
+Nextcloud file thumbnails use the first naturally ordered supported image in CBZ archives. CBR thumbnails are enabled
+when the optional PHP `rar` extension is installed. Unsupported, encrypted, multi-volume, malformed, or over-limit
+archives retain Nextcloud's generic file icon.
+
 ## Supported Nextcloud versions
 
 EPUB Viewer supports Nextcloud 33, 34, and 35. PHP 8.2–8.5 is supported on
