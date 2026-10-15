@@ -63,5 +63,8 @@
     "ext-dom": "*",
     "ext-json": "*",
     "ext-zip": "*"
+  },
+  "suggest": {
+    "ext-rar": "Enables CBR thumbnail generation"
   }
 }

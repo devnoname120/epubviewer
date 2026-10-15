@@ -60,7 +60,7 @@ jobs:
         uses: shivammathur/setup-php@3209251719395a11279642c89c6fd159cdf5dc82 # main (21 commits after latest release (v2.32.0) at time of writing)
         with:
           php-version: ${{ matrix.php_version }}
-          extensions: ctype,curl,dom,fileinfo,ftp,gd,intl,json,ldap,mbstring,openssl,pdo_sqlite,posix,sqlite,xml,zip
+          extensions: ctype,curl,dom,fileinfo,ftp,gd,intl,json,ldap,mbstring,openssl,pdo_sqlite,posix,rar,sqlite,xml,zip
           coverage: none
 
       - name: Composer install nextcloud-server
@@ -75,7 +75,7 @@ jobs:
           composer dump-autoload --dev
 
       - name: PHP unit tests
-        run: vendor/bin/phpunit --bootstrap vendor/autoload.php --configuration tests/phpunit.xml
+        run: vendor/bin/phpunit --bootstrap tests/bootstrap-unit.php --configuration tests/phpunit.xml
 
       - name: Psalm
         run: |
@@ -136,7 +136,7 @@ jobs:
         uses: shivammathur/setup-php@3209251719395a11279642c89c6fd159cdf5dc82 # main (21 commits after latest release (v2.32.0) at time of writing)
         with:
           php-version: ${{ matrix.php_version }}
-          extensions: ctype,curl,dom,fileinfo,ftp,gd,intl,json,ldap,mbstring,openssl,pdo_sqlite,posix,sqlite,xml,zip
+          extensions: ctype,curl,dom,fileinfo,ftp,gd,intl,json,ldap,mbstring,openssl,pdo_sqlite,posix,rar,sqlite,xml,zip
           coverage: none
 
       - name: Composer install nextcloud-server

@@ -21,6 +21,8 @@ CBR and CBZ are supported using a custom renderer inspired by [balaclark]'s work
 
 Comic pages may use static JPEG, PNG, GIF, or WebP images. PDF and comic documents are limited to 1,000 pages. Animated images and TIFF pages are not supported.
 
+Nextcloud file thumbnails use the first naturally ordered supported image in CBZ archives. CBR thumbnails are enabled when the optional PHP `rar` extension is installed. Unsupported, encrypted, multi-volume, malformed, or over-limit archives retain Nextcloud's generic file icon.
+
 See [README] for more exhaustive information on features and potential misfeatures of this app.
 
    [epub.js]: https://github.com/futurepress/epub.js
