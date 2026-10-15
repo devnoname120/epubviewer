@@ -135,13 +135,25 @@ final class ZipMetadataPreflight {
 	}
 
 	private static function u64(string $data, int $offset, string $archiveDescription): int {
-		// Accepted archives and cardinalities are below 4 GiB; reject larger ZIP64 values.
-		if (self::u32($data, $offset + 4) !== 0) {
+		$low = self::u32($data, $offset);
+		$high = self::u32($data, $offset + 4);
+		if (PHP_INT_SIZE < 8) {
+			if ($high !== 0 || $low > PHP_INT_MAX) {
+				throw new \UnexpectedValueException(sprintf(
+					'The %s ZIP64 metadata exceeds the platform offset range.',
+					$archiveDescription,
+				));
+			}
+
+			return $low;
+		}
+		if ($high > 0x7fffffff) {
 			throw new \UnexpectedValueException(sprintf(
-				'The %s ZIP64 metadata exceeds the preview limits.',
+				'The %s ZIP64 metadata exceeds the platform offset range.',
 				$archiveDescription,
 			));
 		}
-		return self::u32($data, $offset);
+
+		return $high * 0x100000000 + $low;
 	}
 }
