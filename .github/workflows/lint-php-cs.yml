@@ -50,6 +50,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
+      - name: Checkout Nextcloud server
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        with:
+          path: nextcloud-server
+          repository: nextcloud/server
+          ref: stable35
+          persist-credentials: false
+
       - name: Set up php8.2
         uses: shivammathur/setup-php@c665c7a15b5295c2488ac8a87af9cb806cd72198 # v2
         with:
