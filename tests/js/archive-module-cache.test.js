@@ -15,7 +15,8 @@ test('versions the generated archive module with the template revision query', a
   );
   assert.match(source, /new URL\(['"]\.\.\/epubviewer-rar\.mjs['"], import\.meta\.url\)/);
   assert.match(source, /archiveModuleUrl\.search\s*=\s*new URL\(import\.meta\.url\)\.search/);
-  assert.match(source, /await import\(archiveModuleUrl\.href\)/);
+  assert.doesNotMatch(source, /await import\(archiveModuleUrl\.href\)/);
+  assert.match(source, /window\.CBRJS\.archiveReady\s*=\s*import\(archiveModuleUrl\.href\)\.then/);
 });
 
 test('emits a hashed worker through Vite static worker discovery', async () => {

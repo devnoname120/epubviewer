@@ -131,6 +131,34 @@ function createHarness(entries, options = {}) {
     }
   }
 
+  const cbrjs = {
+    UnarchiveEventType: eventTypes,
+  };
+  const installArchiveSupport = () => {
+    cbrjs.getUnarchiver = function () {
+      return new FakeUnarchiver();
+    };
+    cbrjs.getRarUnarchiver = function (url) {
+      rarUrls.push(url);
+      return new FakeUnarchiver();
+    };
+    cbrjs.getZipUnarchiver = function (url) {
+      zipUrls.push(url);
+      return new FakeUnarchiver();
+    };
+  };
+  if (options.deferArchiveSupport) {
+    cbrjs.archiveReady = new Promise((resolve) => {
+      setImmediate(() => {
+        installArchiveSupport();
+        resolve();
+      });
+    });
+  } else {
+    installArchiveSupport();
+    cbrjs.archiveReady = Promise.resolve();
+  }
+
   const context = vm.createContext({
     $: jQuery,
     ArrayBuffer,
@@ -159,20 +187,7 @@ function createHarness(entries, options = {}) {
     },
     Uint8Array,
     addEventListener() {},
-    CBRJS: {
-      getUnarchiver() {
-        return new FakeUnarchiver();
-      },
-      getRarUnarchiver(url) {
-        rarUrls.push(url);
-        return new FakeUnarchiver();
-      },
-      getZipUnarchiver(url) {
-        zipUrls.push(url);
-        return new FakeUnarchiver();
-      },
-      UnarchiveEventType: eventTypes,
-    },
+    CBRJS: cbrjs,
     console,
     document: {
       head: {
@@ -267,9 +282,36 @@ test('streams RAR comics through the range worker instead of buffering the publi
   assert.equal(result.books.length, 1);
 });
 
+test('waits for asynchronous archive backends before starting a direct RAR URL', async () => {
+  const result = createHarness([{ filename: '001.JPG' }], {
+    deferArchiveSupport: true,
+    format: 'cbr',
+    path: '/delayed.cbr',
+  });
+  await result.ready;
+
+  assert.deepEqual(result.rarUrls, ['/delayed.cbr']);
+  assert.equal(result.fetchCalls.length, 0);
+  assert.equal(result.books.length, 1);
+});
+
+test('waits for asynchronous archive backends before opening a buffered CBZ', async () => {
+  const result = createHarness([{ filename: '001.JPG' }], {
+    deferArchiveSupport: true,
+    format: 'cbz',
+    path: '/delayed.cbz',
+  });
+  await result.ready;
+
+  assert.equal(result.fetchCalls.length, 1);
+  assert.deepEqual(result.zipUrls, []);
+  assert.equal(result.books.length, 1);
+});
+
 test('falls back to bounded ZIP ranges when a CBZ exceeds the buffered input limit', async () => {
   const result = createHarness([{ filename: '001.JPG' }], {
     contentLength: 100 * 1024 * 1024 + 1,
+    deferArchiveSupport: true,
     format: 'cbz',
     path: '/large.cbz',
   });

@@ -202,12 +202,30 @@ CBRJS.Reader = function(bookPath, _options) {
             if (startResult && typeof startResult.catch === 'function') startResult.catch(failArchive);
         }
 
+		function whenArchiveReady(callback) {
+			var ready = CBRJS.archiveReady;
+			if (ready && typeof ready.then === 'function') {
+				ready.then(function () {
+					if (!done) callback();
+				}).catch(failArchive);
+				return;
+			}
+
+			try {
+				callback();
+			} catch (error) {
+				failArchive(error);
+			}
+		}
+
         if (rangeRar) {
-            if (typeof CBRJS.getRarUnarchiver !== 'function') {
-                failArchive('RAR range support failed to load.');
-                return;
-            }
-            startUnarchiver(CBRJS.getRarUnarchiver(url));
+			whenArchiveReady(function () {
+				if (typeof CBRJS.getRarUnarchiver !== 'function') {
+					failArchive('RAR range support failed to load.');
+					return;
+				}
+				startUnarchiver(CBRJS.getRarUnarchiver(url));
+			});
             return;
         }
 
@@ -215,20 +233,24 @@ CBRJS.Reader = function(bookPath, _options) {
             resetTimer();
             if (total > 0) $progressbar.css('width', Math.floor(loaded / total * 100) + '%');
         }).then(function (arrayBuffer) {
-            if (typeof CBRJS.getUnarchiver !== 'function') {
-                failArchive('Archive support failed to load.');
-                return;
-            }
-            startUnarchiver(CBRJS.getUnarchiver(arrayBuffer), arrayBuffer.byteLength);
-	        }).catch(function (error) {
-	            if (rangeZip && error && error.code === 'ARCHIVE_INPUT_LIMIT') {
-	                if (typeof CBRJS.getZipUnarchiver !== 'function') {
-	                    failArchive('ZIP range support failed to load.');
-	                    return;
-	                }
-	                startUnarchiver(CBRJS.getZipUnarchiver(url));
-	                return;
-	            }
+			whenArchiveReady(function () {
+				if (typeof CBRJS.getUnarchiver !== 'function') {
+					failArchive('Archive support failed to load.');
+					return;
+				}
+				startUnarchiver(CBRJS.getUnarchiver(arrayBuffer), arrayBuffer.byteLength);
+			});
+		}).catch(function (error) {
+			if (rangeZip && error && error.code === 'ARCHIVE_INPUT_LIMIT') {
+				whenArchiveReady(function () {
+					if (typeof CBRJS.getZipUnarchiver !== 'function') {
+						failArchive('ZIP range support failed to load.');
+						return;
+					}
+					startUnarchiver(CBRJS.getZipUnarchiver(url));
+				});
+				return;
+			}
 	            failArchive(error);
 	        });
 	    }
