@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
+import { createArchiveRangeReader } from '../../src/archiveRangeReader.js';
 import { createRarRangeReader } from '../../src/rarRangeReader.js';
 
 const ORIGIN = 'https://cloud.example.test';
@@ -52,7 +53,7 @@ async function readAll(stream) {
   return result;
 }
 
-describe('bounded RAR HTTP range reader', () => {
+describe('bounded archive HTTP range reader', () => {
   it('opens a 281 MB same-origin archive without downloading it up front', async () => {
     const requests = [];
     const total = 281_218_915;
@@ -65,9 +66,32 @@ describe('bounded RAR HTTP range reader', () => {
 
     assert.equal(reader.length, total);
     assert.deepEqual(await readAll(await reader.read(254_758_226, 8)), Uint8Array.from([0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59]));
-    assert.deepEqual(requests.map(({ range }) => range), ['bytes=0-0', 'bytes=254758226-254758233']);
+    assert.deepEqual(requests.map(({ range }) => range), ['bytes=0-1', 'bytes=254758226-254758233']);
     assert.equal(requests[0].options.credentials, 'same-origin');
     assert.equal(requests[0].options.redirect, 'error');
+  });
+
+  it('avoids Nextcloud servers that expand a bytes=0-0 probe into the complete file', async () => {
+    const requests = [];
+    const total = 281_218_915;
+    const reader = await createArchiveRangeReader(URL, {
+      fetch: async (input, options = {}) => {
+        const range = new Headers(options.headers).get('range');
+        requests.push(range);
+        if (range === 'bytes=0-0') {
+          return rangeResponse(0, total - 1, total, Uint8Array.of(0), 206, total);
+        }
+        const match = /^bytes=(\d+)-(\d+)$/.exec(range ?? '');
+        assert.ok(match);
+        return rangeResponse(Number(match[1]), Number(match[2]), total);
+      },
+      maxArchiveBytes: 1024 * 1024 * 1024,
+      maxFetchedBytes: total + 1024,
+      origin: ORIGIN,
+    });
+
+    assert.equal(reader.length, total);
+    assert.deepEqual(requests, ['bytes=0-1']);
   });
 
   it('rejects cross-origin input before issuing a request', async () => {
@@ -98,9 +122,9 @@ describe('bounded RAR HTTP range reader', () => {
 
   it('requires a precise 206 Content-Range response', async () => {
     for (const response of [
-      rangeResponse(0, 0, 10, Uint8Array.of(0), 200),
-      { ...rangeResponse(1, 1, 10), url: URL },
-      { ...rangeResponse(0, 0, 10), headers: new Headers({ 'content-length': '1' }) },
+      rangeResponse(0, 1, 10, Uint8Array.of(0, 1), 200),
+      { ...rangeResponse(1, 2, 10), url: URL },
+      { ...rangeResponse(0, 1, 10), headers: new Headers({ 'content-length': '2' }) },
     ]) {
       await assert.rejects(
         createRarRangeReader(URL, {
@@ -150,7 +174,7 @@ describe('bounded RAR HTTP range reader', () => {
       const fetch = async () => {
         calls += 1;
         return calls === 1
-          ? rangeResponse(0, 0, 10)
+          ? rangeResponse(0, 1, 10)
           : rangeResponse(2, 3, 10, data, 206, 2);
       };
       const reader = await createRarRangeReader(URL, {
@@ -167,7 +191,7 @@ describe('bounded RAR HTTP range reader', () => {
     const reader = await createRarRangeReader(URL, {
       fetch: rangeFetch(100, []),
       maxArchiveBytes: 100,
-      maxFetchedBytes: 6,
+      maxFetchedBytes: 7,
       origin: ORIGIN,
     });
     await readAll(await reader.read(0, 5));

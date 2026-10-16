@@ -24,6 +24,37 @@ test('RAR range budget covers one archive scan and one bounded fallback entry', 
   );
 });
 
+test('labels publication input-limit failures for bounded URL fallback', async () => {
+  const originalFetch = globalThis.fetch;
+  let cancelled = false;
+  globalThis.fetch = async () => ({
+    body: new ReadableStream({
+      cancel() {
+        cancelled = true;
+      },
+    }),
+    headers: new Headers({
+      'content-length': String(limits.policy.archiveBytes + 1),
+    }),
+    ok: true,
+  });
+
+  try {
+    await assert.rejects(
+      limits.download('/large.cbz', new AbortController().signal),
+      (error) => {
+        assert.equal(error.code, 'ARCHIVE_INPUT_LIMIT');
+        assert.match(error.message, /input limit/);
+        return true;
+      },
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+
+  assert.equal(cancelled, true);
+});
+
 test('checks ZIP metadata before materializing entries and does not trust a false entry count', () => {
   const data = readFileSync(fixture);
   assert.ok(limits.inspectZip(data).size > 1);

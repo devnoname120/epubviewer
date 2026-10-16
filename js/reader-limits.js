@@ -27,6 +27,12 @@
     if (!condition) throw new Error(message || 'Publication exceeds reader resource limits.');
   }
 
+  function fail(code, message) {
+    var error = new Error(message);
+    error.code = code;
+    throw error;
+  }
+
   function entry(size, compressed, total) {
     assert(
       Number.isSafeInteger(size) && size >= 0 && size <= policy.entryBytes,
@@ -184,22 +190,33 @@
     }
     try {
       var response = await fetch(url, { signal: signal, credentials: 'same-origin' });
-      if (!response.ok || !response.body || Number(response.headers.get('content-length') || 0) > policy.archiveBytes) {
+      if (!response.ok || !response.body) {
         if (response.body) await response.body.cancel().catch(function () {});
         assert(false, 'Publication download failed or exceeds the input limit.');
       }
       var length = Number(response.headers.get('content-length') || 0);
-      return (
-        await readStream(
-          response.body,
-          policy.archiveBytes,
-          signal,
-          progress &&
-            function (loaded) {
-              progress(loaded, length);
-            },
-        )
-      ).buffer;
+      if (length > policy.archiveBytes) {
+        await response.body.cancel().catch(function () {});
+        fail('ARCHIVE_INPUT_LIMIT', 'Publication download failed or exceeds the input limit.');
+      }
+      try {
+        return (
+          await readStream(
+            response.body,
+            policy.archiveBytes,
+            signal,
+            progress &&
+              function (loaded) {
+                progress(loaded, length);
+              },
+          )
+        ).buffer;
+      } catch (error) {
+        if (error && error.message === 'Publication stream exceeds the byte limit.') {
+          fail('ARCHIVE_INPUT_LIMIT', 'Publication download failed or exceeds the input limit.');
+        }
+        throw error;
+      }
     } finally {
       clearTimeout(timer);
     }
