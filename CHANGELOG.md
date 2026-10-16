@@ -1,3 +1,14 @@
+## 1.9.12 - 2026-10-16
+
+### Fixed
+
+- Open CBR archives up to 1 GiB through bounded same-origin HTTP byte ranges instead of requiring the complete archive to fit in the 100 MiB browser input buffer (#50).
+- Decode the affected independently compressed RAR 3 PPMd entries with a pinned, bounded libarchive WebAssembly fallback when the primary JavaScript decoder reaches its known mode-transition failure.
+
+### Security
+
+- Require exact `206 Partial Content` responses, bound cumulative range traffic, validate archive metadata before extraction, and enable WebAssembly compilation only for CBR reader responses.
+
 ## 1.9.11 - 2026-10-15
 
 ### Added
