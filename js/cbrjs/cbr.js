@@ -106,10 +106,11 @@ CBRJS.Reader = function(bookPath, _options) {
 
 	function extractImages(url, opts) {
         var images = [], ua, done = false;
-        var controller = new AbortController();
-        var filename = decodeURIComponent(url.split('/').pop());
-        var format = reader.options.session.format || '';
-        var rangeRar = format === 'application/x-cbr' || format === 'application/comicbook+rar';
+	        var controller = new AbortController();
+	        var filename = decodeURIComponent(url.split('/').pop());
+	        var format = reader.options.session.format || '';
+	        var rangeRar = ['cbr', 'application/x-cbr', 'application/comicbook+rar'].indexOf(format) !== -1;
+	        var rangeZip = ['cbz', 'application/x-cbz', 'application/comicbook+zip'].indexOf(format) !== -1;
         var options = $.extend({
             start: function () {}, extract: function () {}, progress: function () {},
             finish: function () {}, error: function () {}
@@ -219,8 +220,18 @@ CBRJS.Reader = function(bookPath, _options) {
                 return;
             }
             startUnarchiver(CBRJS.getUnarchiver(arrayBuffer), arrayBuffer.byteLength);
-        }).catch(failArchive);
-    }
+	        }).catch(function (error) {
+	            if (rangeZip && error && error.code === 'ARCHIVE_INPUT_LIMIT') {
+	                if (typeof CBRJS.getZipUnarchiver !== 'function') {
+	                    failArchive('ZIP range support failed to load.');
+	                    return;
+	                }
+	                startUnarchiver(CBRJS.getZipUnarchiver(url));
+	                return;
+	            }
+	            failArchive(error);
+	        });
+	    }
 
 	function openComicArchive(url, options) {
 
