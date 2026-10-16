@@ -1,7 +1,7 @@
 {
   "name": "epubviewer",
   "description": "EPUB/CBR/PDF reader app for Nextcloud",
-  "version": "1.9.11",
+  "version": "1.9.12",
   "author": "devnoname120 <devnoname120@gmail.com>",
   "contributors": [
     "devnoname120 <devnoname120@gmail.com>"
@@ -21,6 +21,7 @@
     "lint-github-actions": "go run github.com/rhysd/actionlint/cmd/actionlint@latest",
     "pin-github-actions": "pin-github-action .github/workflows/",
     "update-deps": "npx npm-check-updates",
+    "prebuild": "node scripts/prepare-generated-assets.mjs",
     "build": "vite --mode production build",
     "dev": "vite --mode development build",
     "watch": "vite --mode development build --watch",

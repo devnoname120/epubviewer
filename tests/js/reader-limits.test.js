@@ -17,6 +17,13 @@ test('rejects over-budget entry sizes, cumulative bytes, and compression ratios'
   assert.equal(limits.entry(1024, 10, 0), 1024);
 });
 
+test('RAR range budget covers one archive scan and one bounded fallback entry', () => {
+  assert.ok(
+    limits.policy.rarFetchBytes
+      >= limits.policy.rarArchiveBytes + limits.policy.directoryBytes + limits.policy.entryBytes,
+  );
+});
+
 test('checks ZIP metadata before materializing entries and does not trust a false entry count', () => {
   const data = readFileSync(fixture);
   assert.ok(limits.inspectZip(data).size > 1);

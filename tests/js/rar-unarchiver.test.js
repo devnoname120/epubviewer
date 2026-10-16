@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 
 import {
   createComicUnarchiver,
+  createRarUrlUnarchiver,
   isRarArchive,
   MaryRarUnarchiver,
 } from '../../src/rarUnarchiver.js';
@@ -65,6 +66,35 @@ describe('@mary/rar unarchiver adapter', () => {
     });
 
     assert.equal(selected, bitjs);
+  });
+
+  it('starts same-origin RAR URL extraction without transferring an archive buffer', async () => {
+    const worker = new FakeWorker([{ type: 'start' }, { type: 'finish', metadata: {} }]);
+    const unarchiver = createRarUrlUnarchiver('/remote.php/dav/files/alice/large.cbr', {
+      origin: 'https://cloud.example.test',
+      workerFactory: () => worker,
+    });
+
+    await unarchiver.start();
+
+    assert.ok(unarchiver instanceof MaryRarUnarchiver);
+    assert.deepEqual(worker.posted, [{
+      message: {
+        type: 'extract-url',
+        url: 'https://cloud.example.test/remote.php/dav/files/alice/large.cbr',
+      },
+      transfer: [],
+    }]);
+  });
+
+  it('rejects cross-origin RAR URLs before starting a worker', () => {
+    assert.throws(
+      () => createRarUrlUnarchiver('https://attacker.example/large.cbr', {
+        origin: 'https://cloud.example.test',
+        workerFactory: () => new FakeWorker([]),
+      }),
+      /same origin/,
+    );
   });
 
   it('translates worker messages into the existing archive event API', async () => {

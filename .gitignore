@@ -1,7 +1,8 @@
 nextcloud-server
 nextcloud-docker-dev
-vendor
+/vendor
 build
+assets
 .php-cs-fixer.cache
 css/epubviewer-settings.css
 js/*

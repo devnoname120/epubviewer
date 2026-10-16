@@ -81,6 +81,9 @@ final class ReaderResponseBuilder implements IReaderResponseBuilder {
 		$policy->addAllowedFontDomain('blob:');
 		$policy->addAllowedImageDomain('blob:');
 		$policy->addAllowedWorkerSrcDomain('\'self\'');
+		if (in_array($type, ['application/x-cbr', 'application/comicbook+rar'], true)) {
+			$policy->allowEvalWasm();
+		}
 
 		$response = new TemplateResponse(Application::APP_ID, $template, $params, TemplateResponse::RENDER_AS_BLANK);
 		$response->setContentSecurityPolicy($policy);
