@@ -218,6 +218,42 @@ describe('bounded ZIP range extraction', () => {
     await assert.rejects(extract(invalid), /data descriptor/);
   });
 
+  it('keeps progress byte counts after transferring an extracted buffer', async () => {
+    const archive = makeZip([{ contents: 'transferred page', method: 0, name: 'page.jpg' }]);
+    const source = sparseReader(archive.archiveLength, archive.regions);
+    const progress = [];
+
+    const result = await extractZipRange(source, limits, {
+      extract(entry) {
+        structuredClone(entry.fileData, { transfer: [entry.fileData.buffer] });
+      },
+      progress(event) {
+        progress.push(event);
+      },
+    });
+
+    assert.equal(result.totalBytes, 16);
+    assert.equal(progress.at(-1).currentBytesUnarchivedInFile, 16);
+  });
+
+  it('reports preflight activity before decoding entries', async () => {
+    const archive = makeZip([{ contents: 'page', name: 'page.jpg' }]);
+    const source = sparseReader(archive.archiveLength, archive.regions);
+    const order = [];
+
+    await extractZipRange(source, limits, {
+      extract() {
+        order.push('extract');
+      },
+      progress(event) {
+        order.push(event.currentBytesUnarchivedInFile === 0 ? 'preflight' : 'decoded');
+      },
+    });
+
+    assert.equal(order[0], 'preflight');
+    assert.deepEqual(order.slice(-2), ['extract', 'decoded']);
+  });
+
   it('rejects encrypted, unsupported, duplicate, and inconsistent entries before output', async () => {
     const cases = [
       [makeZip([{ contents: 'x', encrypted: true, name: 'encrypted.jpg' }]), /Encrypted ZIP/],

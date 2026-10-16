@@ -264,8 +264,20 @@ export async function extractZipRange(source, limits, sink = {}) {
 		endRecord.directoryOffset, endRecord.directorySize)
 	const centralEntries = parseCentralDirectory(directoryBytes, endRecord, limits)
 	const entries = []
+	const declaredRegularFiles = centralEntries.filter((entry) => !isDirectory(entry) && !isSymlink(entry)).length
+	let preflightBytes = 0
 	for (const entry of centralEntries) {
 		entries.push(await preflightLocalEntry(source, limits, entry, endRecord.directoryOffset))
+		preflightBytes = Math.max(preflightBytes, entry.localOffset + 30)
+		await sink.progress?.({
+			currentBytesUnarchived: Math.min(preflightBytes, source.length),
+			currentBytesUnarchivedInFile: 0,
+			currentFilename: entry.name,
+			currentFileNumber: 0,
+			totalCompressedBytesRead: 0,
+			totalFilesInArchive: declaredRegularFiles,
+			totalUncompressedBytesInArchive: source.length,
+		})
 	}
 
 	const regularFiles = entries.filter((entry) => !isDirectory(entry) && !isSymlink(entry))
@@ -281,13 +293,14 @@ export async function extractZipRange(source, limits, sink = {}) {
 			'ZIP output size differs from metadata.')
 		limits.assert(crc32(output) === entry.crc, 'ZIP entry CRC32 differs from metadata.')
 
+		const fileBytes = output.byteLength
 		compressedBytesRead += entry.compressedSize
-		totalBytes += output.byteLength
+		totalBytes += fileBytes
 		totalFiles += 1
 		await sink.extract?.({ filename: entry.name, fileData: output }, entry)
 		await sink.progress?.({
 			currentBytesUnarchived: Math.min(entry.dataOffset + entry.compressedSize, source.length),
-			currentBytesUnarchivedInFile: output.byteLength,
+			currentBytesUnarchivedInFile: fileBytes,
 			currentFilename: entry.name,
 			currentFileNumber: totalFiles,
 			totalCompressedBytesRead: compressedBytesRead,
