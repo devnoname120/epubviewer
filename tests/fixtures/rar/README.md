@@ -11,3 +11,8 @@
 - `comic-compressed-rar4.rar` is a RAR 4 archive generated with RAR 6.24 from
   a static 1x1 GIF containing a large comment block. It exercises the selected
   entry compression-ratio limit without introducing third-party image data.
+- `comic-ppm-rar4.rar` is a RAR 4 archive generated with RAR 6.24 from
+  `img/book.png` plus a deterministic PNG text chunk, forced through RAR3 PPMd
+  compression and stored as `page-01.PNG`. It covers the bounded libarchive
+  fallback used when the primary JavaScript RAR3 decoder cannot decode an
+  otherwise valid compressed entry.

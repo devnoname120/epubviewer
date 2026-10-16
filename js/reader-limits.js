@@ -3,6 +3,8 @@
   'use strict';
   var policy = Object.freeze({
     archiveBytes: 100 * 1024 * 1024,
+    rarArchiveBytes: 1024 * 1024 * 1024,
+    rarFetchBytes: 1105 * 1024 * 1024,
     entries: 10000,
     directoryBytes: 16 * 1024 * 1024,
     entryBytes: 64 * 1024 * 1024,

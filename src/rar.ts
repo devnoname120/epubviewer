@@ -1,1 +1,1 @@
-export { createComicUnarchiver, isRarArchive, MaryRarUnarchiver } from './rarUnarchiver.js'
+export { createComicUnarchiver, createRarUrlUnarchiver, isRarArchive, MaryRarUnarchiver } from './rarUnarchiver.js'

@@ -108,6 +108,8 @@ CBRJS.Reader = function(bookPath, _options) {
         var images = [], ua, done = false;
         var controller = new AbortController();
         var filename = decodeURIComponent(url.split('/').pop());
+        var format = reader.options.session.format || '';
+        var rangeRar = format === 'application/x-cbr' || format === 'application/comicbook+rar';
         var options = $.extend({
             start: function () {}, extract: function () {}, progress: function () {},
             finish: function () {}, error: function () {}
@@ -130,9 +132,14 @@ CBRJS.Reader = function(bookPath, _options) {
             options.error(typeof error === 'string' ? error : (error && error.message) || 'Failed to extract images from archive, file corrupted or unsupported?');
         }
 
-        var timer = setTimeout(function () {
-            failArchive('Comic download exceeded the time limit.');
-        }, ReaderLimits.policy.workMilliseconds);
+        var timer;
+        function resetTimer() {
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                failArchive('Comic loading made no progress before the time limit.');
+            }, ReaderLimits.policy.workMilliseconds);
+        }
+        resetTimer();
         window.addEventListener('pagehide', function () {
             done = true;
             clearTimeout(timer);
@@ -143,26 +150,25 @@ CBRJS.Reader = function(bookPath, _options) {
         options.start(filename);
         $progressbar.css('width', '0%');
 
-        ReaderLimits.download(url, controller.signal, function (loaded, total) {
-            if (total > 0) $progressbar.css('width', Math.floor(loaded / total * 100) + '%');
-        }).then(function (arrayBuffer) {
-            clearTimeout(timer);
+        function startUnarchiver(candidate, archiveSize) {
             if (done) return;
-            $('.icon-cloud_download').addClass('ok');
-            reader.options.session.size = arrayBuffer.byteLength;
+            ua = candidate;
+            if (archiveSize) reader.options.session.size = archiveSize;
             var eventTypes = CBRJS.UnarchiveEventType;
-            if (typeof CBRJS.getUnarchiver !== 'function' || !eventTypes) {
+            if (!ua || !eventTypes) {
                 failArchive('Archive support failed to load.');
                 return;
             }
-            ua = CBRJS.getUnarchiver(arrayBuffer);
-            if (!ua) { failArchive(); return; }
-            ua.addEventListener(eventTypes.START, function () {
+            ua.addEventListener(eventTypes.START, function (event) {
+                resetTimer();
+                $('.icon-cloud_download').addClass('ok');
+                if (event.archiveSize) reader.options.session.size = event.archiveSize;
                 $progressbar.css('width', '0%');
                 $('.icon-unarchive').addClass('active');
             });
             ua.addEventListener(eventTypes.EXTRACT, function (event) {
                 if (done) return;
+                resetTimer();
                 try {
                     var blob = CBRJS.createImageBlob(event.unarchivedFile);
                     if (!blob) return;
@@ -174,12 +180,14 @@ CBRJS.Reader = function(bookPath, _options) {
                 } catch (error) { failArchive(error); }
             });
             ua.addEventListener(eventTypes.PROGRESS, function (event) {
+                resetTimer();
                 if (!done && event.totalUncompressedBytesInArchive > 0) {
                     options.progress(Math.floor(event.currentBytesUnarchived / event.totalUncompressedBytesInArchive * 100));
                 }
             });
             ua.addEventListener(eventTypes.FINISH, function () {
                 if (done) return;
+                clearTimeout(timer);
                 done = true;
                 if (!images.length) {
                     revoke();
@@ -191,6 +199,26 @@ CBRJS.Reader = function(bookPath, _options) {
             ua.addEventListener(eventTypes.ERROR, function (event) { failArchive(event.msg); });
             var startResult = ua.start();
             if (startResult && typeof startResult.catch === 'function') startResult.catch(failArchive);
+        }
+
+        if (rangeRar) {
+            if (typeof CBRJS.getRarUnarchiver !== 'function') {
+                failArchive('RAR range support failed to load.');
+                return;
+            }
+            startUnarchiver(CBRJS.getRarUnarchiver(url));
+            return;
+        }
+
+        ReaderLimits.download(url, controller.signal, function (loaded, total) {
+            resetTimer();
+            if (total > 0) $progressbar.css('width', Math.floor(loaded / total * 100) + '%');
+        }).then(function (arrayBuffer) {
+            if (typeof CBRJS.getUnarchiver !== 'function') {
+                failArchive('Archive support failed to load.');
+                return;
+            }
+            startUnarchiver(CBRJS.getUnarchiver(arrayBuffer), arrayBuffer.byteLength);
         }).catch(failArchive);
     }
 

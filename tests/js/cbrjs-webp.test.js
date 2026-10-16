@@ -32,11 +32,13 @@ function validImage(filename) {
   return Buffer.from('ffd8ffc00008080001000101ffd9', 'hex');
 }
 
-function createHarness(entries) {
+function createHarness(entries, options = {}) {
   const revoked = [];
   const blobs = [];
   const books = [];
   const messages = [];
+  const fetchCalls = [];
+  const rarUrls = [];
   const eventTypes = {
     ERROR: 'error',
     EXTRACT: 'extract',
@@ -135,15 +137,22 @@ function createHarness(entries) {
     AbortController,
     setTimeout,
     clearTimeout,
-    fetch: async () => ({
+    fetch: async (...args) => {
+      fetchCalls.push(args);
+      return ({
       ok: true,
       headers: { get: () => '1' },
       body: new ReadableStream({ start(controller) { controller.enqueue(new Uint8Array([1])); controller.close(); } }),
-    }),
+      });
+    },
     Uint8Array,
     addEventListener() {},
     CBRJS: {
       getUnarchiver() {
+        return new FakeUnarchiver();
+      },
+      getRarUnarchiver(url) {
+        rarUrls.push(url);
         return new FakeUnarchiver();
       },
       UnarchiveEventType: eventTypes,
@@ -199,11 +208,12 @@ function createHarness(entries) {
     session: {
       cursor: { value: 0 },
       defaults: [],
+      format: options.format ?? 'application/x-cbz',
       preferences: [],
     },
   });
 
-  return { blobs, books, context, messages, revoked, OriginalComicBook,
+  return { blobs, books, context, fetchCalls, messages, rarUrls, revoked, OriginalComicBook,
     ready: new Promise(resolve => setImmediate(resolve)) };
 }
 
@@ -227,6 +237,15 @@ test('reports an archive with no supported image pages', async () => {
   assert.equal(result.blobs.length, 0);
   assert.equal(result.books.length, 0);
   assert.equal(result.messages.at(-1), 'No supported images were found in this comic archive.');
+});
+
+test('streams RAR comics through the range worker instead of buffering the publication', async () => {
+  const result = createHarness([{ filename: '001.JPG' }], { format: 'application/x-cbr' });
+  await result.ready;
+
+  assert.deepEqual(result.rarUrls, ['/comic.cbz']);
+  assert.equal(result.fetchCalls.length, 0);
+  assert.equal(result.books.length, 1);
 });
 
 test('renders fitted comic pages at the display pixel density', async () => {

@@ -21,6 +21,7 @@
     "lint-github-actions": "go run github.com/rhysd/actionlint/cmd/actionlint@latest",
     "pin-github-actions": "pin-github-action .github/workflows/",
     "update-deps": "npx npm-check-updates",
+    "prebuild": "node scripts/prepare-generated-assets.mjs",
     "build": "vite --mode production build",
     "dev": "vite --mode development build",
     "watch": "vite --mode development build --watch",

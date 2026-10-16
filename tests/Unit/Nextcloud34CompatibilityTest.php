@@ -75,6 +75,18 @@ class Nextcloud34CompatibilityTest extends TestCase {
 		self::assertStringNotContainsString(', \'blank\')', $contents);
 	}
 
+	public function testComicReaderAllowsBoundedWebAssemblyCompilation(): void {
+		$contents = file_get_contents($this->repoRoot() . '/lib/Service/ReaderResponseBuilder.php');
+		self::assertIsString($contents);
+
+		self::assertStringContainsString(
+			"if (in_array(\$type, ['application/x-cbr', 'application/comicbook+rar'], true)) {\n"
+			. "\t\t\t\$policy->allowEvalWasm();\n"
+			. "\t\t}",
+			$contents,
+		);
+	}
+
 	public function testAppDoesNotUseDeprecatedUserIdContainerAlias(): void {
 		$contents = file_get_contents($this->repoRoot() . '/lib/AppInfo/Application.php');
 		self::assertIsString($contents);

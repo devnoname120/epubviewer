@@ -23,6 +23,12 @@ quality, a set of image enhancement filters are provided.
 
 Comic pages may use JPEG, PNG, GIF, or WebP. TIFF pages are not supported.
 
+The browser reader opens CBR files up to 1 GiB through bounded same-origin HTTP byte-range requests instead of loading
+the complete archive into one JavaScript buffer. Servers must return standards-compliant `206 Partial Content`
+responses. The normal JavaScript RAR decoder handles ordinary RAR 4 and RAR 5 entries; a pinned, bounded libarchive
+WebAssembly module is loaded only for independently compressed RAR 3 PPMd entries that the primary decoder cannot
+decode.
+
 Nextcloud file thumbnails use the first naturally ordered supported image in CBZ archives. CBR thumbnails are enabled
 when the optional PHP `rar` extension is installed. Unsupported, encrypted, multi-volume, malformed, or over-limit
 archives retain Nextcloud's generic file icon.

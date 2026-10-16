@@ -33,17 +33,21 @@ function archiveEvent(message) {
 }
 
 export class MaryRarUnarchiver extends EventTarget {
-	constructor(arrayBuffer, options = {}) {
+	constructor(input, options = {}) {
 		super()
-		if (!(arrayBuffer instanceof ArrayBuffer)) {
-			throw new TypeError('RAR input must be an ArrayBuffer')
+		if (input instanceof ArrayBuffer) {
+			globalThis.ReaderLimits.assert(input.byteLength <= globalThis.ReaderLimits.policy.archiveBytes, 'RAR exceeds the input limit.')
+			this.request = { type: 'extract', arrayBuffer: input }
+		} else if (input?.type === 'extract-url' && typeof input.url === 'string') {
+			this.request = { type: 'extract-url', url: input.url }
+		} else {
+			throw new TypeError('RAR input must be an ArrayBuffer or a validated URL request')
 		}
 
-		globalThis.ReaderLimits.assert(arrayBuffer.byteLength <= globalThis.ReaderLimits.policy.archiveBytes, 'RAR exceeds the input limit.')
-		this.arrayBuffer = arrayBuffer
 		this.workerFactory = options.workerFactory ?? createWorker
 		this.worker = null
 		this.startPromise = null
+		this.timer = null
 	}
 
 	start() {
@@ -69,7 +73,14 @@ export class MaryRarUnarchiver extends EventTarget {
 				reject(new Error(detail))
 			}
 
-			this.timer = setTimeout(() => fail('RAR extraction exceeded the time limit.'), globalThis.ReaderLimits.policy.workMilliseconds)
+			const resetTimer = () => {
+				clearTimeout(this.timer)
+				this.timer = setTimeout(
+					() => fail('RAR extraction made no progress before the time limit.'),
+					globalThis.ReaderLimits.policy.workMilliseconds,
+				)
+			}
+			resetTimer()
 
 			worker.addEventListener('message', (event) => {
 				const message = event.data
@@ -82,6 +93,7 @@ export class MaryRarUnarchiver extends EventTarget {
 					return
 				}
 
+				resetTimer()
 				this.dispatchEvent(archiveEvent(message))
 				if (message.type === 'finish') {
 					settled = true
@@ -97,10 +109,11 @@ export class MaryRarUnarchiver extends EventTarget {
 				fail('Could not read the RAR extraction worker response.')
 			})
 
-			const arrayBuffer = this.arrayBuffer
-			this.arrayBuffer = null
+			const request = this.request
+			this.request = null
 			try {
-				worker.postMessage({ type: 'extract', arrayBuffer }, [arrayBuffer])
+				const transfer = request.type === 'extract' ? [request.arrayBuffer] : []
+				worker.postMessage(request, transfer)
 			} catch (error) {
 				fail(error instanceof Error ? error.message : '')
 			}
@@ -111,12 +124,24 @@ export class MaryRarUnarchiver extends EventTarget {
 
 	stop() {
 		clearTimeout(this.timer)
-		this.arrayBuffer = null
+		this.request = null
 		if (this.worker !== null) {
 			this.worker.terminate()
 			this.worker = null
 		}
 	}
+}
+
+export function createRarUrlUnarchiver(input, options = {}) {
+	const origin = new URL(options.origin ?? globalThis.location?.origin).origin
+	const url = new URL(input, origin)
+	if (url.origin !== origin) {
+		throw new Error('RAR input must use the same origin as the viewer.')
+	}
+
+	return new MaryRarUnarchiver({ type: 'extract-url', url: url.href }, {
+		workerFactory: options.workerFactory,
+	})
 }
 
 export function createComicUnarchiver(arrayBuffer, options = {}) {

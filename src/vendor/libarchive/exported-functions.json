@@ -1,0 +1,14 @@
+[
+  "_comic_archive_open",
+  "_comic_archive_next",
+  "_comic_archive_entry_path",
+  "_comic_archive_entry_size",
+  "_comic_archive_entry_is_regular",
+  "_comic_archive_entry_is_encrypted",
+  "_comic_archive_read_exact",
+  "_comic_archive_close",
+  "_comic_archive_version_number",
+  "_comic_archive_last_error",
+  "_malloc",
+  "_free"
+]
