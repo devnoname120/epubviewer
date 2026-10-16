@@ -1,19 +1,25 @@
 import '../js/reader-limits.js'
 import { fromUint8Array, unrar, unrar3, walkRar3Archive, walkRar5Archive } from '@mary/rar'
-import { createRarRangeReader } from './rarRangeReader.js'
+import { createArchiveRangeReader } from './archiveRangeReader.js'
 import { getRar3FallbackDecoder } from './rar3FallbackRuntime.js'
+import { extractZipRange } from './zipRangeExtractor.js'
 
 interface ExtractBufferRequest {
 	type: 'extract'
 	arrayBuffer: ArrayBuffer
 }
 
-interface ExtractUrlRequest {
+interface ExtractRarUrlRequest {
 	type: 'extract-url'
 	url: string
 }
 
-type ExtractRequest = ExtractBufferRequest | ExtractUrlRequest
+interface ExtractZipUrlRequest {
+	type: 'extract-zip-url'
+	url: string
+}
+
+type ExtractRequest = ExtractBufferRequest | ExtractRarUrlRequest | ExtractZipUrlRequest
 
 interface WorkerMessage {
 	type: string
@@ -70,7 +76,7 @@ async function readExact(source: Reader, offset: number, length: number): Promis
 	return limits.readStream(await source.read(offset, length), length)
 }
 
-async function openSource(request: ExtractRequest): Promise<Reader> {
+async function openRarSource(request: ExtractBufferRequest | ExtractRarUrlRequest): Promise<Reader> {
 	const limits = (globalThis as any).ReaderLimits
 	if (request.type === 'extract') {
 		limits.assert(request.arrayBuffer instanceof ArrayBuffer, 'RAR extraction worker received invalid input.')
@@ -78,7 +84,7 @@ async function openSource(request: ExtractRequest): Promise<Reader> {
 		return fromUint8Array(new Uint8Array(request.arrayBuffer)) as Reader
 	}
 	if (request.type === 'extract-url' && typeof request.url === 'string') {
-		return createRarRangeReader(request.url, {
+		return createArchiveRangeReader(request.url, {
 			fetch: globalThis.fetch,
 			maxArchiveBytes: limits.policy.rarArchiveBytes,
 			maxFetchedBytes: limits.policy.rarFetchBytes,
@@ -280,8 +286,8 @@ async function extractRar3(source: Reader, blocks: Rar3FileBlock[]): Promise<{ b
 	return { bytes, fallback: fallbackUsed, files }
 }
 
-async function extractArchive(request: ExtractRequest): Promise<void> {
-	const source = await openSource(request)
+async function extractRarArchive(request: ExtractBufferRequest | ExtractRarUrlRequest): Promise<void> {
+	const source = await openRarSource(request)
 	const isRar5 = await detectRar5(source)
 	send({ type: 'start', archiveSize: source.length })
 	const rar3Blocks = await preflightArchive(source, isRar5)
@@ -309,14 +315,55 @@ async function extractArchive(request: ExtractRequest): Promise<void> {
 	})
 }
 
+async function extractZipArchive(request: ExtractZipUrlRequest): Promise<void> {
+	const limits = (globalThis as any).ReaderLimits
+	const source = await createArchiveRangeReader(request.url, {
+		fetch: globalThis.fetch,
+		maxArchiveBytes: limits.policy.rarArchiveBytes,
+		maxFetchedBytes: limits.policy.rarFetchBytes,
+		origin: workerScope.location.origin,
+	}) as Reader
+	send({ type: 'start', archiveSize: source.length })
+	const result = await extractZipRange(source, limits, {
+		extract(entry: { fileData: Uint8Array; filename: string }) {
+			send({ type: 'extract', unarchivedFile: entry }, [entry.fileData.buffer])
+		},
+		progress(progress: WorkerMessage) {
+			send({ type: 'progress', ...progress })
+		},
+	})
+
+	send({
+		type: 'progress',
+		currentFilename: '',
+		currentFileNumber: result.totalFiles,
+		currentBytesUnarchivedInFile: 0,
+		currentBytesUnarchived: source.length,
+		totalUncompressedBytesInArchive: source.length,
+		totalFilesInArchive: result.totalFiles,
+		totalCompressedBytesRead: source.length,
+	})
+	send({
+		type: 'finish',
+		metadata: {
+			backend: 'bounded ZIP ranges',
+			totalBytes: result.totalBytes,
+			totalFiles: result.totalFiles,
+		},
+	})
+}
+
 workerScope.addEventListener('message', (event: MessageEvent<ExtractRequest>) => {
 	const request = event.data
-	if (request?.type !== 'extract' && request?.type !== 'extract-url') {
+	if (request?.type !== 'extract' && request?.type !== 'extract-url' && request?.type !== 'extract-zip-url') {
 		send({ type: 'error', msg: 'RAR extraction worker received invalid input.' })
 		return
 	}
 
-	extractArchive(request)
+	const extraction = request.type === 'extract-zip-url'
+		? extractZipArchive(request)
+		: extractRarArchive(request)
+	extraction
 		.catch((error: unknown) => {
 			send({ type: 'error', msg: errorMessage(error) })
 		})
