@@ -21,35 +21,87 @@ function parseContentRange(value) {
 	return { end, start, total }
 }
 
+const NORMALIZED_CHUNK_BYTES = 64 * 1024
+
 function exactLengthStream(source, expectedBytes) {
 	const reader = source.getReader()
-	let delivered = 0
+	const chunks = []
+	let buffered = 0
+	let firstOffset = 0
+	let received = 0
+	let sourceDone = false
+
+	function take(size) {
+		const first = chunks[0]
+		const firstBytes = first.byteLength - firstOffset
+		if (firstBytes >= size) {
+			const output = first.subarray(firstOffset, firstOffset + size)
+			firstOffset += size
+			if (firstOffset === first.byteLength) {
+				chunks.shift()
+				firstOffset = 0
+			}
+			buffered -= size
+			return output
+		}
+
+		const output = new Uint8Array(size)
+		let outputOffset = 0
+		while (outputOffset < size) {
+			const chunk = chunks[0]
+			const available = chunk.byteLength - firstOffset
+			const count = Math.min(available, size - outputOffset)
+			output.set(chunk.subarray(firstOffset, firstOffset + count), outputOffset)
+			firstOffset += count
+			outputOffset += count
+			if (firstOffset === chunk.byteLength) {
+				chunks.shift()
+				firstOffset = 0
+			}
+		}
+		buffered -= size
+		return output
+	}
 
 	return new ReadableStream({
 		async pull(controller) {
-			while (true) {
-				const { done, value } = await reader.read()
-				if (done) {
-					if (delivered !== expectedBytes) {
-						controller.error(new Error('Archive server returned an invalid range body length.'))
-					} else {
-						controller.close()
+			try {
+				while (!sourceDone && buffered < NORMALIZED_CHUNK_BYTES) {
+					const { done, value } = await reader.read()
+					if (done) {
+						sourceDone = true
+						break
 					}
-					return
+
+					if (!(value instanceof Uint8Array) || value.byteLength > expectedBytes - received) {
+						await reader.cancel()
+						controller.error(new Error('Archive server returned an invalid range body length.'))
+						return
+					}
+					if (value.byteLength === 0) {
+						continue
+					}
+
+					chunks.push(value)
+					buffered += value.byteLength
+					received += value.byteLength
 				}
 
-				if (!(value instanceof Uint8Array) || delivered + value.byteLength > expectedBytes) {
-					await reader.cancel()
+				if (sourceDone && received !== expectedBytes) {
 					controller.error(new Error('Archive server returned an invalid range body length.'))
 					return
 				}
-				if (value.byteLength === 0) {
-					continue
+				if (buffered === 0) {
+					controller.close()
+					return
 				}
 
-				delivered += value.byteLength
-				controller.enqueue(value)
-				return
+				controller.enqueue(take(Math.min(NORMALIZED_CHUNK_BYTES, buffered)))
+				if (sourceDone && buffered === 0) {
+					controller.close()
+				}
+			} catch (error) {
+				controller.error(error)
 			}
 		},
 		cancel(reason) {

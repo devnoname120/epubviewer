@@ -53,6 +53,12 @@ async function readAll(stream) {
   return result;
 }
 
+async function readChunks(stream) {
+  const chunks = [];
+  for await (const chunk of stream) chunks.push(chunk);
+  return chunks;
+}
+
 describe('bounded archive HTTP range reader', () => {
   it('opens a 281 MB same-origin archive without downloading it up front', async () => {
     const requests = [];
@@ -185,6 +191,58 @@ describe('bounded archive HTTP range reader', () => {
       });
       await assert.rejects(readAll(await reader.read(2, 2)), /range body length/);
     }
+  });
+
+  it('normalizes irregular network chunks into stable bounded slabs', async () => {
+    const total = 200_000;
+    const expected = Uint8Array.from({ length: 150_000 }, (_, index) => index & 0xff);
+    let calls = 0;
+    const reader = await createArchiveRangeReader(URL, {
+      fetch: async () => {
+        calls += 1;
+        if (calls === 1) return rangeResponse(0, 1, total);
+        let offset = 0;
+        const sizes = [6725, 345];
+        while (sizes.reduce((sum, size) => sum + size, 0) < expected.byteLength) {
+          sizes.push(sizes.length % 2 === 0 ? 8192 : 8176);
+        }
+        const chunks = [];
+        for (const size of sizes) {
+          if (offset >= expected.byteLength) break;
+          const end = Math.min(offset + size, expected.byteLength);
+          chunks.push(expected.slice(offset, end));
+          offset = end;
+        }
+        return {
+          body: new ReadableStream({
+            start(controller) {
+              for (const chunk of chunks) controller.enqueue(chunk);
+              controller.close();
+            },
+          }),
+          headers: new Headers({
+            'content-length': String(expected.byteLength),
+            'content-range': `bytes 10-${10 + expected.byteLength - 1}/${total}`,
+          }),
+          ok: true,
+          status: 206,
+          url: URL,
+        };
+      },
+      maxArchiveBytes: total,
+      maxFetchedBytes: total + 2,
+      origin: ORIGIN,
+    });
+
+    const chunks = await readChunks(await reader.read(10, expected.byteLength));
+
+    assert.deepEqual(chunks.map((chunk) => chunk.byteLength), [65_536, 65_536, 18_928]);
+    assert.deepEqual(await readAll(new ReadableStream({
+      start(controller) {
+        for (const chunk of chunks) controller.enqueue(chunk);
+        controller.close();
+      },
+    })), expected);
   });
 
   it('bounds cumulative network reads and validates requested offsets', async () => {
