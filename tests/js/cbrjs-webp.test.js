@@ -39,6 +39,7 @@ function createHarness(entries, options = {}) {
   const messages = [];
   const fetchCalls = [];
   const rarUrls = [];
+  const zipUrls = [];
   const eventTypes = {
     ERROR: 'error',
     EXTRACT: 'extract',
@@ -130,6 +131,34 @@ function createHarness(entries, options = {}) {
     }
   }
 
+  const cbrjs = {
+    UnarchiveEventType: eventTypes,
+  };
+  const installArchiveSupport = () => {
+    cbrjs.getUnarchiver = function () {
+      return new FakeUnarchiver();
+    };
+    cbrjs.getRarUnarchiver = function (url) {
+      rarUrls.push(url);
+      return new FakeUnarchiver();
+    };
+    cbrjs.getZipUnarchiver = function (url) {
+      zipUrls.push(url);
+      return new FakeUnarchiver();
+    };
+  };
+  if (options.deferArchiveSupport) {
+    cbrjs.archiveReady = new Promise((resolve) => {
+      setImmediate(() => {
+        installArchiveSupport();
+        resolve();
+      });
+    });
+  } else {
+    installArchiveSupport();
+    cbrjs.archiveReady = Promise.resolve();
+  }
+
   const context = vm.createContext({
     $: jQuery,
     ArrayBuffer,
@@ -140,23 +169,25 @@ function createHarness(entries, options = {}) {
     fetch: async (...args) => {
       fetchCalls.push(args);
       return ({
-      ok: true,
-      headers: { get: () => '1' },
-      body: new ReadableStream({ start(controller) { controller.enqueue(new Uint8Array([1])); controller.close(); } }),
+      ok: options.fetchOk ?? true,
+      headers: {
+        get(name) {
+          return name.toLowerCase() === 'content-length'
+            ? String(options.contentLength ?? 1)
+            : null;
+        },
+      },
+      body: new ReadableStream({
+        start(controller) {
+          controller.enqueue(new Uint8Array([1]));
+          controller.close();
+        },
+      }),
       });
     },
     Uint8Array,
     addEventListener() {},
-    CBRJS: {
-      getUnarchiver() {
-        return new FakeUnarchiver();
-      },
-      getRarUnarchiver(url) {
-        rarUrls.push(url);
-        return new FakeUnarchiver();
-      },
-      UnarchiveEventType: eventTypes,
-    },
+    CBRJS: cbrjs,
     console,
     document: {
       head: {
@@ -204,7 +235,7 @@ function createHarness(entries, options = {}) {
     return book;
   };
 
-  new context.CBRJS.Reader('/comic.cbz', {
+  new context.CBRJS.Reader(options.path ?? '/comic.cbz', {
     session: {
       cursor: { value: 0 },
       defaults: [],
@@ -213,7 +244,7 @@ function createHarness(entries, options = {}) {
     },
   });
 
-  return { blobs, books, context, fetchCalls, messages, rarUrls, revoked, OriginalComicBook,
+  return { blobs, books, context, fetchCalls, messages, rarUrls, revoked, zipUrls, OriginalComicBook,
     ready: new Promise(resolve => setImmediate(resolve)) };
 }
 
@@ -240,12 +271,68 @@ test('reports an archive with no supported image pages', async () => {
 });
 
 test('streams RAR comics through the range worker instead of buffering the publication', async () => {
-  const result = createHarness([{ filename: '001.JPG' }], { format: 'application/x-cbr' });
+  const result = createHarness([{ filename: '001.JPG' }], {
+    format: 'cbr',
+    path: '/comic.cbr',
+  });
   await result.ready;
 
-  assert.deepEqual(result.rarUrls, ['/comic.cbz']);
+  assert.deepEqual(result.rarUrls, ['/comic.cbr']);
   assert.equal(result.fetchCalls.length, 0);
   assert.equal(result.books.length, 1);
+});
+
+test('waits for asynchronous archive backends before starting a direct RAR URL', async () => {
+  const result = createHarness([{ filename: '001.JPG' }], {
+    deferArchiveSupport: true,
+    format: 'cbr',
+    path: '/delayed.cbr',
+  });
+  await result.ready;
+
+  assert.deepEqual(result.rarUrls, ['/delayed.cbr']);
+  assert.equal(result.fetchCalls.length, 0);
+  assert.equal(result.books.length, 1);
+});
+
+test('waits for asynchronous archive backends before opening a buffered CBZ', async () => {
+  const result = createHarness([{ filename: '001.JPG' }], {
+    deferArchiveSupport: true,
+    format: 'cbz',
+    path: '/delayed.cbz',
+  });
+  await result.ready;
+
+  assert.equal(result.fetchCalls.length, 1);
+  assert.deepEqual(result.zipUrls, []);
+  assert.equal(result.books.length, 1);
+});
+
+test('falls back to bounded ZIP ranges when a CBZ exceeds the buffered input limit', async () => {
+  const result = createHarness([{ filename: '001.JPG' }], {
+    contentLength: 100 * 1024 * 1024 + 1,
+    deferArchiveSupport: true,
+    format: 'cbz',
+    path: '/large.cbz',
+  });
+  await result.ready;
+
+  assert.equal(result.fetchCalls.length, 1);
+  assert.deepEqual(result.zipUrls, ['/large.cbz']);
+  assert.equal(result.books.length, 1);
+});
+
+test('does not hide non-limit CBZ download failures behind the range fallback', async () => {
+  const result = createHarness([], {
+    fetchOk: false,
+    format: 'cbz',
+    path: '/unavailable.cbz',
+  });
+  await result.ready;
+
+  assert.deepEqual(result.zipUrls, []);
+  assert.equal(result.books.length, 0);
+  assert.match(result.messages.at(-1), /download failed/);
 });
 
 test('renders fitted comic pages at the display pixel density', async () => {

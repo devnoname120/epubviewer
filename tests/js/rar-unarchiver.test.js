@@ -4,6 +4,7 @@ import { describe, it } from 'node:test';
 import {
   createComicUnarchiver,
   createRarUrlUnarchiver,
+  createZipUrlUnarchiver,
   isRarArchive,
   MaryRarUnarchiver,
 } from '../../src/rarUnarchiver.js';
@@ -95,6 +96,25 @@ describe('@mary/rar unarchiver adapter', () => {
       }),
       /same origin/,
     );
+  });
+
+  it('starts same-origin ZIP URL extraction without transferring an archive buffer', async () => {
+    const worker = new FakeWorker([{ type: 'start' }, { type: 'finish', metadata: {} }]);
+    const unarchiver = createZipUrlUnarchiver('/remote.php/dav/files/alice/large.cbz', {
+      origin: 'https://cloud.example.test',
+      workerFactory: () => worker,
+    });
+
+    await unarchiver.start();
+
+    assert.ok(unarchiver instanceof MaryRarUnarchiver);
+    assert.deepEqual(worker.posted, [{
+      message: {
+        type: 'extract-zip-url',
+        url: 'https://cloud.example.test/remote.php/dav/files/alice/large.cbz',
+      },
+      transfer: [],
+    }]);
   });
 
   it('translates worker messages into the existing archive event API', async () => {

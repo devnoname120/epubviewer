@@ -115,7 +115,11 @@ async function runWorker(input, backend) {
   };
   vm.runInNewContext(workerSource, {
     ...backend,
+    createArchiveRangeReader: backend.createArchiveRangeReader
+      ?? backend.createRarRangeReader
+      ?? (() => { throw new Error('Unexpected URL source'); }),
     createRarRangeReader: backend.createRarRangeReader ?? (() => { throw new Error('Unexpected URL source'); }),
+    extractZipRange: backend.extractZipRange ?? (() => { throw new Error('Unexpected ZIP extraction'); }),
     getRar3FallbackDecoder: backend.getRar3FallbackDecoder ?? (() => ({
       decode() { throw new Error('Unexpected RAR3 fallback'); },
     })),
@@ -247,6 +251,54 @@ test('RAR worker opens large URL inputs through the bounded range reader', async
   assert.equal(opened.url, 'https://cloud.example.test/large.cbr');
   assert.equal(opened.options.origin, 'https://cloud.example.test');
   assert.equal(opened.options.maxArchiveBytes, globalThis.ReaderLimits.policy.rarArchiveBytes);
+});
+
+test('archive worker extracts large ZIP URL inputs through bounded ranges', async () => {
+  const source = readerFromBytes(Uint8Array.of(0x50, 0x4b));
+  let opened = null;
+  let extractionSource = null;
+  const backend = {
+    createArchiveRangeReader: async (url, options) => {
+      opened = { options, url };
+      return source;
+    },
+    extractZipRange: async (input, limits, sink) => {
+      extractionSource = input;
+      const fileData = Uint8Array.of(1, 2, 3);
+      await sink.extract({ filename: 'page.jpg', fileData });
+      await sink.progress({
+        currentBytesUnarchived: 2,
+        currentBytesUnarchivedInFile: 3,
+        currentFilename: 'page.jpg',
+        currentFileNumber: 1,
+        totalCompressedBytesRead: 2,
+        totalFilesInArchive: 1,
+        totalUncompressedBytesInArchive: 2,
+      });
+      return { totalBytes: 3, totalFiles: 1 };
+    },
+    fromUint8Array: readerFromBytes,
+    walkRar3Archive: async function* () {},
+    walkRar5Archive: async function* () {},
+    unrar: async function* () {},
+    unrar3: async function* () {},
+  };
+
+  const messages = await runWorker({
+    type: 'extract-zip-url',
+    url: 'https://cloud.example.test/large.cbz',
+  }, backend);
+
+  assert.equal(messages.at(-1).type, 'finish', messages.at(-1).msg);
+  assert.equal(messages.at(-1).metadata.backend, 'bounded ZIP ranges');
+  assert.equal(opened.url, 'https://cloud.example.test/large.cbz');
+  assert.equal(opened.options.origin, 'https://cloud.example.test');
+  assert.equal(opened.options.maxArchiveBytes, globalThis.ReaderLimits.policy.rarArchiveBytes);
+  assert.equal(extractionSource, source);
+  assert.deepEqual(
+    messages.find((message) => message.type === 'extract').unarchivedFile.fileData,
+    Uint8Array.of(1, 2, 3),
+  );
 });
 
 test('RAR worker keeps ordinary compressed RAR3 entries on the primary decoder', async () => {

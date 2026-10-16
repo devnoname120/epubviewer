@@ -17,7 +17,7 @@ export function isRarArchive(arrayBuffer) {
 
 function createWorker() {
 	return new Worker(new URL('./rarWorker.ts', import.meta.url), {
-		name: 'epubviewer-rar',
+		name: 'epubviewer-archive',
 		type: 'module',
 	})
 }
@@ -38,10 +38,11 @@ export class MaryRarUnarchiver extends EventTarget {
 		if (input instanceof ArrayBuffer) {
 			globalThis.ReaderLimits.assert(input.byteLength <= globalThis.ReaderLimits.policy.archiveBytes, 'RAR exceeds the input limit.')
 			this.request = { type: 'extract', arrayBuffer: input }
-		} else if (input?.type === 'extract-url' && typeof input.url === 'string') {
-			this.request = { type: 'extract-url', url: input.url }
-		} else {
-			throw new TypeError('RAR input must be an ArrayBuffer or a validated URL request')
+			} else if ((input?.type === 'extract-url' || input?.type === 'extract-zip-url')
+				&& typeof input.url === 'string') {
+				this.request = { type: input.type, url: input.url }
+			} else {
+				throw new TypeError('RAR input must be an ArrayBuffer or a validated URL request')
 		}
 
 		this.workerFactory = options.workerFactory ?? createWorker
@@ -132,16 +133,24 @@ export class MaryRarUnarchiver extends EventTarget {
 	}
 }
 
-export function createRarUrlUnarchiver(input, options = {}) {
+function createUrlUnarchiver(type, input, options = {}) {
 	const origin = new URL(options.origin ?? globalThis.location?.origin).origin
 	const url = new URL(input, origin)
 	if (url.origin !== origin) {
-		throw new Error('RAR input must use the same origin as the viewer.')
+		throw new Error('Archive input must use the same origin as the viewer.')
 	}
 
-	return new MaryRarUnarchiver({ type: 'extract-url', url: url.href }, {
+	return new MaryRarUnarchiver({ type, url: url.href }, {
 		workerFactory: options.workerFactory,
 	})
+}
+
+export function createRarUrlUnarchiver(input, options = {}) {
+	return createUrlUnarchiver('extract-url', input, options)
+}
+
+export function createZipUrlUnarchiver(input, options = {}) {
+	return createUrlUnarchiver('extract-zip-url', input, options)
 }
 
 export function createComicUnarchiver(arrayBuffer, options = {}) {

@@ -1,3 +1,13 @@
+## 1.9.13 - 2026-10-16
+
+### Fixed
+
+- Open CBR files through the bounded range reader when Nextcloud reports their real `cbr` extension instead of a MIME string.
+- Open CBZ files larger than the 100 MiB buffered-publication limit through strict same-origin byte ranges, with bounded metadata, entry output, transfer volume, CRC, and data-descriptor validation.
+- Avoid Nextcloud 34's broken one-byte range handling by probing archive size with `bytes=0-1` and rejecting expanded or inconsistent responses.
+- Version the archive module and emitted worker, and wait for asynchronous archive backends before extraction so stale caches and module initialization races cannot produce “Archive support failed to load.”
+- Normalize validated range bodies into bounded 64 KiB slabs so RAR3 decoding is independent of the server's TLS/network chunk boundaries.
+
 ## 1.9.12 - 2026-10-16
 
 ### Fixed
