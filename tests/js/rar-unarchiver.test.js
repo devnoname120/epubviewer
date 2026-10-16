@@ -117,37 +117,6 @@ describe('@mary/rar unarchiver adapter', () => {
     }]);
   });
 
-  it('propagates the archive module revision query to its worker URL', async () => {
-    const OriginalWorker = globalThis.Worker;
-    let workerUrl = '';
-    let workerOptions = null;
-
-    class CapturingWorker extends FakeWorker {
-      constructor(url, options) {
-        super([{ type: 'finish', metadata: {} }]);
-        workerUrl = String(url);
-        workerOptions = options;
-      }
-    }
-
-    globalThis.Worker = CapturingWorker;
-    try {
-      const versioned = await import('../../src/rarUnarchiver.js?revision=0054');
-      const unarchiver = versioned.createRarUrlUnarchiver('/large.cbr', {
-        origin: 'https://cloud.example.test',
-      });
-      await unarchiver.start();
-    } finally {
-      globalThis.Worker = OriginalWorker;
-    }
-
-    assert.equal(new URL(workerUrl).search, '?revision=0054');
-    assert.deepEqual(workerOptions, {
-      name: 'epubviewer-archive',
-      type: 'module',
-    });
-  });
-
   it('translates worker messages into the existing archive event API', async () => {
     const page = Uint8Array.from([1, 2, 3]);
     const worker = new FakeWorker([

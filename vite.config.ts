@@ -12,7 +12,7 @@ export default defineConfig({
 		format: 'es',
 		rollupOptions: {
 			output: {
-				entryFileNames: 'js/epubviewer-rar-worker.mjs',
+					entryFileNames: 'js/epubviewer-rar-worker-[hash].mjs',
 			},
 		},
 	},

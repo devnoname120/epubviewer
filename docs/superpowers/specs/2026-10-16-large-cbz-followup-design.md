@@ -53,7 +53,7 @@ The extractor emits the same start, extract, progress, finish, and error message
 
 ### Cache-safe generated-module loading
 
-`bitjs.js` will dynamically import `epubviewer-rar.mjs` with the query string from its own versioned URL. The generated archive module will propagate that query string to the worker URL. Consequently, template version changes invalidate the loader, generated archive module, and worker as one deployment unit.
+`bitjs.js` will dynamically import `epubviewer-rar.mjs` with the query string from its own versioned URL. Vite will emit the archive worker with a content hash and place that hashed URL in the generated archive module. Consequently, template version changes invalidate the loader and generated archive module, while worker content changes create a new immutable worker URL.
 
 The stable BitJS dependency graph remains unchanged. The generated archive module and worker, whose public contract changed in 1.9.12, are explicitly tied to the template revision so a stale 1.9.11 module can no longer be selected by a 1.9.12-or-later loader.
 
@@ -69,7 +69,7 @@ Regression coverage will include:
 
 - real `cbr` and `cbz` extension routing;
 - the Nextcloud `bytes=0-0` quirk and the two-byte probe;
-- cache-version propagation from `bitjs.js` to the generated module and worker;
+- cache-version propagation from `bitjs.js` to the generated module and content-hashed worker emission;
 - fallback only for the archive-input-limit error;
 - sparse large-ZIP extraction without allocating the archive size;
 - stored and deflated entries, data descriptors, UTF-8 and legacy names;

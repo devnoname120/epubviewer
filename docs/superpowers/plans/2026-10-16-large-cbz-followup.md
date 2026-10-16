@@ -4,7 +4,7 @@
 
 **Goal:** Make large CBR and CBZ publications open through bounded same-origin byte ranges while preventing stale generated archive modules from breaking upgraded installations.
 
-**Architecture:** Keep the current buffered BitJS path for small ZIP publications, add a focused range-based ZIP extractor inside the existing archive worker for oversized CBZ files, and generalize the validated HTTP range transport shared with RAR. Tie the generated archive module and worker URLs to the template revision query so their public contracts update atomically.
+**Architecture:** Keep the current buffered BitJS path for small ZIP publications, add a focused range-based ZIP extractor inside the existing archive worker for oversized CBZ files, and generalize the validated HTTP range transport shared with RAR. Tie the generated archive module to the template revision query and emit the worker with a content hash so stale contracts cannot collide.
 
 **Tech Stack:** Browser ES modules, Web Workers, TypeScript, BitJS DEFLATE, Node.js test runner, Vite, PHP/Nextcloud templates.
 
@@ -17,16 +17,16 @@
 - `src/rarRangeReader.js`: compatibility re-export for existing imports.
 - `src/zipRangeExtractor.js`: EOCD/central-directory preflight, bounded entry reads, inflate, CRC validation, and extraction callbacks.
 - `src/rarWorker.ts`: dispatch RAR and ZIP URL requests through one worker message contract.
-- `src/rarUnarchiver.js`: generic URL-worker adapter plus RAR and ZIP factories; query-preserving worker URL.
+- `src/rarUnarchiver.js`: generic URL-worker adapter plus RAR and ZIP factories using Vite's statically discoverable worker form.
 - `src/rar.ts`: public exports for both URL factories.
 - `js/cbrjs/bitjs.js`: query-preserving dynamic import of the generated archive bundle and CBRJS factory registration.
 - `js/cbrjs/cbr.js`: real extension/MIME routing and ZIP range fallback only on an input-limit error.
 - `tests/js/archive-range-reader.test.js`: transport and Nextcloud `0-0` regression coverage.
 - `tests/js/zip-range-extractor.test.js`: sparse large-ZIP and integrity/limit coverage.
-- `tests/js/rar-unarchiver.test.js`: ZIP URL adapter and worker-query coverage.
+- `tests/js/rar-unarchiver.test.js`: ZIP URL adapter coverage.
 - `tests/js/rar-worker-limits.test.js`: ZIP worker dispatch contract.
 - `tests/js/cbrjs-webp.test.js`: extension routing and oversized-CBZ fallback behavior.
-- `tests/js/archive-module-cache.test.js`: loader and generated-worker query propagation contract.
+- `tests/js/archive-module-cache.test.js`: loader version propagation and content-hashed worker contract.
 
 ### Task 1: Stabilize range transport and archive-limit signaling
 
@@ -224,7 +224,7 @@ assert.deepEqual(worker.posted[0], {
 })
 ```
 
-Add a Worker stub and dynamically import `src/rarUnarchiver.js?revision=0054`; assert its constructed worker URL carries `revision=0054`.
+Add a cache-contract test that requires the Vite-statically-discoverable `new Worker(new URL(...))` form and a worker output name containing `[hash]`.
 
 - [ ] **Step 2: Run focused tests and verify RED**
 
@@ -234,7 +234,7 @@ Run:
 node --test tests/js/rar-worker-limits.test.js tests/js/rar-unarchiver.test.js
 ```
 
-Expected: FAIL because ZIP request type/factory and query propagation are absent.
+Expected: FAIL because ZIP request type/factory and hashed worker output are absent.
 
 - [ ] **Step 3: Add ZIP request dispatch**
 
@@ -249,15 +249,18 @@ interface ExtractZipUrlRequest {
 
 For ZIP, create the generic range reader with ZIP policy limits, send start, call `extractZipRange`, transfer each decoded entry, then send finish metadata `{ backend: 'bounded ZIP ranges', totalBytes, totalFiles }`.
 
-- [ ] **Step 4: Generalize the URL unarchiver and preserve the revision query**
+- [ ] **Step 4: Generalize the URL unarchiver and preserve Vite worker discovery**
 
-Build the worker URL as:
+Keep the worker expression statically analyzable by Vite:
 
 ```js
-const workerUrl = new URL('./rarWorker.ts', import.meta.url)
-workerUrl.search = new URL(import.meta.url).search
-return new Worker(workerUrl, { name: 'epubviewer-archive', type: 'module' })
+return new Worker(new URL('./rarWorker.ts', import.meta.url), {
+  name: 'epubviewer-archive',
+  type: 'module',
+})
 ```
+
+Set `worker.rollupOptions.output.entryFileNames` to `js/epubviewer-rar-worker-[hash].mjs` in `vite.config.ts`.
 
 Add a shared same-origin URL factory and export:
 
@@ -292,7 +295,7 @@ git commit -m "feat: route large CBZ files through archive worker"
 
 Change the existing RAR test to use `format: 'cbr'` and a `.cbr` URL. Add a CBZ URL-fallback test where `ReaderLimits.download` rejects an error with `code = 'ARCHIVE_INPUT_LIMIT'`; assert `getZipUnarchiver(url)` is called and no generic error is shown. Add a non-limit rejection test and assert ZIP URL fallback is not used.
 
-Add a cache-contract test that reads `bitjs.js` and asserts it imports the archive bundle dynamically after copying `new URL(import.meta.url).search`, rather than using a static named import. Test the generated module’s worker URL query through the adapter test from Task 3.
+Add a cache-contract test that reads `bitjs.js` and asserts it imports the archive bundle dynamically after copying `new URL(import.meta.url).search`, rather than using a static named import. Assert the generated worker uses a content-hashed filename through Vite.
 
 - [ ] **Step 2: Run focused tests and verify RED**
 
@@ -380,7 +383,7 @@ Open the original Wild Arms CBR, Final Fantasy III CBZ, and Castlevania CBZ with
 - page counts 133, 188, and 132 respectively;
 - the CBR uses bounded ranges and exactly one libarchive fallback;
 - the 278 MB CBZ does not issue a full-file response;
-- a simulated stale 1.9.11 archive module cannot be selected because the request URL includes the current revision.
+- a simulated stale 1.9.11 archive module cannot be selected because the module request includes the current revision and its worker URL is content-hashed.
 
 - [ ] **Step 3: Update release metadata and changelog**
 

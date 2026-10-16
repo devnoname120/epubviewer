@@ -16,9 +16,7 @@ export function isRarArchive(arrayBuffer) {
 }
 
 function createWorker() {
-	const workerUrl = new URL('./rarWorker.ts', import.meta.url)
-	workerUrl.search = new URL(import.meta.url).search
-	return new Worker(workerUrl, {
+	return new Worker(new URL('./rarWorker.ts', import.meta.url), {
 		name: 'epubviewer-archive',
 		type: 'module',
 	})
