@@ -255,6 +255,8 @@ describe('EPUB highlight model', () => {
       { ...validHighlight(), type: 'annotation' },
       validHighlight({ color: 'url(javascript:alert(1))' }),
       validHighlight({ id: '' }),
+      validHighlight({ id: '../bookmark/other-user' }),
+      validHighlight({ id: 'x'.repeat(129) }),
       validHighlight({ body: 'x'.repeat(policy.highlightTextCharacters + 1) }),
       validHighlight({ anchor: { start: 'x'.repeat(policy.highlightCfiCharacters + 1) } }),
       validHighlight({ anchor: { end: 'not-a-cfi' } }),

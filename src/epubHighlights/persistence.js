@@ -35,6 +35,7 @@ export class HighlightRepository {
 		this.onChange = onChange
 		this.onStatus = onStatus
 		this.pending = new Map()
+		this._indexRestoredHighlights()
 	}
 
 	list() {
@@ -162,6 +163,20 @@ export class HighlightRepository {
 		})
 		this.pending.set(id, tail)
 		return current
+	}
+
+	_indexRestoredHighlights() {
+		for (const [key, value] of Object.entries(this.annotations)) {
+			const normalized = normalizeHighlight(value, this.policy)
+			if (normalized === null || key === normalized.id) {
+				continue
+			}
+			const current = normalizeHighlight(this.annotations[normalized.id], this.policy)
+			if (current === null) {
+				this.annotations[normalized.id] = normalized
+			}
+			delete this.annotations[key]
+		}
 	}
 
 	_change(action, id, value) {

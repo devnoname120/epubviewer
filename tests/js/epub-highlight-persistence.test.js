@@ -219,6 +219,32 @@ describe('EPUB highlight persistence', () => {
     assert.notEqual(values[0], original);
   });
 
+  test('rekeys restored list records by persistent highlight id for later mutations', async () => {
+    const original = highlight('restored-highlight');
+    const annotations = [original, { id: 'note', type: 'annotation' }];
+    const setCalls = [];
+    const repository = new HighlightRepository({
+      annotations,
+      policy,
+      session: {
+        deleteBookmark() {
+          return Promise.resolve();
+        },
+        setBookmark(name, value, type, content) {
+          setCalls.push({ content, name, type, value });
+          return Promise.resolve();
+        },
+      },
+    });
+
+    await repository.update(original.id, { color: 'green' });
+
+    assert.equal(annotations[0], undefined);
+    assert.equal(annotations[original.id].color, 'green');
+    assert.equal(setCalls[0].name, original.id);
+    assert.equal(annotations[1].type, 'annotation');
+  });
+
   test('does not let UI observer failures interrupt server persistence', async () => {
     const result = harness({}, {
       onChange() {

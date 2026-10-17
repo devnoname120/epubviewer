@@ -8,7 +8,8 @@ export const HIGHLIGHT_PALETTE = Object.freeze({
 
 const TEXT_NODE = 3
 const HIGHLIGHT_VERSION = 1
-const MAX_ID_CHARACTERS = 512
+const MAX_ID_CHARACTERS = 128
+const SAFE_ID = /^[A-Za-z0-9_-]+$/
 
 function policyOrThrow(policy) {
 	if (!policy || typeof policy !== 'object') {
@@ -39,6 +40,10 @@ function isCfi(value, policy) {
 
 function isFiniteTimestamp(value) {
 	return typeof value === 'number' && Number.isFinite(value) && value >= 0
+}
+
+function isSafeId(value) {
+	return isBoundedString(value, MAX_ID_CHARACTERS) && SAFE_ID.test(value)
 }
 
 function normalizeAnchor(value, policy) {
@@ -85,7 +90,7 @@ export function normalizeHighlight(value, inputPolicy = globalThis.ReaderLimits?
 	const policy = policyOrThrow(inputPolicy)
 	if (!isPlainObject(value)
 		|| value.type !== 'highlight'
-		|| !isBoundedString(value.id, MAX_ID_CHARACTERS)
+		|| !isSafeId(value.id)
 		|| !isFiniteTimestamp(value.date)
 		|| !isFiniteTimestamp(value.edited)
 		|| !isBoundedString(value.body, policy.highlightTextCharacters, true)

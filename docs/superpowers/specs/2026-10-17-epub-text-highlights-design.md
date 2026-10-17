@@ -67,6 +67,7 @@ Each saved record uses the existing bookmark row and JSON content:
 The existing schema limits bookmark `value` to 512 characters and `content` to 4,000 characters. The bookmark `value` therefore stores only the start CFI, while `content` stores the complete annotation. Existing restoration code places the decoded content object in `reader.settings.annotations` without a migration.
 
 Only fixed palette keys are accepted. Raw CSS from persisted state is never evaluated.
+Generated highlight IDs are limited to 128 ASCII letters, digits, underscores, or hyphens so they remain safe bookmark-route path segments.
 
 ## Point-CFI handling
 
@@ -117,6 +118,7 @@ All publication-derived text is inserted with `textContent`.
 `ReaderLimits.policy` gains dedicated highlight limits that fit the existing database columns:
 
 - 1,000 saved highlights per publication;
+- 128 safe ASCII characters per highlight ID;
 - 480 characters per endpoint CFI;
 - 1,024 characters retained for a selected-text excerpt;
 - 3,900 UTF-8 bytes for the serialized annotation content;

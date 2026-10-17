@@ -16,7 +16,8 @@
 - `src/epubHighlights/model.js`: fixed palette, annotation validation, text-range normalization, paired point-CFI creation/restoration, ordering, and serialization bounds.
 - `src/epubHighlights/persistence.js`: serialize create/update/delete operations per highlight, update `reader.settings.annotations`, call the existing session endpoints, and roll back failures.
 - `src/epubHighlights/renderer.js`: render current-chapter ranges through CSS Custom Highlights or bounded overlays without modifying EPUB text nodes.
-- `src/epubHighlights/index.js`: register the epub.js plugin, bind selection/chapter/reflow events, drive the toolbar and Highlights sidebar, and expose the controller show/hide contract.
+- `src/epubHighlights/controller.js`: bind selection/chapter/reflow events, drive the toolbar and Highlights sidebar, and expose the controller show/hide contract.
+- `src/epubHighlights/index.js`: register the controller as an epub.js reader plugin before reader startup.
 - `js/epubjs/css/highlights.css`: outer-reader toolbar/sidebar styles and iframe fallback classes.
 - `templates/epubviewer.php`: load the stylesheet/module and add accessible toolbar/sidebar markup.
 - `vite.config.ts`: emit `js/epubviewer-epub-highlights.mjs` as a stable versioned entry.
@@ -104,7 +105,7 @@ export function compareHighlights(left, right, EpubCFI)
 
 ```js
 {
-  id: nonEmptyStringAtMost(512),
+  id: safeAsciiRouteSegmentAtMost(128),
   type: 'highlight',
   date: finiteNonNegativeNumber,
   edited: finiteNonNegativeNumber,

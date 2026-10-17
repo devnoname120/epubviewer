@@ -11,7 +11,7 @@ const REGISTRY_PREFIX = 'epubviewer-'
 function highlightStyle(palette) {
 	const rules = [
 		'.epubviewer-highlight-layer { position: absolute; inset: 0; pointer-events: none; z-index: 2147483000; }',
-		'.epubviewer-highlight-rect { position: absolute; border-radius: 2px; opacity: 0.42; mix-blend-mode: multiply; }',
+		'.epubviewer-highlight-rect { position: absolute; border-radius: 2px; opacity: 0.42; }',
 	]
 	for (const [name, color] of Object.entries(palette)) {
 		rules.push(`::highlight(${REGISTRY_PREFIX}${name}) { background-color: ${color}; color: inherit; }`)
