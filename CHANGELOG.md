@@ -1,3 +1,10 @@
+## 1.9.14 - 2026-10-17
+
+### Fixed
+
+- Open high-resolution comic scans up to 32 Mi-pixels per page while preserving the existing 64 Mi-pixel aggregate decoded-image budget (#50).
+- Preflight source dimensions and evict optional cached pages under memory pressure so double-page spreads and forward/backward navigation remain available without retaining a third approximately 30-megapixel page.
+
 ## 1.9.13 - 2026-10-16
 
 ### Fixed
