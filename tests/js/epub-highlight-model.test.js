@@ -182,7 +182,7 @@ class FakeEpubCFI {
   parse(value) {
     const match = /^epubcfi\(spine-(\d+)!\/([^:]+):(\d+)\)$/.exec(value);
     if (!match) return { spinePos: -1, steps: [] };
-    const childIndexes = { a: 0, b: 1, c: 0 };
+    const childIndexes = { a: 0, b: 1, c: 0, head: 0, tail: 1 };
     return {
       characterOffset: Number(match[3]),
       nodeKey: match[2],
@@ -313,6 +313,25 @@ describe('EPUB highlight model', () => {
     assert.equal(range.startOffset, 2);
     assert.equal(range.endOffset, 4);
     assert.equal(range.toString(), 'pha beta');
+  });
+
+  test('resolves CFI text indexes independently of interleaved element children', () => {
+    const head = new FakeText('head', 'before ');
+    const nested = new FakeElement('nested', [new FakeText('nested-text', 'inline')]);
+    const tail = new FakeText('tail', 'after');
+    const root = new FakeElement('root', [head, nested, tail]);
+    const document = new FakeDocument(root);
+    const anchor = {
+      end: 'epubcfi(spine-0!/tail:5)',
+      spinePos: 0,
+      start: 'epubcfi(spine-0!/tail:0)',
+      version: 1,
+    };
+
+    const range = highlightAnchorToRange(anchor, document, FakeEpubCFI, policy);
+
+    assert.ok(range);
+    assert.equal(range.toString(), 'after');
   });
 
   test('rejects collapsed, inverted, missing, and cross-spine anchors', () => {

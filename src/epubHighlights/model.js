@@ -249,7 +249,9 @@ function resolvePoint(value, expectedSpinePos, document, cfi) {
 		return null
 	}
 	const parent = cfi.findParent(parsed, document)
-	const node = parent?.childNodes?.[step.index]
+	const textNodes = Array.from(parent?.childNodes ?? [])
+		.filter((node) => node?.nodeType === TEXT_NODE)
+	const node = textNodes[step.index]
 	if (!node || node.nodeType !== TEXT_NODE || parsed.characterOffset > node.length) {
 		return null
 	}
