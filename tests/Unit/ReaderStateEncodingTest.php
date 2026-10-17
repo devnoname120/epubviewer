@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\Epubviewer\Tests\Unit;
 
 use JsonException;
+use OCA\Epubviewer\Db\Bookmark;
 use OCA\Epubviewer\Service\ReaderResponseBuilder;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -27,6 +28,38 @@ final class ReaderStateEncodingTest extends TestCase {
 	public function testUnencodableValuesRaiseAnExplicitJsonError(): void {
 		$this->expectException(JsonException::class);
 		$this->encode(['value' => INF]);
+	}
+
+	public function testPersistedEpubHighlightRoundTripsNestedDataAsLiteralText(): void {
+		$start = 'epubcfi(/6/2!/4/2/1:0)';
+		$content = [
+			'id' => 'highlight-test',
+			'type' => 'highlight',
+			'date' => 1,
+			'edited' => 2,
+			'anchor' => [
+				'version' => 1,
+				'spinePos' => 0,
+				'start' => $start,
+				'end' => 'epubcfi(/6/2!/4/2/1:12)',
+			],
+			'body' => '<script>literal text</script>',
+			'color' => 'yellow',
+		];
+		$encodedContent = json_encode($content, JSON_THROW_ON_ERROR);
+		self::assertLessThanOrEqual(3900, strlen($encodedContent));
+
+		$bookmark = new Bookmark();
+		$bookmark->setName('highlight-test');
+		$bookmark->setType('highlight');
+		$bookmark->setValue(json_encode($start, JSON_THROW_ON_ERROR));
+		$bookmark->setContent($encodedContent);
+		$bookmark->setLastModified('2');
+
+		$service = $bookmark->toService();
+		self::assertSame($start, $service['value']);
+		self::assertSame($content, $service['content']);
+		self::assertSame('<script>literal text</script>', $service['content']['body']);
 	}
 
 	private function encode(array $state): string {
