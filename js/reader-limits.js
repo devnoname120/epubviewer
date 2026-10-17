@@ -14,7 +14,7 @@
     documentBytes: 4 * 1024 * 1024,
     pages: 1000,
     imageDimension: 8192,
-    imagePixels: 16 * 1024 * 1024,
+    imagePixels: 32 * 1024 * 1024,
     totalImagePixels: 64 * 1024 * 1024,
     canvasPixels: 16 * 1024 * 1024,
     textCharacters: 4 * 1024 * 1024,

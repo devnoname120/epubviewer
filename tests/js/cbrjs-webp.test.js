@@ -226,6 +226,7 @@ function createHarness(entries, options = {}) {
     const book = {
       drawCalls: 0,
       pages: Array.from(pages),
+      pixels: Array.from(pages.pixels || []),
       destroy() {},
       draw() {
         this.drawCalls++;
@@ -259,6 +260,16 @@ test('routes JPEG and WebP archive entries to the comic renderer', async () => {
   assert.equal(result.books.length, 1);
   assert.deepEqual(result.books[0].pages, ['blob:1', 'blob:2']);
   assert.equal(result.books[0].drawCalls, 1);
+});
+
+test('passes validated source pixel counts into the comic cache', async () => {
+  const result = createHarness([{
+    bytes: Buffer.from('ffd8ffc0000808186a12aa01ffd9', 'hex'),
+    filename: '001.JPG',
+  }]);
+  await result.ready;
+
+  assert.deepEqual(result.books[0].pixels, [29_862_500]);
 });
 
 test('reports an archive with no supported image pages', async () => {
@@ -418,6 +429,7 @@ test('comic preload retains only the nearby page window and releases URLs on des
   context.document.getElementById = () => toc;
   context.document.createElement = () => ({ getContext: () => ({}) });
   context.removeEventListener = () => {};
+  context.scroll = () => {};
   context.jQuery.each = () => {};
   const pages = Array.from({ length: 100 }, (_, index) => `blob:page-${index}`);
   const blobs = pages.blobs = pages.map(() => new Blob([validImage('page.jpg')]));
@@ -444,4 +456,186 @@ test('comic preload retains only the nearby page window and releases URLs on des
   assert.equal(blobs.length, 0);
   assert.deepEqual(errors, [], 'destroying images must detach pending decode callbacks');
   assert.ok(images.every(image => image.onload === null && image.onerror === null));
+});
+
+test('comic preload retains a 30-megapixel double-page spread without decoding a third page', async () => {
+  const { context, OriginalComicBook } = createHarness([]);
+  const images = [];
+  const errors = [];
+  context.Image = class {
+    constructor() {
+      this.height = 6250;
+      this.naturalHeight = 6250;
+      this.naturalWidth = 4778;
+      this.value = '';
+      this.width = 4778;
+      images.push(this);
+    }
+    set src(value) {
+      this.value = value;
+      queueMicrotask(() => value ? this.onload?.() : this.onerror?.());
+    }
+    get src() { return this.value; }
+    removeAttribute(name) {
+      assert.equal(name, 'src');
+      this.value = '';
+      queueMicrotask(() => this.onerror?.());
+    }
+  };
+  const toc = { children: Array.from({ length: 10 }, () => ({ firstChild: { removeAttribute() {} } })) };
+  context.document.getElementById = () => toc;
+  context.document.createElement = () => ({ getContext: () => ({}) });
+  context.removeEventListener = () => {};
+  context.scroll = () => {};
+  context.jQuery.each = () => {};
+  const pages = Array.from({ length: 10 }, (_, index) => `blob:page-${index}`);
+  pages.blobs = pages.map(() => new Blob([validImage('page.jpg')]));
+  pages.pixels = pages.map(() => 29_862_500);
+  const book = new OriginalComicBook('viewer', pages, {
+    currentPage: 0,
+    displayMode: 'double',
+    error: message => errors.push(message),
+  });
+  const drawPage = book.drawPage;
+  book.showControl = book.hideControl = book.tocInsert = () => {};
+  book.drawPage = function (number) { if (number !== undefined) drawPage.call(this, number); };
+
+  book.preload();
+  await new Promise(resolve => setImmediate(resolve));
+
+  assert.deepEqual(errors, []);
+  assert.equal(images.length, 2);
+  assert.equal(images.filter(image => image.src).length, 2);
+  assert.ok(2 * 29_862_500 <= context.ReaderLimits.policy.totalImagePixels);
+
+  book.drawPage(3);
+  await new Promise(resolve => setImmediate(resolve));
+
+  assert.deepEqual(errors, []);
+  assert.equal(images.length, 4);
+  assert.equal(images.filter(image => image.src).length, 2);
+
+  const drawPrevPage = book.drawPrevPage;
+  let previousCalls = 0;
+  book.drawPrevPage = function () {
+    previousCalls++;
+    return drawPrevPage.call(this);
+  };
+  book.drawPrevPage();
+  await new Promise(resolve => setImmediate(resolve));
+
+  assert.deepEqual(errors, []);
+  assert.equal(previousCalls, 2);
+  assert.equal(images.length, 5);
+  assert.equal(images.filter(image => image.src).length, 2);
+});
+
+test('comic navigation preserves a requested 30-megapixel page under the aggregate budget', async () => {
+  const { context, OriginalComicBook } = createHarness([]);
+  const images = [];
+  const errors = [];
+  context.Image = class {
+    constructor() {
+      this.height = 6250;
+      this.naturalHeight = 6250;
+      this.naturalWidth = 4778;
+      this.value = '';
+      this.width = 4778;
+      images.push(this);
+    }
+    set src(value) {
+      this.value = value;
+      queueMicrotask(() => value ? this.onload?.() : this.onerror?.());
+    }
+    get src() { return this.value; }
+    removeAttribute(name) {
+      assert.equal(name, 'src');
+      this.value = '';
+      queueMicrotask(() => this.onerror?.());
+    }
+  };
+  const toc = { children: Array.from({ length: 10 }, () => ({ firstChild: { removeAttribute() {} } })) };
+  context.document.getElementById = () => toc;
+  context.document.createElement = () => ({ getContext: () => ({}) });
+  context.removeEventListener = () => {};
+  context.scroll = () => {};
+  context.jQuery.each = () => {};
+  const pages = Array.from({ length: 10 }, (_, index) => `blob:page-${index}`);
+  pages.blobs = pages.map(() => new Blob([validImage('page.jpg')]));
+  pages.pixels = pages.map(() => 29_862_500);
+  const book = new OriginalComicBook('viewer', pages, {
+    currentPage: 0,
+    displayMode: 'single',
+    error: message => errors.push(message),
+  });
+  book.showControl = book.hideControl = book.tocInsert = () => {};
+  book.drawPage = () => {};
+
+  book.preload();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(images.length, 2);
+
+  const drawNextPage = book.drawNextPage;
+  let nextCalls = 0;
+  book.drawNextPage = function () {
+    nextCalls++;
+    return drawNextPage.call(this);
+  };
+  book.drawNextPage();
+  nextCalls = 0;
+  book.drawNextPage();
+  await new Promise(resolve => setImmediate(resolve));
+
+  assert.deepEqual(errors, []);
+  assert.equal(nextCalls, 2);
+  assert.equal(images.length, 3);
+  assert.equal(images.filter(image => image.src).length, 2);
+});
+
+test('accepts browser-downsampled pages below the validated source pixel count', async () => {
+  const { context, OriginalComicBook } = createHarness([]);
+  const images = [];
+  const errors = [];
+  context.Image = class {
+    constructor() {
+      this.height = 3125;
+      this.naturalHeight = 3125;
+      this.naturalWidth = 2389;
+      this.value = '';
+      this.width = 2389;
+      images.push(this);
+    }
+    set src(value) {
+      this.value = value;
+      queueMicrotask(() => value ? this.onload?.() : this.onerror?.());
+    }
+    get src() { return this.value; }
+    removeAttribute(name) {
+      assert.equal(name, 'src');
+      this.value = '';
+      queueMicrotask(() => this.onerror?.());
+    }
+  };
+  const toc = { children: Array.from({ length: 3 }, () => ({ firstChild: { removeAttribute() {} } })) };
+  context.document.getElementById = () => toc;
+  context.document.createElement = () => ({ getContext: () => ({}) });
+  context.removeEventListener = () => {};
+  context.jQuery.each = () => {};
+  const pages = Array.from({ length: 3 }, (_, index) => `blob:page-${index}`);
+  pages.blobs = pages.map(() => new Blob([validImage('page.jpg')]));
+  pages.pixels = pages.map(() => 29_862_500);
+  const book = new OriginalComicBook('viewer', pages, {
+    currentPage: 0,
+    displayMode: 'single',
+    error: message => errors.push(message),
+  });
+  book.showControl = book.hideControl = book.tocInsert = () => {};
+  book.drawPage = () => {};
+
+  book.preload();
+  await new Promise(resolve => setImmediate(resolve));
+
+  assert.deepEqual(errors, []);
+  assert.equal(images.length, 3);
+  assert.equal(images.filter(image => image.src).length, 3);
 });
