@@ -24,7 +24,7 @@ CBRJS.getImageMimeType = function(filename) {
 	return CBRJS.IMAGE_MIME_TYPES[extension[1]];
 };
 
-CBRJS.createImageBlob = function(unarchivedFile) {
+CBRJS.createImageBlob = function(unarchivedFile, details) {
 	if (!unarchivedFile) {
 		return null;
 	}
@@ -34,7 +34,8 @@ CBRJS.createImageBlob = function(unarchivedFile) {
 		return null;
 	}
 
-	ReaderLimits.image(unarchivedFile.fileData);
+	var pixels = ReaderLimits.image(unarchivedFile.fileData);
+	if (details) details.pixels = pixels;
 	return new Blob([unarchivedFile.fileData], { type: mimetype });
 };
 
@@ -116,10 +117,12 @@ CBRJS.Reader = function(bookPath, _options) {
             finish: function () {}, error: function () {}
         }, opts);
         images.blobs = [];
+		images.pixels = [];
 
         function revoke() {
             images.forEach(function (url) { if (url) window.URL.revokeObjectURL(url); });
             images.blobs.length = 0;
+			images.pixels.length = 0;
             images.length = 0;
         }
 
@@ -171,12 +174,14 @@ CBRJS.Reader = function(bookPath, _options) {
                 if (done) return;
                 resetTimer();
                 try {
-                    var blob = CBRJS.createImageBlob(event.unarchivedFile);
+					var details = {};
+					var blob = CBRJS.createImageBlob(event.unarchivedFile, details);
                     if (!blob) return;
                     ReaderLimits.assert(images.length < ReaderLimits.policy.pages, 'Comic exceeds the page limit.');
                     var imageUrl = window.URL.createObjectURL(blob);
                     images.push(imageUrl);
                     images.blobs.push(blob);
+					images.pixels.push(details.pixels);
                     options.extract(imageUrl, blob);
                 } catch (error) { failArchive(error); }
             });
@@ -442,6 +447,7 @@ ComicBook = (function ($) {
 
         var no_pages = srcs.length;
         var blobs = srcs.blobs || null;
+		var sourcePixels = srcs.pixels || null;
         ReaderLimits.assert(no_pages <= ReaderLimits.policy.pages, 'Comic exceeds the page limit.');
         var destroyed = false, preloadRunning = false;
         var pages = []; // array of preloaded Image objects
@@ -455,6 +461,7 @@ ComicBook = (function ($) {
         var is_double_page_spread = false;
         var controlsRendered = false; // have the user controls been inserted into the dom yet?
         var page_requested = false; // used to request non preloaded pages
+		var page_request_callback = null;
 
         function releaseImage(image) {
             // Clearing src can fire an error event and resolve to the containing
@@ -463,6 +470,83 @@ ComicBook = (function ($) {
             image.onerror = null;
             image.removeAttribute('src');
         }
+
+		function releasePageSource(index) {
+			if (blobs && srcs[index]) {
+				window.URL.revokeObjectURL(srcs[index]);
+				srcs[index] = null;
+			}
+		}
+
+		function evictPage(index, clearThumbnail) {
+			if (pages[index]) {
+				releaseImage(pages[index]);
+				delete pages[index];
+				loaded = loaded.filter(function (value) { return value !== index; });
+			}
+			releasePageSource(index);
+			if (clearThumbnail && toc.children[index]) releaseImage(toc.children[index].firstChild);
+		}
+
+		function requiredPageEnd() {
+			return options.displayMode === 'double' && options.currentPage < no_pages - 1
+				? options.currentPage + 1
+				: options.currentPage;
+		}
+
+		function isRequiredPage(index) {
+			if (page_request_callback && typeof page_requested === 'number') return index === page_requested;
+			return index >= options.currentPage && index <= requiredPageEnd();
+		}
+
+		function pageDistance(index) {
+			if (page_request_callback && typeof page_requested === 'number') return Math.abs(index - page_requested);
+			var end = requiredPageEnd();
+			if (index < options.currentPage) return options.currentPage - index;
+			if (index > end) return index - end;
+			return 0;
+		}
+
+		function decodedPixelCount(image) {
+			return image._readerPixels ||
+				(image.naturalWidth || image.width) * (image.naturalHeight || image.height);
+		}
+
+		function fitImageBudget(index, pixels) {
+			var total = pixels;
+			var candidates = [];
+			pages.forEach(function (page, cachedIndex) {
+				var cachedPixels = decodedPixelCount(page);
+				total += cachedPixels;
+				if (!isRequiredPage(cachedIndex)) {
+					candidates.push({
+						distance: pageDistance(cachedIndex),
+						index: cachedIndex,
+						pixels: cachedPixels
+					});
+				}
+			});
+			if (total <= ReaderLimits.policy.totalImagePixels) return true;
+			if (!isRequiredPage(index)) {
+				candidates.push({ distance: pageDistance(index), incoming: true, pixels: pixels });
+			}
+			candidates.sort(function (left, right) {
+				var distance = right.distance - left.distance;
+				if (distance) return distance;
+				if (left.incoming) return -1;
+				if (right.incoming) return 1;
+				return right.index - left.index;
+			});
+			for (var candidateIndex = 0;
+				candidateIndex < candidates.length && total > ReaderLimits.policy.totalImagePixels;
+				candidateIndex++) {
+				var candidate = candidates[candidateIndex];
+				if (candidate.incoming) return false;
+				total -= candidate.pixels;
+				evictPage(candidate.index, false);
+			}
+			return total <= ReaderLimits.policy.totalImagePixels;
+		}
         var shiv = false;
 
         /**
@@ -748,7 +832,7 @@ ComicBook = (function ($) {
          *
          * @return Image
          */
-        ComicBook.prototype.getPage = function (i) {
+        ComicBook.prototype.getPage = function (i, onReady) {
 
             if (i < 0 || i > srcs.length - 1) {
                 throw ComicBookException.INVALID_PAGE + ' ' + i;
@@ -758,6 +842,7 @@ ComicBook = (function ($) {
                 return pages[i];
             } else {
                 page_requested = i;
+				page_request_callback = typeof onReady === 'function' ? onReady : null;
                 this.showControl('loadingOverlay');
                 this.preload();
             }
@@ -820,15 +905,14 @@ ComicBook = (function ($) {
          */
         ComicBook.prototype.preload = function () {
             if (destroyed || preloadRunning) return;
+			var preloadPage = options.currentPage;
+			var preloadMode = options.displayMode;
             var start = Math.max(0, options.currentPage - 1);
             var end = Math.min(no_pages - 1, options.currentPage + 2);
             var queue = [];
             pages.forEach(function (page, index) {
                 if (index < start || index > end) {
-                    releaseImage(page);
-                    delete pages[index];
-                    loaded = loaded.filter(function (value) { return value !== index; });
-                    if (toc.children[index]) releaseImage(toc.children[index].firstChild);
+					evictPage(index, true);
                 }
             });
             // Keep encoded blobs for navigation, but revoke URLs outside the
@@ -848,19 +932,59 @@ ComicBook = (function ($) {
                 if (destroyed) { preloadRunning = false; return; }
                 if (!queue.length) {
                     preloadRunning = false;
-                    self.preload(); // Recompute the window if navigation changed while an image loaded.
+					if (preloadPage !== options.currentPage || preloadMode !== options.displayMode) {
+						self.preload();
+					} else {
+						self.drawPage();
+						self.hideControl('loadingOverlay');
+					}
                     return;
                 }
-                var index = queue.shift(), page = new Image();
+				var index = queue.shift();
+				var expectedPixels = sourcePixels && sourcePixels[index];
+				if (Number.isSafeInteger(expectedPixels) && expectedPixels > 0 &&
+					!fitImageBudget(index, expectedPixels)) {
+					if (isRequiredPage(index)) {
+						preloadRunning = false;
+						self.destroy();
+						self.hideControl('loadingOverlay');
+						options.error('Comic exceeds the retained image pixel limit.');
+						return;
+					}
+					releasePageSource(index);
+					next();
+					return;
+				}
+				var page = new Image();
                 page.onload = function () {
                     if (destroyed) { releaseImage(this); return; }
                     try {
                         var pixels = ReaderLimits.dimensions(this.naturalWidth || this.width, this.naturalHeight || this.height);
-                        pages.forEach(function (cached) { pixels += cached.width * cached.height; });
-                        ReaderLimits.assert(pixels <= ReaderLimits.policy.totalImagePixels, 'Comic exceeds the retained image pixel limit.');
+						ReaderLimits.assert(!expectedPixels || pixels <= expectedPixels,
+							'Comic image dimensions exceed the validated header.');
+						if (!fitImageBudget(index, pixels)) {
+							ReaderLimits.assert(!isRequiredPage(index), 'Comic exceeds the retained image pixel limit.');
+							releaseImage(this);
+							releasePageSource(index);
+							next();
+							return;
+						}
+							this._readerPixels = pixels;
                         pages[index] = this;
                         loaded.push(index);
+							var onReady = null;
+							if (page_requested === index) {
+								page_requested = false;
+								onReady = page_request_callback;
+								page_request_callback = null;
+							}
                         self.tocInsert(this, index, options.thumbnails);
+							if (onReady) {
+								preloadRunning = false;
+								onReady();
+								if (!preloadRunning) self.hideControl('loadingOverlay');
+								return;
+							}
                         var buffer = options.displayMode === 'double' && options.currentPage < no_pages - 1 ? 1 : 0;
                         if (pages[options.currentPage] && pages[options.currentPage + buffer]) {
                             self.drawPage(); self.hideControl('loadingOverlay');
@@ -1125,9 +1249,12 @@ ComicBook = (function ($) {
         ComicBook.prototype.drawNextPage = function () {
 
             var page;
+			var requestedFrom = options.currentPage;
 
             try {
-                page = self.getPage(options.currentPage + 1);
+				page = self.getPage(options.currentPage + 1, function () {
+					if (!destroyed && options.currentPage === requestedFrom) self.drawNextPage();
+				});
             } catch (e) {
             }
 
@@ -1155,9 +1282,12 @@ ComicBook = (function ($) {
         ComicBook.prototype.drawPrevPage = function () {
 
             var page;
+			var requestedFrom = options.currentPage;
 
             try {
-                page = self.getPage(options.currentPage - 1);
+				page = self.getPage(options.currentPage - 1, function () {
+					if (!destroyed && options.currentPage === requestedFrom) self.drawPrevPage();
+				});
             } catch (e) {
             }
 
@@ -1582,6 +1712,8 @@ ComicBook = (function ($) {
         ComicBook.prototype.destroy = function () {
 
             destroyed = true;
+			page_requested = false;
+			page_request_callback = null;
             pages.forEach(releaseImage);
             pages.length = 0;
             loaded.length = 0;

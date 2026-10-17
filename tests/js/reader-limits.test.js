@@ -125,6 +125,15 @@ test('validates image headers before decode and rejects unknown and animated ima
   assert.throws(() => limits.image(readFileSync(new URL('../../img/loading.gif', import.meta.url))), /Animated/);
 });
 
+test('accepts bounded 30-megapixel comic scans without widening the aggregate image budget', () => {
+  const magazinePage = Buffer.from('ffd8ffc0000808186a12aa01ffd9', 'hex');
+  const aboveBudget = Buffer.from('ffd8ffc00008081001200001ffd9', 'hex');
+
+  assert.equal(limits.image(magazinePage), 29_862_500);
+  assert.equal(limits.policy.totalImagePixels, 64 * 1024 * 1024);
+  assert.throws(() => limits.image(aboveBudget), /pixel limit/);
+});
+
 test('PDF page-count limits accept the boundary and refuse an oversized document', () => {
   limits.documentPages(limits.policy.pages);
   assert.throws(() => limits.documentPages(limits.policy.pages + 1), /page-count/);
