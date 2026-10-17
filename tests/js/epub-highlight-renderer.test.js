@@ -129,7 +129,8 @@ describe('EPUB highlight renderer', () => {
       EpubCFI: class {},
       palette: HIGHLIGHT_PALETTE,
       policy,
-      resolveRange(anchor, currentDocument, EpubCFI, value) {
+      resolveRange(anchor, currentDocument, EpubCFI, currentPolicy, value) {
+        assert.equal(currentPolicy, policy);
         return ranges.get(value.id) ?? null;
       },
     });
@@ -151,6 +152,53 @@ describe('EPUB highlight renderer', () => {
     assert.match(style.textContent, /::highlight\(epubviewer-yellow\)/);
     assert.match(style.textContent, /background-color: #f6d94a/);
     assert.doesNotMatch(style.textContent, /expression/);
+  });
+
+  test('passes the configured policy to the default CFI range resolver', () => {
+    const { document, registry } = nativeHarness();
+    const textNode = { length: 8, nodeType: 3 };
+    const parent = { childNodes: [textNode] };
+    document.createRange = () => {
+      let start = 0;
+      let end = 0;
+      return {
+        collapsed: false,
+        setEnd(node, offset) {
+          assert.equal(node, textNode);
+          end = offset;
+        },
+        setStart(node, offset) {
+          assert.equal(node, textNode);
+          start = offset;
+        },
+        toString() {
+          return 'selected'.slice(start, end);
+        },
+      };
+    };
+    class FakeEpubCFI {
+      parse(value) {
+        return {
+          characterOffset: value.endsWith(':8)') ? 8 : 0,
+          spinePos: 0,
+          steps: [{ index: 0, type: 'text' }],
+        };
+      }
+
+      findParent() {
+        return parent;
+      }
+    }
+    const renderer = new EpubHighlightRenderer({
+      EpubCFI: FakeEpubCFI,
+      palette: HIGHLIGHT_PALETTE,
+      policy,
+    });
+
+    const result = renderer.render(document, { spinePos: 0 }, { render: { leftPos: 0 } }, [highlight('default')]);
+
+    assert.deepEqual(result, { mode: 'native', rendered: 1, skipped: 0 });
+    assert.equal(registry.get('epubviewer-yellow').size, 1);
   });
 
   test('replaces owned registry ranges and preserves unrelated custom highlights', () => {
@@ -273,5 +321,43 @@ describe('EPUB highlight renderer', () => {
     renderer.clear();
     flush();
     assert.deepEqual(seen, [highlight('second').anchor.start]);
+  });
+
+  test('schedules through the outer reader window instead of a throttled EPUB iframe', () => {
+    const { document, frames } = fallbackHarness();
+    const callbacks = new Map();
+    let nextId = 100;
+    const originalRequest = globalThis.requestAnimationFrame;
+    const originalCancel = globalThis.cancelAnimationFrame;
+    globalThis.requestAnimationFrame = (callback) => {
+      const id = nextId++;
+      callbacks.set(id, callback);
+      return id;
+    };
+    globalThis.cancelAnimationFrame = (id) => callbacks.delete(id);
+    try {
+      const seen = [];
+      const renderer = new EpubHighlightRenderer({
+        EpubCFI: class {},
+        palette: HIGHLIGHT_PALETTE,
+        policy,
+        resolveRange(anchor) {
+          seen.push(anchor.start);
+          return { getClientRects: () => [] };
+        },
+      });
+
+      renderer.schedule(document, { spinePos: 0 }, { render: { leftPos: 0 } }, [highlight('outer')]);
+
+      assert.equal(frames.size, 0);
+      assert.equal(callbacks.size, 1);
+      [...callbacks.values()][0]();
+      assert.deepEqual(seen, [highlight('outer').anchor.start]);
+    } finally {
+      if (originalRequest === undefined) delete globalThis.requestAnimationFrame;
+      else globalThis.requestAnimationFrame = originalRequest;
+      if (originalCancel === undefined) delete globalThis.cancelAnimationFrame;
+      else globalThis.cancelAnimationFrame = originalCancel;
+    }
   });
 });

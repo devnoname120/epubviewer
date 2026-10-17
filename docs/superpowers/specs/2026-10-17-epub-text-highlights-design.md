@@ -73,7 +73,7 @@ Generated highlight IDs are limited to 128 ASCII letters, digits, underscores, o
 
 The selected `Range` is normalized to its first and last intersecting text nodes. The implementation generates independent start and end CFIs with `EPUBJS.EpubCFI.generateCfiFromTextNode`.
 
-Restoration parses each point CFI and resolves its exact text node and character offset. This avoids `generateRangeFromCfi`'s end-of-text fallback, which otherwise moves a boundary one character backward when the saved offset equals the text-node length.
+Restoration parses each point CFI and resolves its exact text node and character offset. The bundled generator encodes the final text step as the raw `childNodes` index, so restoration follows that legacy representation rather than treating it as a text-only index. This avoids `generateRangeFromCfi`'s end-of-text fallback, which otherwise moves a boundary one character backward when the saved offset equals the text-node length.
 
 A restored range is accepted only when:
 

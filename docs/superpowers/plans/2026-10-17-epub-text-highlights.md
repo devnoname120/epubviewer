@@ -158,7 +158,7 @@ export function highlightAnchorToRange(anchor, document, EpubCFI)
 4. call `generateCfiFromTextNode` for each point;
 5. record `chapter.spinePos` and enforce CFI lengths.
 
-`highlightAnchorToRange` must parse each CFI, use `findParent(parsed, document)` plus the final text step to obtain the exact text node, clamp only to the node length, create a new DOM range, and reject a collapsed or reversed result. Do not use the bundled `generateRangeFromCfi` for endpoint offsets.
+`highlightAnchorToRange` must parse each CFI, use `findParent(parsed, document)` plus the final raw `childNodes` text-step index used by the bundled generator to obtain the exact text node, clamp only to the node length, create a new DOM range, and reject a collapsed or reversed result. Do not use the bundled `generateRangeFromCfi` for endpoint offsets.
 
 - [ ] **Step 7: Run focused tests and verify GREEN**
 

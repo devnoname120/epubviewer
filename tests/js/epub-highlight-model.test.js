@@ -182,7 +182,7 @@ class FakeEpubCFI {
   parse(value) {
     const match = /^epubcfi\(spine-(\d+)!\/([^:]+):(\d+)\)$/.exec(value);
     if (!match) return { spinePos: -1, steps: [] };
-    const childIndexes = { a: 0, b: 1, c: 0, head: 0, tail: 1 };
+    const childIndexes = { a: 0, b: 1, c: 0, head: 0, tail: 2 };
     return {
       characterOffset: Number(match[3]),
       nodeKey: match[2],
@@ -317,7 +317,7 @@ describe('EPUB highlight model', () => {
     assert.equal(range.toString(), 'pha beta');
   });
 
-  test('resolves CFI text indexes independently of interleaved element children', () => {
+  test('resolves the legacy CFI raw child index across interleaved elements', () => {
     const head = new FakeText('head', 'before ');
     const nested = new FakeElement('nested', [new FakeText('nested-text', 'inline')]);
     const tail = new FakeText('tail', 'after');

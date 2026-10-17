@@ -52,7 +52,7 @@ class Nextcloud34CompatibilityTest extends TestCase {
 	public static function readerTemplateRevisionProvider(): array {
 		return [
 			'comic book reader' => ['templates/cbreader.php', '0053'],
-			'epub reader' => ['templates/epubviewer.php', '0073'],
+			'epub reader' => ['templates/epubviewer.php', '0074'],
 			'pdf reader' => ['templates/pdfreader.php', '0135'],
 		];
 	}

@@ -92,12 +92,13 @@ export class EpubHighlightRenderer {
 			}
 			let range = null
 			try {
-				range = this.resolveRange(
-					highlight.anchor,
-					document,
-					this.EpubCFI,
-					highlight,
-				)
+					range = this.resolveRange(
+						highlight.anchor,
+						document,
+						this.EpubCFI,
+						this.policy,
+						highlight,
+					)
 			} catch {
 				range = null
 			}
@@ -118,7 +119,9 @@ export class EpubHighlightRenderer {
 		if (this.frameId !== null) {
 			return
 		}
-		const window = document?.defaultView ?? globalThis
+		const window = typeof globalThis.requestAnimationFrame === 'function'
+			? globalThis
+			: (document?.defaultView ?? globalThis)
 		const request = typeof window.requestAnimationFrame === 'function'
 			? window.requestAnimationFrame.bind(window)
 			: (callback) => globalThis.setTimeout(callback, 0)
