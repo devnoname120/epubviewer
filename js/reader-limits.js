@@ -20,6 +20,11 @@
     textCharacters: 4 * 1024 * 1024,
     pageTextCharacters: 128 * 1024,
     searchResults: 1000,
+    highlights: 1000,
+    highlightCfiCharacters: 480,
+    highlightTextCharacters: 1024,
+    highlightContentBytes: 3900,
+    highlightRectangles: 4096,
     workMilliseconds: 30000,
   });
 
