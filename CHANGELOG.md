@@ -1,3 +1,13 @@
+## 1.9.15 - 2026-10-17
+
+### Added
+
+- Add persistent EPUB text highlights in yellow, green, blue, pink, or orange, with selection controls and a sidebar for navigation, recoloring, and deletion (#48).
+
+### Security
+
+- Validate paired CFI anchors, excerpts, colors, identifiers, record counts, and serialized sizes before persistence or rendering; restore ranges without mutating publication text and bound fallback overlay geometry.
+
 ## 1.9.14 - 2026-10-17
 
 ### Fixed

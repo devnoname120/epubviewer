@@ -12,6 +12,12 @@ full-screen.
 Turn pages by pressing the left/right hand side of the screen/window or using the cursor keys (if you have those), use
 the sidebar to browse through chapters or bookmarks and add annotations.
 
+EPUB text can be highlighted in yellow, green, blue, pink, or orange. Select text in the reader and choose a color from
+the selection toolbar; saved highlights appear in the Highlights sidebar, where they can be opened, recolored, or
+deleted. Highlights are stored per user and file in Nextcloud, persist across browser sessions, and do not modify the
+EPUB archive. The reader accepts at most 1,000 highlights per publication, 480 characters per CFI endpoint, 1,024
+characters per excerpt, and 3,900 UTF-8 bytes per serialized highlight record.
+
 PDF is handled by Mozilla's [pdf.js] renderer in combination with a custom reader app to enable side-by-side display,
 batch search and more. Controls are like those used in the Epub renderer with a few exceptions, e.g. night mode has not
 been implemented yet.

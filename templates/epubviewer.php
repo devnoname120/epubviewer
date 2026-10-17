@@ -12,7 +12,7 @@ $defaults = $_['defaults'];
 $preferences = $_['preferences'];
 $annotations = $_['annotations'];
 $title = htmlentities(basename($downloadLink));
-$revision = '0073';
+$revision = '0074';
 $version = $_['appVersion'] . '.' . $revision;
 $nonce = $_['nonce'];
 $requestToken = $_['requesttoken'];
@@ -48,6 +48,8 @@ $idevice = (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone')
         href="<?php p($urlGenerator->linkTo('epubviewer', 'js/epubjs/css/sidebar.css')) ?>?v=<?php p($version) ?>">
   <link rel="stylesheet"
         href="<?php p($urlGenerator->linkTo('epubviewer', 'js/epubjs/css/popup.css')) ?>?v=<?php p($version) ?>">
+  <link rel="stylesheet"
+        href="<?php p($urlGenerator->linkTo('epubviewer', 'js/epubjs/css/highlights.css')) ?>?v=<?php p($version) ?>">
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/reader-limits.js')) ?>?v=<?php p($version) ?>"></script>
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
@@ -70,6 +72,8 @@ $idevice = (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone')
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/epubjs/hooks/extensions/highlight.js')) ?>?v=<?php p($version) ?>"></script>
   <script type="text/javascript" nonce="<?php p($nonce) ?>"
           src="<?php p($urlGenerator->linkTo('epubviewer', 'js/epubjs/reader.min.js')) ?>?v=<?php p($version) ?>"></script>
+  <script type="module" nonce="<?php p($nonce) ?>"
+          src="<?php p($urlGenerator->linkTo('epubviewer', 'js/epubviewer-epub-highlights.mjs')) ?>?v=<?php p($version) ?>"></script>
 
     <?php if ($idevice): ?>
       <link rel="stylesheet"
@@ -96,6 +100,8 @@ $idevice = (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone')
         <button id="show-Bookmarks" class="show_view icon-turned_in" title="Bookmarks" data-view="Bookmarks"></button>
         <button id="show-Search" class="show_view icon-search" title="Search" data-view="Search"></button>
         <button id="show-Notes" class="show_view icon-comment" title="Notes" data-view="Notes"></button>
+        <button id="show-Highlights" class="show_view icon-mode_edit" title="Highlights"
+                data-view="Highlights"></button>
         <button id="show-Settings" class="show_view icon-settings" title="Settings" data-view="Settings"></button>
       </div>
       <div class="pull-right">
@@ -130,6 +136,10 @@ $idevice = (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone')
           <ol id="notes" class="notes">
           </ol>
         </div>
+      </div>
+      <div id="highlightsView" class="highlights-view view">
+        <ol id="highlights" class="highlights" aria-label="Saved highlights"></ol>
+        <div id="highlight-status" class="highlight-status" aria-live="polite"></div>
       </div>
       <div id="settingsView" class="settings-view view">
         <fieldset class="settings-container" name="font-settings">
@@ -248,6 +258,19 @@ $idevice = (strstr($_SERVER['HTTP_USER_AGENT'], 'iPhone')
   </div> <!-- sidebar -->
 
   <!-- /sidebar -->
+
+  <div id="epub-highlight-toolbar" role="toolbar" aria-label="Highlight selected text" hidden>
+    <button type="button" class="epub-highlight-swatch epub-highlight-yellow"
+            data-highlight-color="yellow" aria-label="Highlight yellow" title="Highlight yellow"></button>
+    <button type="button" class="epub-highlight-swatch epub-highlight-green"
+            data-highlight-color="green" aria-label="Highlight green" title="Highlight green"></button>
+    <button type="button" class="epub-highlight-swatch epub-highlight-blue"
+            data-highlight-color="blue" aria-label="Highlight blue" title="Highlight blue"></button>
+    <button type="button" class="epub-highlight-swatch epub-highlight-pink"
+            data-highlight-color="pink" aria-label="Highlight pink" title="Highlight pink"></button>
+    <button type="button" class="epub-highlight-swatch epub-highlight-orange"
+            data-highlight-color="orange" aria-label="Highlight orange" title="Highlight orange"></button>
+  </div>
 
   <!-- main -->
 

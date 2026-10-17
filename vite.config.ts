@@ -23,6 +23,7 @@ export default defineConfig({
 		rollupOptions: {
 			preserveEntrySignatures: 'strict',
 			input: {
+				'epub-highlights': path.resolve(import.meta.dirname, 'src/epubHighlights/index.js'),
 				main: path.resolve(import.meta.dirname, 'src/main.ts'),
 				rar: path.resolve(import.meta.dirname, 'src/rar.ts'),
 				settings: path.resolve(import.meta.dirname, 'src/settings.ts'),

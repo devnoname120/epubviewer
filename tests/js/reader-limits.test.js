@@ -24,6 +24,14 @@ test('RAR range budget covers one archive scan and one bounded fallback entry', 
   );
 });
 
+test('bounds persisted EPUB highlight state to existing bookmark columns', () => {
+  assert.equal(limits.policy.highlights, 1000);
+  assert.equal(limits.policy.highlightCfiCharacters, 480);
+  assert.equal(limits.policy.highlightTextCharacters, 1024);
+  assert.equal(limits.policy.highlightContentBytes, 3900);
+  assert.equal(limits.policy.highlightRectangles, 4096);
+});
+
 test('labels publication input-limit failures for bounded URL fallback', async () => {
   const originalFetch = globalThis.fetch;
   let cancelled = false;
