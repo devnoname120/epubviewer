@@ -1,3 +1,10 @@
+## 1.9.16 - 2026-10-20
+
+### Fixed
+
+- Open CBR and large CBZ archives when valid HTTP range responses omit the optional `Content-Length` header, including streamed responses from external storage or proxies (#55).
+- Preserve exact `Content-Range` and received-body length validation, declared-length checks, and archive transfer limits.
+
 ## 1.9.15 - 2026-10-17
 
 ### Added

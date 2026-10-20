@@ -157,8 +157,10 @@ export async function createArchiveRangeReader(input, options) {
 			if (range.start !== start || range.end !== end || (archiveBytes !== null && range.total !== archiveBytes)) {
 				throw new Error('Archive server returned an inconsistent range response.')
 			}
-			const contentLength = Number(response.headers.get('content-length'))
-			if (!Number.isSafeInteger(contentLength) || contentLength !== expectedBytes) {
+			const declaredLength = response.headers.get('content-length')
+			const contentLength = Number(declaredLength)
+			// Streamed responses can omit this header; always validate the body length below.
+			if (declaredLength !== null && (!Number.isSafeInteger(contentLength) || contentLength !== expectedBytes)) {
 				throw new Error('Archive server returned an invalid range response length.')
 			}
 

@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { once } from 'node:events';
+import { createServer } from 'node:http';
 import { describe, it } from 'node:test';
 
 import { createArchiveRangeReader } from '../../src/archiveRangeReader.js';
@@ -100,6 +102,90 @@ describe('bounded archive HTTP range reader', () => {
     assert.deepEqual(requests, ['bytes=0-1']);
   });
 
+  it('accepts missing Content-Length on the probe and subsequent ranges', async () => {
+    for (const omitProbeLength of [false, true]) {
+      for (const omitReadLength of [false, true]) {
+        let calls = 0;
+        const fetch = rangeFetch(10, []);
+        const reader = await createRarRangeReader(URL, {
+          fetch: async (...args) => {
+            const response = await fetch(...args);
+            if (++calls === 1 ? omitProbeLength : omitReadLength) {
+              response.headers.delete('content-length');
+            }
+            return response;
+          },
+          maxArchiveBytes: 1024,
+          maxFetchedBytes: 2048,
+          origin: ORIGIN,
+        });
+
+        assert.equal(reader.length, 10);
+        assert.deepEqual(await readAll(await reader.read(3, 4)), Uint8Array.of(3, 4, 5, 6));
+      }
+    }
+  });
+
+  it('reads real chunked HTTP ranges without Content-Length', async (t) => {
+    const bytes = Buffer.from('archive bytes');
+    const ranges = [];
+    const server = createServer((request, response) => {
+      ranges.push(request.headers.range);
+      const match = /^bytes=(\d+)-(\d+)$/.exec(request.headers.range ?? '');
+      if (match === null) {
+        response.writeHead(400).end();
+        return;
+      }
+      const start = Number(match[1]);
+      const end = Number(match[2]);
+      response.writeHead(206, { 'Content-Range': `bytes ${start}-${end}/${bytes.length}` });
+      response.write(bytes.subarray(start, start + 1));
+      response.end(bytes.subarray(start + 1, end + 1));
+    });
+    t.after(() => {
+      server.closeAllConnections();
+      return new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+    });
+    server.listen(0, '127.0.0.1');
+    await once(server, 'listening');
+    const origin = `http://127.0.0.1:${server.address().port}`;
+    const reader = await createArchiveRangeReader(`${origin}/comic.cbr`, {
+      fetch: async (...args) => {
+        const response = await fetch(...args);
+        assert.equal(response.headers.get('content-length'), null);
+        assert.equal(response.headers.get('transfer-encoding'), 'chunked');
+        return response;
+      },
+      maxArchiveBytes: 1024,
+      maxFetchedBytes: 2048,
+      origin,
+    });
+
+    assert.equal(reader.length, bytes.length);
+    assert.deepEqual(await readAll(await reader.read(3, 6)), new Uint8Array(bytes.subarray(3, 9)));
+    assert.deepEqual(ranges, ['bytes=0-1', 'bytes=3-8']);
+  });
+
+  it('rejects invalid Content-Length when it is present', async () => {
+    for (const contentLength of ['0', '1', '3', 'invalid', '9007199254740992']) {
+      for (const invalidProbe of [false, true]) {
+        let calls = 0;
+        const fetch = rangeFetch(10, []);
+        const open = createRarRangeReader(URL, {
+          fetch: async (...args) => {
+            const response = await fetch(...args);
+            if ((++calls === 1) === invalidProbe) response.headers.set('content-length', contentLength);
+            return response;
+          },
+          maxArchiveBytes: 1024,
+          maxFetchedBytes: 2048,
+          origin: ORIGIN,
+        });
+        await assert.rejects(invalidProbe ? open : open.then((reader) => reader.read(2, 2)), /range response length/);
+      }
+    }
+  });
+
   it('rejects cross-origin input before issuing a request', async () => {
     let called = false;
     await assert.rejects(
@@ -175,21 +261,29 @@ describe('bounded archive HTTP range reader', () => {
   });
 
   it('rejects short and oversized range bodies', async () => {
-    for (const data of [Uint8Array.of(1), Uint8Array.of(1, 2, 3)]) {
-      let calls = 0;
-      const fetch = async () => {
-        calls += 1;
-        return calls === 1
-          ? rangeResponse(0, 1, 10)
-          : rangeResponse(2, 3, 10, data, 206, 2);
-      };
-      const reader = await createRarRangeReader(URL, {
-        fetch,
-        maxArchiveBytes: 1024,
-        maxFetchedBytes: 2048,
-        origin: ORIGIN,
-      });
-      await assert.rejects(readAll(await reader.read(2, 2)), /range body length/);
+    for (const omitContentLength of [false, true]) {
+      for (const invalidProbe of [false, true]) {
+        for (const data of [Uint8Array.of(1), Uint8Array.of(1, 2, 3)]) {
+          let calls = 0;
+          const fetch = async () => {
+            const response = ++calls === 1
+              ? rangeResponse(0, 1, 10, invalidProbe ? data : null, 206, 2)
+              : rangeResponse(2, 3, 10, data, 206, 2);
+            if (omitContentLength) response.headers.delete('content-length');
+            return response;
+          };
+          const open = createRarRangeReader(URL, {
+            fetch,
+            maxArchiveBytes: 1024,
+            maxFetchedBytes: 2048,
+            origin: ORIGIN,
+          });
+          await assert.rejects(
+            invalidProbe ? open : open.then(async (reader) => readAll(await reader.read(2, 2))),
+            /range body length/,
+          );
+        }
+      }
     }
   });
 
