@@ -1,3 +1,11 @@
+## 1.9.17 - 2026-10-22
+
+### Fixed
+
+- Open valid independently compressed RAR3/CBR entries when the primary decoder reports `over-subscribed RAR3 Huffman table`, using the existing bounded libarchive fallback (#56).
+- Preserve Unicode RAR3 filenames in the WebAssembly fallback by selecting a UTF-8 locale before reading archive headers.
+- Add regression coverage for Unicode filenames, the Huffman fallback, CRC rejection, and solid-run dependency safeguards.
+
 ## 1.9.16 - 2026-10-20
 
 ### Fixed
