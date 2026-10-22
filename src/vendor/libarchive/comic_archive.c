@@ -7,6 +7,7 @@
 #include <archive_entry.h>
 #include <emscripten.h>
 #include <limits.h>
+#include <locale.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +26,11 @@ static void set_error(struct archive *archive, const char *fallback) {
 
 EMSCRIPTEN_KEEPALIVE
 uintptr_t comic_archive_open(const unsigned char *data, size_t size) {
+    /* RAR Unicode filenames must not be converted through the default C locale. */
+    if (setlocale(LC_CTYPE, "C.UTF-8") == NULL) {
+        set_error(NULL, "Could not enable UTF-8 archive filenames.");
+        return 0;
+    }
     struct comic_archive *handle = calloc(1, sizeof(*handle));
     if (handle == NULL) {
         set_error(NULL, "Could not allocate the archive handle.");

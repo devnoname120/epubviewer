@@ -16,3 +16,8 @@
   compression and stored as `page-01.PNG`. It covers the bounded libarchive
   fallback used when the primary JavaScript RAR3 decoder cannot decode an
   otherwise valid compressed entry.
+- `comic-unicode-ppm-rar4.rar` contains the same repository-owned PNG and
+  compressed stream as `comic-ppm-rar4.rar`, with a standard RAR3 Unicode
+  filename (`pagë-01.PNG`) and a recomputed file-header CRC. It exercises the
+  WebAssembly decoder's UTF-8 locale without redistributing the comic attached
+  to discussion #56.

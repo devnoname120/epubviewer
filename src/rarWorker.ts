@@ -60,6 +60,7 @@ const RAR3_DIRECTORY_MASK = 0x00e0
 const RAR3_VERSION = 0x0800
 const RAR3_MODE_SWITCH_ERROR = 'RAR3 in-stream table refresh switched to PPMd unexpectedly'
 const RAR3_PPMD_INVALID_SYMBOL_ERROR = 'RAR3 PPMd: decoder reported invalid symbol'
+const RAR3_HUFFMAN_TABLE_ERROR = 'over-subscribed RAR3 Huffman table'
 
 function send(message: WorkerMessage, transfer: Transferable[] = []): void {
 	workerScope.postMessage(message, transfer)
@@ -185,7 +186,7 @@ function canUseRar3Fallback(error: unknown, blocks: Rar3FileBlock[], index: numb
 	const block = blocks[index]
 	const message = error instanceof Error ? error.message : ''
 	return error instanceof Error
-		&& (message === RAR3_MODE_SWITCH_ERROR || message === RAR3_PPMD_INVALID_SYMBOL_ERROR)
+		&& (message === RAR3_MODE_SWITCH_ERROR || message === RAR3_PPMD_INVALID_SYMBOL_ERROR || message === RAR3_HUFFMAN_TABLE_ERROR)
 		&& block.method !== RAR3_STORED
 		&& (block.fileFlags & RAR3_SOLID) === 0
 		&& !hasDependentRar3SolidEntry(blocks, index)

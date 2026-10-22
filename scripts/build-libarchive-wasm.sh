@@ -7,8 +7,8 @@ set -eu
 
 version='3.8.10'
 source_sha256='56cad765459d5ee25a3b761f90c47d99379d28297fbfb72d908880d6b875fb96'
-module_sha256='a6b61028365b69a9f3aaae6d68f81d04ff20c40c45110587dfa452e34f0312e4'
-wasm_sha256='1efc41d79751e4f07ef4269bdf8442d5637e99267cbc688bed09b26bb3de1fa6'
+module_sha256='67ec2dc301a277bd53fd1063e08a12e6c6effa6eb5428a6f06a458dfca0783bd'
+wasm_sha256='4f7612505168660da97d936a0cf8ff506ba8bbc47ecb95843af86d7a9bd878dc'
 image='emscripten/emsdk@sha256:5aea37132ad0827908065a5d7432d2f4048011dce7169aa1ab3441b0720312e2'
 
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)

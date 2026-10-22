@@ -9,6 +9,7 @@ import { createRar3LibarchiveDecoder } from '../../src/rar3LibarchiveFallback.js
 import '../../js/reader-limits.js';
 
 const RAR3_MODE_SWITCH_ERROR = 'RAR3 in-stream table refresh switched to PPMd unexpectedly';
+const RAR3_HUFFMAN_TABLE_ERROR = 'over-subscribed RAR3 Huffman table';
 
 const workerSource = ts
   .transpileModule(fs.readFileSync(new URL('../../src/rarWorker.ts', import.meta.url), 'utf8'), {
@@ -115,14 +116,29 @@ async function runWorker(input, backend) {
   };
   vm.runInNewContext(workerSource, {
     ...backend,
-    createArchiveRangeReader: backend.createArchiveRangeReader
-      ?? backend.createRarRangeReader
-      ?? (() => { throw new Error('Unexpected URL source'); }),
-    createRarRangeReader: backend.createRarRangeReader ?? (() => { throw new Error('Unexpected URL source'); }),
-    extractZipRange: backend.extractZipRange ?? (() => { throw new Error('Unexpected ZIP extraction'); }),
-    getRar3FallbackDecoder: backend.getRar3FallbackDecoder ?? (() => ({
-      decode() { throw new Error('Unexpected RAR3 fallback'); },
-    })),
+    createArchiveRangeReader:
+      backend.createArchiveRangeReader ??
+      backend.createRarRangeReader ??
+      (() => {
+        throw new Error('Unexpected URL source');
+      }),
+    createRarRangeReader:
+      backend.createRarRangeReader ??
+      (() => {
+        throw new Error('Unexpected URL source');
+      }),
+    extractZipRange:
+      backend.extractZipRange ??
+      (() => {
+        throw new Error('Unexpected ZIP extraction');
+      }),
+    getRar3FallbackDecoder:
+      backend.getRar3FallbackDecoder ??
+      (() => ({
+        decode() {
+          throw new Error('Unexpected RAR3 fallback');
+        },
+      })),
     self: scope,
     ReaderLimits: globalThis.ReaderLimits,
     ArrayBuffer,
@@ -132,9 +148,10 @@ async function runWorker(input, backend) {
     console,
   });
   listener({
-    data: input instanceof Uint8Array
-      ? { type: 'extract', arrayBuffer: input.buffer.slice(input.byteOffset, input.byteOffset + input.byteLength) }
-      : input,
+    data:
+      input instanceof Uint8Array
+        ? { type: 'extract', arrayBuffer: input.buffer.slice(input.byteOffset, input.byteOffset + input.byteLength) }
+        : input,
   });
   return result;
 }
@@ -284,10 +301,13 @@ test('archive worker extracts large ZIP URL inputs through bounded ranges', asyn
     unrar3: async function* () {},
   };
 
-  const messages = await runWorker({
-    type: 'extract-zip-url',
-    url: 'https://cloud.example.test/large.cbz',
-  }, backend);
+  const messages = await runWorker(
+    {
+      type: 'extract-zip-url',
+      url: 'https://cloud.example.test/large.cbz',
+    },
+    backend,
+  );
 
   assert.equal(messages.at(-1).type, 'finish', messages.at(-1).msg);
   assert.equal(messages.at(-1).metadata.backend, 'bounded ZIP ranges');
@@ -302,69 +322,62 @@ test('archive worker extracts large ZIP URL inputs through bounded ranges', asyn
 });
 
 test('RAR worker keeps ordinary compressed RAR3 entries on the primary decoder', async () => {
-  const bytes = Uint8Array.from([
-    0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00,
-    1, 2, 3, 4, 5, 6, 7,
-    8, 9, 10,
-  ]);
+  const bytes = Uint8Array.from([0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   const block = rar3Block();
   let fallbackCalls = 0;
-  const backend = rar3Backend(
-    bytes,
-    [block],
-    [rar3Entry(block, () => streamBytes(11, 12, 13))],
-    async () => {
-      fallbackCalls += 1;
-      return { filename: block.name, fileData: Uint8Array.of(21, 22, 23) };
-    },
-  );
+  const backend = rar3Backend(bytes, [block], [rar3Entry(block, () => streamBytes(11, 12, 13))], async () => {
+    fallbackCalls += 1;
+    return { filename: block.name, fileData: Uint8Array.of(21, 22, 23) };
+  });
 
   const messages = await runWorker(bytes, backend);
 
   assert.equal(messages.at(-1).type, 'finish', messages.at(-1).msg);
   assert.equal(messages.at(-1).metadata.backend, '@mary/rar');
   assert.equal(fallbackCalls, 0);
-  assert.deepEqual(messages.find((message) => message.type === 'extract').unarchivedFile.fileData, Uint8Array.of(11, 12, 13));
-});
-
-test('RAR worker falls back only for the known non-solid RAR3 LZ-to-PPMd transition', async () => {
-  const bytes = Uint8Array.from([
-    0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00,
-    1, 2, 3, 4, 5, 6, 7,
-    8, 9, 10,
-  ]);
-  const block = rar3Block();
-  let nativeReads = 0;
-  let fallbackInput = null;
-  const backend = rar3Backend(
-    bytes,
-    [block],
-    [rar3Entry(block, () => {
-      nativeReads += 1;
-      return failingStream(RAR3_MODE_SWITCH_ERROR);
-    })],
-    async (inputBlock, entryBytes) => {
-      fallbackInput = { entryBytes, inputBlock };
-      return { filename: block.name, fileData: Uint8Array.of(11, 12, 13) };
-    },
+  assert.deepEqual(
+    messages.find((message) => message.type === 'extract').unarchivedFile.fileData,
+    Uint8Array.of(11, 12, 13),
   );
-
-  const messages = await runWorker(bytes, backend);
-
-  assert.equal(messages.at(-1).type, 'finish', messages.at(-1).msg);
-  assert.equal(messages.at(-1).metadata.backend, '@mary/rar + libarchive');
-  assert.equal(nativeReads, 1);
-  assert.equal(fallbackInput.inputBlock, block);
-  assert.deepEqual(fallbackInput.entryBytes, bytes.slice(7));
-  assert.deepEqual(messages.find((message) => message.type === 'extract').unarchivedFile.fileData, Uint8Array.of(11, 12, 13));
 });
+
+for (const decoderError of [RAR3_MODE_SWITCH_ERROR, RAR3_HUFFMAN_TABLE_ERROR]) {
+  test(`RAR worker falls back for the independent RAR3 decoder failure: ${decoderError}`, async () => {
+    const bytes = Uint8Array.from([0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    const block = rar3Block();
+    let nativeReads = 0;
+    let fallbackInput = null;
+    const backend = rar3Backend(
+      bytes,
+      [block],
+      [
+        rar3Entry(block, () => {
+          nativeReads += 1;
+          return failingStream(decoderError);
+        }),
+      ],
+      async (inputBlock, entryBytes) => {
+        fallbackInput = { entryBytes, inputBlock };
+        return { filename: block.name, fileData: Uint8Array.of(11, 12, 13) };
+      },
+    );
+
+    const messages = await runWorker(bytes, backend);
+
+    assert.equal(messages.at(-1).type, 'finish', messages.at(-1).msg);
+    assert.equal(messages.at(-1).metadata.backend, '@mary/rar + libarchive');
+    assert.equal(nativeReads, 1);
+    assert.equal(fallbackInput.inputBlock, block);
+    assert.deepEqual(fallbackInput.entryBytes, bytes.slice(7));
+    assert.deepEqual(
+      messages.find((message) => message.type === 'extract').unarchivedFile.fileData,
+      Uint8Array.of(11, 12, 13),
+    );
+  });
+}
 
 test('RAR worker does not hide unrelated RAR3 decoder failures behind the fallback', async () => {
-  const bytes = Uint8Array.from([
-    0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00,
-    1, 2, 3, 4, 5, 6, 7,
-    8, 9, 10,
-  ]);
+  const bytes = Uint8Array.from([0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   const block = rar3Block();
   let fallbackCalls = 0;
   const backend = rar3Backend(
@@ -385,11 +398,7 @@ test('RAR worker does not hide unrelated RAR3 decoder failures behind the fallba
 });
 
 test('RAR worker does not hide unrelated PPMd failures behind the fallback', async () => {
-  const bytes = Uint8Array.from([
-    0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00,
-    1, 2, 3, 4, 5, 6, 7,
-    8, 9, 10,
-  ]);
+  const bytes = Uint8Array.from([0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   const block = rar3Block();
   let fallbackCalls = 0;
   const backend = rar3Backend(
@@ -409,38 +418,33 @@ test('RAR worker does not hide unrelated PPMd failures behind the fallback', asy
   assert.equal(fallbackCalls, 0);
 });
 
-test('RAR worker does not detach a failing RAR3 head from its following solid run', async () => {
-  const bytes = Uint8Array.from([
-    0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00,
-    1, 2, 3, 4, 5, 6, 7,
-    8, 9, 10,
-    11, 12, 13, 14, 15, 16, 17,
-    18, 19, 20,
-  ]);
-  const first = rar3Block();
-  const second = rar3Block({
-    dataOffset: 24,
-    fileFlags: 0x0010,
-    headerOffset: 17,
-    name: 'page-02.jpg',
+for (const decoderError of [RAR3_MODE_SWITCH_ERROR, RAR3_HUFFMAN_TABLE_ERROR]) {
+  test(`RAR worker preserves solid-run dependencies after: ${decoderError}`, async () => {
+    const bytes = Uint8Array.from([
+      0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    ]);
+    const first = rar3Block();
+    const second = rar3Block({
+      dataOffset: 24,
+      fileFlags: 0x0010,
+      headerOffset: 17,
+      name: 'page-02.jpg',
+    });
+    let fallbackCalls = 0;
+    const backend = rar3Backend(
+      bytes,
+      [first, second],
+      [rar3Entry(first, () => failingStream(decoderError)), rar3Entry(second, () => streamBytes(21, 22, 23))],
+      async () => {
+        fallbackCalls += 1;
+        return { filename: first.name, fileData: Uint8Array.of(11, 12, 13) };
+      },
+    );
+
+    const messages = await runWorker(bytes, backend);
+
+    assert.equal(messages.at(-1).type, 'error');
+    assert.equal(messages.at(-1).msg, decoderError);
+    assert.equal(fallbackCalls, 0);
   });
-  let fallbackCalls = 0;
-  const backend = rar3Backend(
-    bytes,
-    [first, second],
-    [
-      rar3Entry(first, () => failingStream(RAR3_MODE_SWITCH_ERROR)),
-      rar3Entry(second, () => streamBytes(21, 22, 23)),
-    ],
-    async () => {
-      fallbackCalls += 1;
-      return { filename: first.name, fileData: Uint8Array.of(11, 12, 13) };
-    },
-  );
-
-  const messages = await runWorker(bytes, backend);
-
-  assert.equal(messages.at(-1).type, 'error');
-  assert.match(messages.at(-1).msg, /switched to PPMd/);
-  assert.equal(fallbackCalls, 0);
-});
+}
