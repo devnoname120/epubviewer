@@ -1,3 +1,10 @@
+## 1.9.18 - 2026-10-24
+
+### Fixed
+
+- Open valid independently compressed RAR3/CBR entries when the primary decoder stops early with a decompressed-size mismatch, using the existing bounded libarchive fallback (#57).
+- Preserve exact output-size and CRC checks, archive resource limits, and solid-run dependency safeguards during recovery.
+
 ## 1.9.17 - 2026-10-22
 
 ### Fixed
