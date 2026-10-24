@@ -61,6 +61,7 @@ const RAR3_VERSION = 0x0800
 const RAR3_MODE_SWITCH_ERROR = 'RAR3 in-stream table refresh switched to PPMd unexpectedly'
 const RAR3_PPMD_INVALID_SYMBOL_ERROR = 'RAR3 PPMd: decoder reported invalid symbol'
 const RAR3_HUFFMAN_TABLE_ERROR = 'over-subscribed RAR3 Huffman table'
+const RAR3_SIZE_MISMATCH_ERROR = /^RAR3 decompressed size mismatch: got (\d+) bytes, expected (\d+)$/
 
 function send(message: WorkerMessage, transfer: Transferable[] = []): void {
 	workerScope.postMessage(message, transfer)
@@ -185,8 +186,12 @@ function hasDependentRar3SolidEntry(blocks: Rar3FileBlock[], index: number): boo
 function canUseRar3Fallback(error: unknown, blocks: Rar3FileBlock[], index: number): boolean {
 	const block = blocks[index]
 	const message = error instanceof Error ? error.message : ''
+	const sizeMismatch = RAR3_SIZE_MISMATCH_ERROR.exec(message)
+	const shortOutput = sizeMismatch !== null
+		&& Number(sizeMismatch[1]) < block.unpackedSize
+		&& Number(sizeMismatch[2]) === block.unpackedSize
 	return error instanceof Error
-		&& (message === RAR3_MODE_SWITCH_ERROR || message === RAR3_PPMD_INVALID_SYMBOL_ERROR || message === RAR3_HUFFMAN_TABLE_ERROR)
+		&& (message === RAR3_MODE_SWITCH_ERROR || message === RAR3_PPMD_INVALID_SYMBOL_ERROR || message === RAR3_HUFFMAN_TABLE_ERROR || shortOutput)
 		&& block.method !== RAR3_STORED
 		&& (block.fileFlags & RAR3_SOLID) === 0
 		&& !hasDependentRar3SolidEntry(blocks, index)

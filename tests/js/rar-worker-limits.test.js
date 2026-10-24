@@ -10,6 +10,8 @@ import '../../js/reader-limits.js';
 
 const RAR3_MODE_SWITCH_ERROR = 'RAR3 in-stream table refresh switched to PPMd unexpectedly';
 const RAR3_HUFFMAN_TABLE_ERROR = 'over-subscribed RAR3 Huffman table';
+const RAR3_SIZE_MISMATCH_ERROR = 'RAR3 decompressed size mismatch: got 2 bytes, expected 3';
+const RAR3_FALLBACK_ERRORS = [RAR3_MODE_SWITCH_ERROR, RAR3_HUFFMAN_TABLE_ERROR, RAR3_SIZE_MISMATCH_ERROR];
 
 const workerSource = ts
   .transpileModule(fs.readFileSync(new URL('../../src/rarWorker.ts', import.meta.url), 'utf8'), {
@@ -270,6 +272,42 @@ test('RAR worker opens large URL inputs through the bounded range reader', async
   assert.equal(opened.options.maxArchiveBytes, globalThis.ReaderLimits.policy.rarArchiveBytes);
 });
 
+test('RAR worker size-mismatch recovery decodes the owned fixture with real libarchive', {
+  skip: Number.parseInt(process.versions.node, 10) < 24,
+}, async () => {
+  const backend = await import('@mary/rar');
+  const wasmBinary = fs.readFileSync(new URL('../../src/vendor/libarchive/comic_archive.wasm', import.meta.url));
+  const decoder = createRar3LibarchiveDecoder(async () => createComicArchive({ wasmBinary }));
+  const data = fs.readFileSync(new URL('../fixtures/rar/comic-ppm-rar4.rar', import.meta.url));
+  const messages = await runWorker(data, {
+    ...backend,
+    unrar3: async function* (source) {
+      for await (const entry of backend.unrar3(source)) {
+        yield {
+          compressedSize: entry.compressedSize,
+          filename: entry.filename,
+          isDirectory: entry.isDirectory,
+          isSymlink: entry.isSymlink,
+          size: entry.size,
+          get body() {
+            return failingStream(`RAR3 decompressed size mismatch: got ${entry.size - 1} bytes, expected ${entry.size}`);
+          },
+        };
+      }
+    },
+    getRar3FallbackDecoder: () => decoder,
+  });
+
+  assert.equal(messages.at(-1).type, 'finish', messages.at(-1).msg);
+  assert.equal(messages.at(-1).metadata.backend, '@mary/rar + libarchive');
+  const page = messages.find((message) => message.type === 'extract').unarchivedFile;
+  assert.equal(page.filename, 'page-01.PNG');
+  assert.equal(
+    createHash('sha256').update(page.fileData).digest('hex'),
+    '146775fc99a489c2242ebe0e2bc2bde5681e0ea9ac552a83a1f351a09a6a77f1',
+  );
+});
+
 test('archive worker extracts large ZIP URL inputs through bounded ranges', async () => {
   const source = readerFromBytes(Uint8Array.of(0x50, 0x4b));
   let opened = null;
@@ -341,7 +379,7 @@ test('RAR worker keeps ordinary compressed RAR3 entries on the primary decoder',
   );
 });
 
-for (const decoderError of [RAR3_MODE_SWITCH_ERROR, RAR3_HUFFMAN_TABLE_ERROR]) {
+for (const decoderError of RAR3_FALLBACK_ERRORS) {
   test(`RAR worker falls back for the independent RAR3 decoder failure: ${decoderError}`, async () => {
     const bytes = Uint8Array.from([0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     const block = rar3Block();
@@ -418,7 +456,7 @@ test('RAR worker does not hide unrelated PPMd failures behind the fallback', asy
   assert.equal(fallbackCalls, 0);
 });
 
-for (const decoderError of [RAR3_MODE_SWITCH_ERROR, RAR3_HUFFMAN_TABLE_ERROR]) {
+for (const decoderError of RAR3_FALLBACK_ERRORS) {
   test(`RAR worker preserves solid-run dependencies after: ${decoderError}`, async () => {
     const bytes = Uint8Array.from([
       0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
@@ -448,3 +486,61 @@ for (const decoderError of [RAR3_MODE_SWITCH_ERROR, RAR3_HUFFMAN_TABLE_ERROR]) {
     assert.equal(fallbackCalls, 0);
   });
 }
+
+for (const decoderError of [
+  'RAR3 decompressed size mismatch: got 2 bytes, expected 4',
+  'RAR3 decompressed size mismatch: got 3 bytes, expected 3',
+  'RAR3 decompressed size mismatch: got 4 bytes, expected 3',
+  'RAR3 decompressed size mismatch',
+]) {
+  test(`RAR worker does not broaden size-mismatch fallback eligibility: ${decoderError}`, async () => {
+    const bytes = Uint8Array.from([0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    const block = rar3Block();
+    let fallbackCalls = 0;
+    const backend = rar3Backend(bytes, [block], [rar3Entry(block, () => failingStream(decoderError))], async () => {
+      fallbackCalls += 1;
+      return { filename: block.name, fileData: Uint8Array.of(11, 12, 13) };
+    });
+
+    const messages = await runWorker(bytes, backend);
+
+    assert.equal(messages.at(-1).type, 'error');
+    assert.equal(messages.at(-1).msg, decoderError);
+    assert.equal(fallbackCalls, 0);
+  });
+}
+
+test('RAR worker does not use the size-mismatch fallback for stored or solid entries', async () => {
+  for (const overrides of [{ method: 0x30 }, { fileFlags: 0x0010 }]) {
+    const bytes = Uint8Array.from([0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    const block = rar3Block(overrides);
+    let fallbackCalls = 0;
+    const backend = rar3Backend(bytes, [block], [rar3Entry(block, () => failingStream(RAR3_SIZE_MISMATCH_ERROR))], async () => {
+      fallbackCalls += 1;
+      return { filename: block.name, fileData: Uint8Array.of(11, 12, 13) };
+    });
+
+    const messages = await runWorker(bytes, backend);
+
+    assert.equal(messages.at(-1).type, 'error');
+    assert.equal(messages.at(-1).msg, RAR3_SIZE_MISMATCH_ERROR);
+    assert.equal(fallbackCalls, 0);
+  }
+});
+
+test('RAR worker propagates fallback integrity failures after a primary size mismatch', async () => {
+  const bytes = Uint8Array.from([0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  const block = rar3Block();
+  let fallbackCalls = 0;
+  const backend = rar3Backend(bytes, [block], [rar3Entry(block, () => failingStream(RAR3_SIZE_MISMATCH_ERROR))], async () => {
+    fallbackCalls += 1;
+    throw new Error('File CRC error');
+  });
+
+  const messages = await runWorker(bytes, backend);
+
+  assert.equal(messages.at(-1).type, 'error');
+  assert.equal(messages.at(-1).msg, 'File CRC error');
+  assert.equal(fallbackCalls, 1);
+  assert.equal(messages.some((message) => message.type === 'extract'), false);
+});
