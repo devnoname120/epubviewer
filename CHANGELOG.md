@@ -1,3 +1,11 @@
+## 1.9.19 - 2026-10-28
+
+### Fixed
+
+- Sort comic pages naturally by filename while keeping their encoded blobs and validated image dimensions aligned, so reading and sidebar numbering no longer follow arbitrary archive storage order (#58).
+- Load visible sidebar thumbnails independently of the nearby full-page cache; make every sidebar page navigable, release offscreen previews, and keep temporary decoding within the retained-image budget.
+- Keep the desktop toolbar available on hover after closing the sidebar instead of hiding it with `display: none`.
+
 ## 1.9.18 - 2026-10-24
 
 ### Fixed
