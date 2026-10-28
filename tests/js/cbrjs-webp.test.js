@@ -226,6 +226,7 @@ function createHarness(entries, options = {}) {
     const book = {
       drawCalls: 0,
       pages: Array.from(pages),
+      blobs: Array.from(pages.blobs || []),
       pixels: Array.from(pages.pixels || []),
       destroy() {},
       draw() {
@@ -270,6 +271,159 @@ test('passes validated source pixel counts into the comic cache', async () => {
   await result.ready;
 
   assert.deepEqual(result.books[0].pixels, [29_862_500]);
+});
+
+for (const format of ['cbr', 'cbz']) {
+  test(`naturally orders ${format} pages with their blobs and validated dimensions`, async () => {
+    const page = number => {
+      const bytes = validImage('page.jpg');
+      bytes.writeUInt16BE(number, 9);
+      return { filename: `comic/Page ${number}.jpg`, bytes };
+    };
+    const result = createHarness([page(25), page(1), page(10), page(2)], { format });
+    await result.ready;
+
+    assert.deepEqual(result.books[0].pages, ['blob:2', 'blob:4', 'blob:3', 'blob:1']);
+    assert.deepEqual(result.books[0].pixels, [1, 2, 10, 25]);
+    assert.deepEqual(result.books[0].blobs, [result.blobs[1], result.blobs[3], result.blobs[2], result.blobs[0]]);
+  });
+}
+
+test('closing the comic sidebar leaves the toolbar available for hover', async () => {
+  const { context, OriginalComicBook } = createHarness([]);
+  context.document.createElement = () => ({ getContext: () => ({}) });
+  context.document.getElementById = () => ({ children: [] });
+  const book = new OriginalComicBook('viewer', [], {});
+  let toggles = 0;
+  book.toggleToolbar = () => { toggles++; };
+  book.hideControl = () => {};
+  book.closeSidebar();
+  assert.equal(toggles, 0, 'sidebar close must not toggle the toolbar to display:none');
+  book.isMobile = true;
+  book.closeSidebar();
+  assert.equal(toggles, 1, 'preserve the existing mobile touch-to-toggle behavior');
+});
+
+async function createThumbnailHarness({ highResolution = false, retainPages = false, deferSources = false } = {}) {
+  const harness = createHarness([]);
+  await harness.ready;
+  const { context, OriginalComicBook } = harness;
+  const viewport = {
+    scrollTop: 0,
+    listeners: {},
+    addEventListener(event, callback) { this.listeners[event] = callback; },
+    removeEventListener(event) { delete this.listeners[event]; },
+    getBoundingClientRect: () => ({ top: 0, bottom: 300, height: 300 }),
+  };
+  const toc = { children: [], parentNode: viewport, appendChild(item) { item.parentNode = this; this.children.push(item); } };
+  const images = [];
+  context.Image = class {
+    constructor() { this.value = ''; images.push(this); }
+    set src(value) {
+      this.value = value;
+      const size = /^data:(\d+)x(\d+)$/.exec(value);
+      this.width = this.naturalWidth = size ? Number(size[1]) : highResolution ? 4778 : 100;
+      this.height = this.naturalHeight = size ? Number(size[2]) : highResolution ? 6250 : 100;
+      if (!deferSources || !value.startsWith('blob:')) queueMicrotask(() => value ? this.onload?.() : this.onerror?.());
+    }
+    get src() { return this.value; }
+    removeAttribute() { this.value = ''; queueMicrotask(() => this.onerror?.()); }
+  };
+  context.document.createElement = type => type === 'canvas' ? {
+    getContext: () => ({ fillRect() {}, clearRect() {}, drawImage() {} }),
+    toDataURL() { return `data:${this.width}x${this.height}`; },
+  } : {
+    children: [],
+    listeners: {},
+    appendChild(child) { child.parentNode = this; this.children.push(child); this.firstChild = this.children[0]; },
+    replaceChild(child, previous) {
+      this.children[this.children.indexOf(previous)] = child;
+      child.parentNode = this;
+      this.firstChild = this.children[0];
+    },
+    setAttribute(name, value) { this[name] = value; },
+    addEventListener(event, callback) { this.listeners[event] = callback; },
+    getBoundingClientRect() {
+      const top = (Number(this.id.slice(5)) - 1) * 200 - viewport.scrollTop;
+      return { top, bottom: top + 200, height: 200 };
+    },
+  };
+  context.document.getElementById = id => id === 'toc' ? toc : toc.children.find(item => item.id === id);
+  context.removeEventListener = () => {};
+  context.jQuery.each = () => {};
+  const sources = Array.from({ length: 47 }, (_, index) => `blob:page-${index}`);
+  sources.blobs = sources.map(() => new Blob([validImage('page.jpg')]));
+  sources.pixels = sources.map(() => highResolution ? 29_862_500 : 10000);
+  const errors = [];
+  const navigation = [];
+  const book = new OriginalComicBook('viewer', sources, { displayMode: 'double', thumbnails: true, error: message => errors.push(message) });
+  book.showControl = book.hideControl = book.scrollToc = () => {};
+  book.drawPage = number => { navigation.push(number); };
+  book.tocCreate(sources.length);
+  if (retainPages) {
+    book.preload();
+    await new Promise(resolve => setImmediate(resolve));
+  }
+  return { ...harness, book, toc, viewport, sources, images, errors, navigation };
+}
+
+test('sidebar thumbnails load beyond the page cache and release offscreen previews', async () => {
+  const { book, toc, viewport, images, errors, navigation } = await createThumbnailHarness();
+  book.openSidebar();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(toc.children[0].firstChild.naturalWidth, 200);
+  assert.equal(toc.children[1].firstChild.naturalWidth, 200);
+  assert.equal(toc.children[9].firstChild.naturalWidth, 5);
+
+  viewport.scrollTop = 1800;
+  viewport.listeners.scroll();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(toc.children[9].firstChild.naturalWidth, 200);
+  assert.equal(toc.children[10].firstChild.naturalWidth, 200);
+  assert.equal(toc.children[0].firstChild.naturalWidth, 5);
+  assert.equal(images.filter(image => image.src.startsWith('blob:')).length, 0, 'temporary full-size thumbnail sources must be released');
+
+  // The click handler was bound once, even before its thumbnail was decoded.
+  assert.equal(typeof toc.children[46].listeners.click, 'function');
+  toc.children[46].listeners.click();
+  assert.deepEqual(navigation, [47]);
+  book.closeSidebar();
+  assert.equal(toc.children[9].firstChild.naturalWidth, 5);
+  assert.deepEqual(errors, []);
+  book.controls = {};
+  book.destroy();
+  assert.equal(viewport.listeners.scroll, undefined);
+});
+
+test('closing the sidebar cancels a pending thumbnail decode and releases its URL', async () => {
+  const { book, viewport, images, revoked, errors } = await createThumbnailHarness({ deferSources: true });
+  book.openSidebar();
+  const pending = images.find(image => image.src.startsWith('blob:'));
+  assert.ok(pending);
+  const url = pending.src;
+  book.closeSidebar();
+  assert.equal(pending.src, '');
+  assert.equal(pending.onload, null);
+  assert.equal(pending.onerror, null);
+  assert.ok(revoked.includes(url));
+  assert.deepEqual(errors, []);
+  book.controls = {};
+  book.destroy();
+  assert.equal(viewport.listeners.scroll, undefined);
+});
+
+test('thumbnail decoding cannot exceed the retained image budget beside a high-resolution spread', async () => {
+  const { book, viewport, images, errors } = await createThumbnailHarness({ highResolution: true, retainPages: true });
+  const sources = () => images.filter(image => image.src.startsWith('blob:')).length;
+  assert.equal(sources(), 2);
+  viewport.scrollTop = 1800;
+  book.openSidebar();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(sources(), 2, 'a third 30-megapixel source must not be decoded for the sidebar');
+  assert.deepEqual(errors, []);
+  book.closeSidebar();
+  book.controls = {};
+  book.destroy();
 });
 
 test('reports an archive with no supported image pages', async () => {

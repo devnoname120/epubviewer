@@ -107,6 +107,7 @@ CBRJS.Reader = function(bookPath, _options) {
 
 	function extractImages(url, opts) {
         var images = [], ua, done = false;
+		var imageFiles = [];
 	        var controller = new AbortController();
 	        var filename = decodeURIComponent(url.split('/').pop());
 	        var format = reader.options.session.format || '';
@@ -124,6 +125,7 @@ CBRJS.Reader = function(bookPath, _options) {
             images.blobs.length = 0;
 			images.pixels.length = 0;
             images.length = 0;
+			imageFiles.length = 0;
         }
 
         function failArchive(error) {
@@ -182,6 +184,7 @@ CBRJS.Reader = function(bookPath, _options) {
                     images.push(imageUrl);
                     images.blobs.push(blob);
 					images.pixels.push(details.pixels);
+					imageFiles.push({ name: event.unarchivedFile.filename, url: imageUrl, blob: blob, pixels: details.pixels });
                     options.extract(imageUrl, blob);
                 } catch (error) { failArchive(error); }
             });
@@ -200,6 +203,14 @@ CBRJS.Reader = function(bookPath, _options) {
                     options.error('No supported images were found in this comic archive.');
                     return;
                 }
+				var compareNames = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' }).compare;
+				imageFiles.sort(function (left, right) { return compareNames(left.name, right.name); });
+				imageFiles.forEach(function (file, index) {
+					images[index] = file.url;
+					images.blobs[index] = file.blob;
+					images.pixels[index] = file.pixels;
+				});
+				imageFiles.length = 0;
                 options.finish(images);
             });
             ua.addEventListener(eventTypes.ERROR, function (event) { failArchive(event.msg); });
@@ -457,6 +468,14 @@ ComicBook = (function ($) {
         var tctx = tcv.getContext('2d'); // context used for thumbnailer
         var toc = document.getElementById('toc'); // context used for thumbnailer
         var loaded = []; // the images that have been loaded so far
+		var sidebarOpen = false;
+		var thumbnailWanted = [];
+		var thumbnailPixels = [];
+		var thumbnailImage = null;
+		var thumbnailUrl = null;
+		var thumbnailPendingPixels = 0;
+		var thumbnailTimer = null;
+		var thumbnailPlaceholder = null;
         var scale = 1; // page zoom scale, 1 = 100%
         var is_double_page_spread = false;
         var controlsRendered = false; // have the user controls been inserted into the dom yet?
@@ -471,6 +490,93 @@ ComicBook = (function ($) {
             image.removeAttribute('src');
         }
 
+		function thumbnailPixelCount() {
+			return thumbnailPixels.reduce(function (total, pixels) { return total + pixels; }, thumbnailPendingPixels);
+		}
+
+		function cancelThumbnailDecode() {
+			clearTimeout(thumbnailTimer);
+			if (thumbnailImage) releaseImage(thumbnailImage);
+			if (thumbnailUrl) window.URL.revokeObjectURL(thumbnailUrl);
+			thumbnailImage = thumbnailUrl = null;
+			thumbnailPendingPixels = 0;
+		}
+
+		function clearThumbnail(index) {
+			if (!thumbnailPixels[index]) return;
+			delete thumbnailPixels[index];
+			var image = toc.children[index].firstChild;
+			releaseImage(image);
+			if (!destroyed && thumbnailPlaceholder) image.src = thumbnailPlaceholder;
+		}
+
+		function clearThumbnails() {
+			cancelThumbnailDecode();
+			thumbnailPixels.forEach(function (_pixels, index) { clearThumbnail(index); });
+			thumbnailWanted = [];
+		}
+
+		function retainedPixels() {
+			return pages.reduce(function (total, image) { return total + decodedPixelCount(image); }, thumbnailPixelCount());
+		}
+
+		function loadVisibleThumbnail() {
+			// Preview one visible page at a time without extending the full-page
+			// preload window. Reserve its source pixels until decoding is released.
+			if (destroyed || !sidebarOpen || !options.thumbnails || preloadRunning || thumbnailImage) return;
+			for (var index = 0; index < no_pages; index++) {
+				if (!thumbnailWanted[index] || thumbnailPixels[index]) continue;
+				if (pages[index]) {
+					self.tocInsert(pages[index], index, true);
+					continue;
+				}
+				var expectedPixels = sourcePixels && sourcePixels[index];
+				if (!blobs || !Number.isSafeInteger(expectedPixels) || expectedPixels < 1 ||
+					retainedPixels() + expectedPixels + 65536 > ReaderLimits.policy.totalImagePixels) continue;
+				thumbnailPendingPixels = expectedPixels + 65536;
+				var image = thumbnailImage = new Image();
+				thumbnailUrl = window.URL.createObjectURL(blobs[index]);
+				(function (pageIndex, expected, pending) {
+					function finish() {
+						if (thumbnailImage !== pending) return;
+						cancelThumbnailDecode();
+						loadVisibleThumbnail();
+					}
+					pending.onload = function () {
+						if (destroyed || thumbnailImage !== pending) return;
+						try {
+							var pixels = ReaderLimits.dimensions(pending.naturalWidth || pending.width, pending.naturalHeight || pending.height);
+							ReaderLimits.assert(pixels <= expected, 'Comic thumbnail dimensions exceed the validated header.');
+							self.tocInsert(pending, pageIndex, true);
+						} catch (_error) { thumbnailWanted[pageIndex] = false; }
+						finish();
+					};
+					pending.onerror = function () { thumbnailWanted[pageIndex] = false; finish(); };
+					thumbnailTimer = setTimeout(pending.onerror, ReaderLimits.policy.workMilliseconds);
+				})(index, expectedPixels, image);
+				image.src = thumbnailUrl;
+				return;
+			}
+		}
+
+		function refreshThumbnails() {
+			if (destroyed || !sidebarOpen || !options.thumbnails || !toc || !toc.parentNode) {
+				clearThumbnails();
+				return;
+			}
+			var viewport = toc.parentNode.getBoundingClientRect();
+			thumbnailWanted = [];
+			for (var index = 0; index < no_pages; index++) {
+				var item = toc.children[index].getBoundingClientRect();
+				if (viewport.height > 0 && item.bottom > viewport.top && item.top < viewport.bottom) thumbnailWanted[index] = true;
+			}
+			thumbnailPixels.forEach(function (_pixels, index) {
+				if (!thumbnailWanted[index]) clearThumbnail(index);
+			});
+			if (thumbnailImage) cancelThumbnailDecode();
+			loadVisibleThumbnail();
+		}
+
 		function releasePageSource(index) {
 			if (blobs && srcs[index]) {
 				window.URL.revokeObjectURL(srcs[index]);
@@ -478,14 +584,13 @@ ComicBook = (function ($) {
 			}
 		}
 
-		function evictPage(index, clearThumbnail) {
+		function evictPage(index) {
 			if (pages[index]) {
 				releaseImage(pages[index]);
 				delete pages[index];
 				loaded = loaded.filter(function (value) { return value !== index; });
 			}
 			releasePageSource(index);
-			if (clearThumbnail && toc.children[index]) releaseImage(toc.children[index].firstChild);
 		}
 
 		function requiredPageEnd() {
@@ -513,7 +618,8 @@ ComicBook = (function ($) {
 		}
 
 		function fitImageBudget(index, pixels) {
-			var total = pixels;
+			var extraPixels = thumbnailPixelCount();
+			var total = pixels + extraPixels;
 			var candidates = [];
 			pages.forEach(function (page, cachedIndex) {
 				var cachedPixels = decodedPixelCount(page);
@@ -526,6 +632,10 @@ ComicBook = (function ($) {
 					});
 				}
 			});
+			if (total > ReaderLimits.policy.totalImagePixels && extraPixels > 0) {
+				clearThumbnails();
+				total -= extraPixels;
+			}
 			if (total <= ReaderLimits.policy.totalImagePixels) return true;
 			if (!isRequiredPage(index)) {
 				candidates.push({ distance: pageDistance(index), incoming: true, pixels: pixels });
@@ -543,7 +653,7 @@ ComicBook = (function ($) {
 				var candidate = candidates[candidateIndex];
 				if (candidate.incoming) return false;
 				total -= candidate.pixels;
-				evictPage(candidate.index, false);
+				evictPage(candidate.index);
 			}
 			return total <= ReaderLimits.policy.totalImagePixels;
 		}
@@ -765,6 +875,7 @@ ComicBook = (function ($) {
             tcv.height = Math.max(1, Math.floor(thumbHeight * ratio));
             tctx.drawImage(image, 0, 0, tcv.width, tcv.height);
             thumb.src = tcv.toDataURL();
+			thumb._readerThumbnailPixels = tcv.width * tcv.height;
             tctx.clearRect(0, 0, tcv.width, tcv.height);
 
             return thumb;
@@ -781,6 +892,7 @@ ComicBook = (function ($) {
             tctx.fillStyle = "rgba(200, 200, 200, 0)";
             tctx.fillRect(0, 0, tcv.width, tcv.height);
             var imgsrc = tcv.toDataURL();
+			thumbnailPlaceholder = imgsrc;
 
             for(var i = 0; i < no_pages; i++) {
                 var item = document.createElement('li');
@@ -792,39 +904,32 @@ ComicBook = (function ($) {
                 item.appendChild(placeholder);
                 item.appendChild(label);
                 toc.appendChild(item);
+				item.addEventListener('click', self.drawPage.bind(self, i + 1, true));
             }
+			toc.parentNode.addEventListener('scroll', refreshThumbnails);
         };
 
         /**
          * Insert thumbnail into TOC
          */
         ComicBook.prototype.tocInsert = function (image, page, replace) {
+            if (replace !== true || !thumbnailWanted[page] || thumbnailPixels[page]) return;
+			var extraPixels = image === thumbnailImage ? 0 : 65536;
+			if (retainedPixels() + extraPixels > ReaderLimits.policy.totalImagePixels) return;
             var placeholder = toc.children[page].firstChild;
-            if (replace === true) {
-                placeholder.parentNode.replaceChild(
-                    self.getThumb(image),
-                    placeholder
-                );
-            }
-
-            toc.children[page].addEventListener('click', function (e) {
-                self.drawPage(page + 1, true);
-            });
+			var thumb = self.getThumb(image);
+			thumbnailPixels[page] = thumb._readerThumbnailPixels;
+			placeholder.parentNode.replaceChild(thumb, placeholder);
         };
 
         /**
          * Populate TOC on demand
          */
         ComicBook.prototype.tocPopulate = function () {
-            var i = 0;
-            while (i < srcs.length) {
-                if (pages[i]) self.tocInsert(pages[i], i, true);
-                i++;
-            }
-
             // set, but don't save for future sessions
             options.thumbnails = true;
             $('#toc-populate').removeClass('open');
+			refreshThumbnails();
         };
 
         /**
@@ -905,6 +1010,7 @@ ComicBook = (function ($) {
          */
         ComicBook.prototype.preload = function () {
             if (destroyed || preloadRunning) return;
+			cancelThumbnailDecode();
 			var preloadPage = options.currentPage;
 			var preloadMode = options.displayMode;
             var start = Math.max(0, options.currentPage - 1);
@@ -912,7 +1018,7 @@ ComicBook = (function ($) {
             var queue = [];
             pages.forEach(function (page, index) {
                 if (index < start || index > end) {
-					evictPage(index, true);
+					evictPage(index);
                 }
             });
             // Keep encoded blobs for navigation, but revoke URLs outside the
@@ -925,7 +1031,7 @@ ComicBook = (function ($) {
             });
             for (var index = options.currentPage; index <= end; index++) if (!pages[index]) queue.push(index);
             for (var index = options.currentPage - 1; index >= start; index--) if (!pages[index]) queue.push(index);
-            if (!queue.length) { self.drawPage(); self.hideControl('loadingOverlay'); return; }
+            if (!queue.length) { self.drawPage(); self.hideControl('loadingOverlay'); refreshThumbnails(); return; }
             preloadRunning = true;
             this.showControl('loadingOverlay');
             function next() {
@@ -937,6 +1043,7 @@ ComicBook = (function ($) {
 					} else {
 						self.drawPage();
 						self.hideControl('loadingOverlay');
+						refreshThumbnails();
 					}
                     return;
                 }
@@ -1318,6 +1425,7 @@ ComicBook = (function ($) {
             }
 
             options.session.setDefault("thumbnails", options.thumbnails);
+			refreshThumbnails();
         };
 
         ComicBook.prototype.thumbnailWidth = function() {
@@ -1643,16 +1751,20 @@ ComicBook = (function ($) {
         };
 
         ComicBook.prototype.openSidebar = function () {
+            sidebarOpen = true;
             $('.sidebar').addClass('open');
             $('.toolbar').addClass('open');
             self.showControl('busyOverlay');
             self.scrollToc();
+			refreshThumbnails();
         };
 
         ComicBook.prototype.closeSidebar = function () {
+            sidebarOpen = false;
+			clearThumbnails();
             $('.sidebar').removeClass('open');
             $('.toolbar').removeClass('open');
-            self.toggleToolbar();
+            if (self.isMobile) self.toggleToolbar();
             self.hideControl('busyOverlay');
         };
 
@@ -1695,6 +1807,7 @@ ComicBook = (function ($) {
             if (!options.thumbnails) {
                 $('#toc-populate').addClass('open');
             }
+			refreshThumbnails();
         };
 
         ComicBook.prototype.showBookSettings = function () {
@@ -1712,6 +1825,8 @@ ComicBook = (function ($) {
         ComicBook.prototype.destroy = function () {
 
             destroyed = true;
+			clearThumbnails();
+			if (toc && toc.parentNode) toc.parentNode.removeEventListener('scroll', refreshThumbnails);
 			page_requested = false;
 			page_request_callback = null;
             pages.forEach(releaseImage);
